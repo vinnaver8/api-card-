@@ -49,6 +49,50 @@
             </div>
             </div>
     </div>
+    <script>
+        // In a separate script.js file linked in your HTML
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.querySelector('.friends-opinions-sidebar');
+
+    const opinionsData = [
+        { name: 'John Doe', time: 'Just now', avatar: 'https://via.placeholder.com/40/FF5733/FFFFFF?text=JD' },
+        { name: 'Jane Smith', time: '5 mins ago', avatar: 'https://via.placeholder.com/40/33A2FF/FFFFFF?text=JS' },
+        // ... more opinions
+    ];
+
+    let opinionIndex = 0;
+
+    function addOpinionCard() {
+        if (opinionIndex < opinionsData.length) {
+            const opinion = opinionsData[opinionIndex];
+            const newCard = document.createElement('div');
+            newCard.classList.add('opinion-card');
+            newCard.innerHTML = `
+                <img src="${opinion.avatar}" alt="${opinion.name} Avatar" class="avatar">
+                <div class="opinion-details">
+                    <span class="name">${opinion.name}</span>
+                    <span class="timestamp">${opinion.time}</span>
+                </div>
+            `;
+            sidebar.appendChild(newCard);
+
+            // Apply GSAP animation (requires GSAP library)
+            // gsap.from(newCard, { opacity: 0, y: 50, rotationY: 90, duration: 0.8, ease: "power3.out" });
+
+            opinionIndex++;
+        } else {
+            clearInterval(opinionInterval); // Stop adding cards when all are shown
+        }
+    }
+
+    // Add initial cards
+    addOpinionCard();
+    addOpinionCard(); // Add a couple initially
+
+    // Set interval to add new cards every few seconds
+    const opinionInterval = setInterval(addOpinionCard, 3000); // Add a new card every 3 seconds
+});
+</script>
 </body>
 </html>
 
