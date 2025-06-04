@@ -250,7 +250,7 @@
     ──────────────────────────────────────────────────────────────────────────*/
     .controls {
       position: absolute;
-      top: 100%;
+      bottom: 100%;
       left: 50%;
       transform: translateX(-50%);
       background-color: rgba(0, 0, 0, 0.7);
@@ -301,7 +301,7 @@
                       clip-rule="evenodd"/>
                   </svg>
                 </div>
-                <div class="item__text">jh3yy</div>
+                <div class="item__text">INDOX</div>
               </div>
             </li>
             <li>
@@ -438,14 +438,9 @@
       </div>
     </article>
   </main>
-
-  <!--─────────────────────────────────────────────────────────────────────────
-    JAVASCRIPT: Only used to bind the “3D” checkbox to the --rotate variable.
-  ──────────────────────────────────────────────────────────────────────────-->
-  <script>
+ <script>
     const dimensionCheckbox = document.querySelector("#dimension");
     dimensionCheckbox.addEventListener("change", () => {
-      /* No extra JS needed—CSS :has() handles the 3D transform */
     });
   </script>
 </body>
