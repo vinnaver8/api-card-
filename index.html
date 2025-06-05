@@ -3,264 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Keyboard with Sparkle Animation</title>
+  <title>3D Skewed Box</title>
   <style>
-    /* ---------------------------- */
-    /*   BASIC PAGE RESET/STYLING   */
-    /* ---------------------------- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    /* ------------------------------------- */
+    /*   YOUR ORIGINAL CSS (slightly adapted) */
+    /* ------------------------------------- */
     body {
-      background-color: #0a0a14;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      margin: 0;
       height: 100vh;
-      font-family: Arial, sans-serif;
-    }
-
-    /* ---------------------------- */
-    /*      KEYBOARD CONTAINER      */
-    /* ---------------------------- */
-    .keyboard {
-      display: grid;
-      grid-template-columns: repeat(2, 80px);
-      grid-template-rows: repeat(2, 80px);
-      gap: 12px;
-      perspective: 800px;
-      transform-style: preserve-3d;
-      transition: transform 0.1s ease-out;
-      position: relative;
-      /* we’ll use this to position sparkles absolutely */
-    }
-
-    /* When “active” class is added, we push the whole keyboard down slightly ("punch" effect) */
-    .keyboard.active {
-      transform: translateY(6px) rotateX(5deg);
-    }
-
-    /* ---------------------------- */
-    /*         INDIVIDUAL KEYS      */
-    /* ---------------------------- */
-    .key {
-      width: 80px;
-      height: 80px;
-      border-radius: 8px;
-      background-color: #1b1b1f;
-      color: #fff;
+      background: #01087d;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      font-weight: bold;
+    }
+
+    .box {
       position: relative;
-      cursor: default;
-      user-select: none;
-      /* 3D “lift” effect: */
-      box-shadow:
-        0 6px 0 rgba(0, 0, 0, 0.4),      /* “bottom” face */
-        0 6px 12px rgba(0, 0, 0, 0.5);     /* drop shadow */
-      transition: box-shadow 0.1s ease-out, transform 0.1s ease-out;
+      width: 200px;    /* base width for the “top” face */
+      height: 55px;    /* total height of the “front” face (not the skewed top) */
+      transform-style: preserve-3d;
+      perspective: 800px;
     }
 
-    /* When the key itself is pressed, we push it down a bit more. */
-    .key:active {
-      transform: translateY(4px);
-      box-shadow:
-        0 2px 0 rgba(0, 0, 0, 0.4),
-        0 2px 8px rgba(0, 0, 0, 0.5);
-    }
-
-    /* ---------------------------- */
-    /*      THE “GREEN” KEY         */
-    /* ---------------------------- */
-    .key.green {
-      background-color: #0fcc5b;
-      color: #0a0a14;
-      /* a subtle glow at rest: */
-      box-shadow:
-        0 6px 0 rgba(0, 0, 0, 0.4),
-        0 6px 12px rgba(0, 0, 0, 0.5),
-        0 0 8px rgba(15, 204, 91, 0.6);
-      transition: box-shadow 0.1s ease-out, transform 0.1s ease-out;
-    }
-
-    /* When the “green” key is in active/held state, we boost its glow & brightness: */
-    .keyboard.active .key.green {
-      box-shadow:
-        0 2px 0 rgba(0, 0, 0, 0.4),
-        0 2px 8px rgba(0, 0, 0, 0.5),
-        0 0 20px rgba(15, 204, 91, 0.9),
-        0 0 40px rgba(15, 204, 91, 0.8);
-      transform: translateY(4px);
-    }
-
-    /* ---------------------------- */
-    /*       SPARKLE ELEMENTS       */
-    /* ---------------------------- */
-    /* We'll create 8 tiny “dot” elements (spans) positioned absolutely inside .keyboard. */
-    .sparkle {
+    .side {
+      box-sizing: border-box;
       position: absolute;
-      width: 8px;
-      height: 8px;
-      background-color: #ffffff;
-      border-radius: 50%;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.5);
-      animation: sparkleAnim 1s infinite;
-      animation-play-state: paused;
+      /* we'll override width/height per face */
     }
 
-    /* Define keyframes for “sparkleAnim”: 
-       - Start invisible at center
-       - Fade in quickly
-       - Move outward along a given direction and fade out
-       - Return to center at the end
-    */
-    @keyframes sparkleAnim {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.3);
-      }
-      10% {
-        opacity: 1;
-        transform: translate(var(--dx), var(--dy)) scale(1);
-      }
-      40% {
-        opacity: 0.5;
-        transform: translate(calc(var(--dx) * 0.8), calc(var(--dy) * 0.8)) scale(0.6);
-      }
-      80% {
-        opacity: 0.2;
-        transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) scale(0.4);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.3);
-      }
+    /* Top face (skewed) */
+    .top {
+      width: 200px;
+      height: 40px;             /* thickness of the top plane */
+      background: #51aef9;
+      transform-origin: top left;
+      transform: skew(55deg, -35deg);
+      z-index: 3;
     }
 
-    /* When .keyboard has .active, run the sparkle animations: */
-    .keyboard.active .sparkle {
-      animation-play-state: running;
+    /* Left face (skewed vertically) */
+    .left {
+      width: 57px;              /* the width corresponds roughly to the “depth” of the left face */
+      height: 55px;
+      background: #8ffce7;
+      transform-origin: bottom left;
+      transform: skew(0, 35deg);
+      top: 40px;                /* push it down so it meets the bottom of the “top” face */
+      left: -23px;              /* shift it left so that its left edge is flush */
+      z-index: 2;
     }
 
-    /* We'll assign each sparkle a different direction (dx, dy) and a small delay */
-    .sparkle:nth-child(1) { /* Up */
-      --dx: -50%, -120%;
-      animation-delay: 0s;
-    }
-    .sparkle:nth-child(2) { /* Up-Right */
-      --dx: 50%, -120%;
-      animation-delay: 0.1s;
-    }
-    .sparkle:nth-child(3) { /* Right */
-      --dx: 120%, -50%;
-      animation-delay: 0.2s;
-    }
-    .sparkle:nth-child(4) { /* Down-Right */
-      --dx: 120%, 50%;
-      animation-delay: 0.3s;
-    }
-    .sparkle:nth-child(5) { /* Down */
-      --dx: 50%, 120%;
-      animation-delay: 0.4s;
-    }
-    .sparkle:nth-child(6) { /* Down-Left */
-      --dx: -50%, 120%;
-      animation-delay: 0.5s;
-    }
-    .sparkle:nth-child(7) { /* Left */
-      --dx: -120%, 50%;
-      animation-delay: 0.6s;
-    }
-    .sparkle:nth-child(8) { /* Up-Left */
-      --dx: -120%, -50%;
-      animation-delay: 0.7s;
-    }
-
-    /* Position all sparkles so that their “0,0” (center) is exactly at the green key’s center */
-    .sparkle {
-      /* We will set these manually in JS so that each sparkle’s “top/left” is the green key’s center */
-      top: 0;
-      left: 0;
+    /* Right (front) face, skewed */
+    .right {
+      width: 200px;             /* same base width as “top” */
+      height: 55px;
+      background: #3460f2;
+      transform-origin: bottom left;
+      transform: skew(0, -35deg);
+      top: 40px;                /* align under the “top” face */
+      left: 34px;               /* shift right so it aligns with the right edge of the top */
+      z-index: 1;
     }
   </style>
 </head>
 <body>
 
-  <!-- ========================== -->
-  <!--    KEYBOARD MARKUP HTML   -->
-  <!-- ========================== -->
-  <div class="keyboard" id="keyboard">
-    <div class="key">Ctrl</div>
-    <div class="key">C</div>
-    <div class="key green" id="greenKey"></div>
-    <div class="key">V</div>
+  <div class="box">
+    <!-- Top face -->
+    <div class="side top"></div>
 
-    <!-- Sparkle elements (positioned absolutely by JavaScript) -->
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
-    <span class="sparkle"></span>
+    <!-- Left face -->
+    <div class="side left"></div>
+
+    <!-- Right/front face -->
+    <div class="side right"></div>
   </div>
 
-  <!-- ========================== -->
-  <!--   JAVASCRIPT FOR LOGIC     -->
-  <!-- ========================== -->
-  <script>
-    (function() {
-      const keyboard = document.getElementById('keyboard');
-      const greenKey = document.getElementById('greenKey');
-      const sparkles = document.querySelectorAll('.sparkle');
-
-      // Whenever the user presses (mousedown or touchstart) on the green key:
-      function activateKeyboard() {
-        // 1) Add “active” class to .keyboard
-        keyboard.classList.add('active');
-
-        // 2) Position each sparkle element exactly at the center of the green key:
-        const keyRect = greenKey.getBoundingClientRect();
-        const kbRect = keyboard.getBoundingClientRect();
-
-        // Calculate center of green key relative to the .keyboard container:
-        const centerX = keyRect.left + keyRect.width / 2 - kbRect.left;
-        const centerY = keyRect.top + keyRect.height / 2 - kbRect.top;
-
-        sparkles.forEach(sp => {
-          sp.style.left = centerX + 'px';
-          sp.style.top  = centerY + 'px';
-        });
-      }
-
-      // When the press is released (mouseup, touchend, mouseleave), remove “active”:
-      function deactivateKeyboard() {
-        keyboard.classList.remove('active');
-      }
-
-      // Event listeners:
-      greenKey.addEventListener('mousedown', activateKeyboard);
-      greenKey.addEventListener('touchstart', function(e) {
-        e.preventDefault(); // prevent simultaneous mouse event
-        activateKeyboard();
-      });
-
-      // On “mouseup” anywhere on the document or “touchend”, we deactivate:
-      document.addEventListener('mouseup', deactivateKeyboard);
-      document.addEventListener('mouseleave', deactivateKeyboard);
-      document.addEventListener('touchend', deactivateKeyboard);
-      document.addEventListener('touchcancel', deactivateKeyboard);
-    })();
-  </script>
 </body>
 </html>
