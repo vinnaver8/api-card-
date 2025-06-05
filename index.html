@@ -2,477 +2,265 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D “Ctrl C V” Keypad (Sparkles → Inward)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Keyboard with Sparkle Animation</title>
   <style>
-    /* ── GLOBAL RESET / BOX SIZING ───────────────────────────────────────── */
-    *, *::before, *::after {
-      box-sizing: border-box;
+    /* ---------------------------- */
+    /*   BASIC PAGE RESET/STYLING   */
+    /* ---------------------------- */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
-
-    /* ── COLOR VARIABLES ─────────────────────────────────────────────────── */
-    :root {
-      --key-dark: hsl(0, 0%, 12%);      /* Very dark key surface */
-      --key-light: hsl(0, 0%, 20%);     /* Slightly lighter accent */
-      --glow-color: hsl(160, 97%, 50%); /* Bright green/teal glow */
-      --text-inactive: hsl(0, 0%, 65%); /* Light grey for inactive labels */
-      --text-active: hsl(0, 0%, 90%);   /* Nearly white for active labels */
-      --bg-dark: hsl(260, 6%, 6%);      /* Deep dark background */
-    }
-
-    /* ── BODY STYLING ────────────────────────────────────────────────────── */
     body {
-      background: var(--bg-dark);
+      background-color: #0a0a14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    /* ---------------------------- */
+    /*      KEYBOARD CONTAINER      */
+    /* ---------------------------- */
+    .keyboard {
       display: grid;
-      place-items: center;
-      min-height: 100vh;
-      font-family: system-ui, sans-serif;
-      overflow: hidden; /* Hide overflow, no scrollbars */
-    }
-
-    /* ── KEYPAD CONTAINER (3D PERSPECTIVE + ROW) ───────────────────────── */
-    .keypad-container {
-      display: flex;
-      gap: 1em;
-      padding: 2em;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 1em;
-      box-shadow: 
-        0 0.5em 1.5em rgba(0, 0, 0, 0.8),
-        inset 0 0 1em rgba(0,0,0,0.5);
-      /* 3D tilt: perspective + rotate on X & Y */
-      transform: perspective(80em) rotateX(12deg) rotateY(-10deg) rotateZ(5deg);
-      transition: transform 0.25s;
-    }
-
-    /* ── INDIVIDUAL KEY CONTAINERS ───────────────────────────────────────── */
-    .sparkle-button {
-      --active: 0;           /* 0 = not pressed, 1 = pressed */
-      --play-state: paused;  /* controls particle animation */
-      position: relative;
-      width: 6em;            /* base width for keys (you can tweak) */
-      height: 6em;           /* base height to make them square */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    /* Make the middle “C” key slightly bigger */
-    .sparkle-button#c-sparkle-button {
-      width: 7.5em;
-      height: 7.5em;
-    }
-
-    /* ── BUTTON (THE KEY “CAP”) ───────────────────────────────────────────── */
-    .sparkle-button button {
-      --cut: 0.05em; /* border inset for spark mask */
-      --bg-base: var(--key-dark);
-      --bg-active-light: hsl(160 97% 40%);
-      --bg-active-dark: hsl(160 97% 30%);
-
-      background: 
-        radial-gradient(
-          40% 50% at center 100%, 
-          var(--bg-active-light) / var(--active),
-          transparent
-        ),
-        radial-gradient(
-          80% 100% at center 120%, 
-          var(--bg-active-dark) / var(--active),
-          transparent
-        ),
-        /* Base color darkens/brights slightly when active */
-        hsl(0 0% calc((var(--active) * 10%) + 12%));
-
-      font-size: 1.75rem;
-      font-weight: 500;
-      border: none;
-      cursor: pointer;
-      padding: 0.75em 1.25em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25em;
-      white-space: nowrap;
-      border-radius: 0.75em;
-      position: relative;
-      width: 100%;
-      height: 100%;
-
-      /* 3D tilt on each key individually */
-      transform: perspective(50em) rotateX(8deg) rotateY(-5deg) translateZ(0);
-      transform-origin: center center;
-
-      box-shadow:
-        /* Outer glow, only visible when --active=1 */
-        0 0 calc(var(--active)*4em) calc(var(--active)*2em) var(--glow-color),
-        /* Inset highlights/shadows */
-        inset 0 0.08em 0 0 hsl(0 0% 30%),
-        inset 0 -0.08em 0 0 hsl(0 0% 5%),
-        inset 0.05em 0 0 0 hsl(0 0% 15%),
-        inset -0.05em 0 0 0 hsl(0 0% 15%),
-        /* Subtle projection shadow */
-        0 0.3em 0.6em rgba(0,0,0,0.7);
-
-      transition: box-shadow 0.15s, transform 0.15s, background 0.15s;
+      grid-template-columns: repeat(2, 80px);
+      grid-template-rows: repeat(2, 80px);
+      gap: 12px;
+      perspective: 800px;
       transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+      position: relative;
+      /* we’ll use this to position sparkles absolutely */
     }
 
-    /* ── PRESSED STATE (DEPTH + SHRINK) ──────────────────────────────────── */
-    .sparkle-button button.button-pressed {
-      transform: perspective(50em) rotateX(8deg) rotateY(-5deg) translateZ(-0.2em);
+    /* When “active” class is added, we push the whole keyboard down slightly ("punch" effect) */
+    .keyboard.active {
+      transform: translateY(6px) rotateX(5deg);
+    }
+
+    /* ---------------------------- */
+    /*         INDIVIDUAL KEYS      */
+    /* ---------------------------- */
+    .key {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      background-color: #1b1b1f;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      position: relative;
+      cursor: default;
+      user-select: none;
+      /* 3D “lift” effect: */
       box-shadow:
-        0 0 calc(var(--active)*2em) calc(var(--active)*1em) var(--glow-color),
-        inset 0 0.1em 0 0 hsl(0 0% 20%),
-        inset 0 -0.1em 0 0 hsl(0 0% 0%),
-        inset 0.05em 0 0 0 hsl(0 0% 10%),
-        inset -0.05em 0 0 0 hsl(0 0% 10%),
-        0 0.1em 0.2em rgba(0, 0, 0, 0.8);
-      scale: 0.97; /* Slight shrink on press */
+        0 6px 0 rgba(0, 0, 0, 0.4),      /* “bottom” face */
+        0 6px 12px rgba(0, 0, 0, 0.5);     /* drop shadow */
+      transition: box-shadow 0.1s ease-out, transform 0.1s ease-out;
     }
 
-    /* ── OUTER GLOW BORDER (Pseudo-element) ─────────────────────────────── */
-    .sparkle-button button::before {
-      content: "";
+    /* When the key itself is pressed, we push it down a bit more. */
+    .key:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ---------------------------- */
+    /*      THE “GREEN” KEY         */
+    /* ---------------------------- */
+    .key.green {
+      background-color: #0fcc5b;
+      color: #0a0a14;
+      /* a subtle glow at rest: */
+      box-shadow:
+        0 6px 0 rgba(0, 0, 0, 0.4),
+        0 6px 12px rgba(0, 0, 0, 0.5),
+        0 0 8px rgba(15, 204, 91, 0.6);
+      transition: box-shadow 0.1s ease-out, transform 0.1s ease-out;
+    }
+
+    /* When the “green” key is in active/held state, we boost its glow & brightness: */
+    .keyboard.active .key.green {
+      box-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(15, 204, 91, 0.9),
+        0 0 40px rgba(15, 204, 91, 0.8);
+      transform: translateY(4px);
+    }
+
+    /* ---------------------------- */
+    /*       SPARKLE ELEMENTS       */
+    /* ---------------------------- */
+    /* We'll create 8 tiny “dot” elements (spans) positioned absolutely inside .keyboard. */
+    .sparkle {
       position: absolute;
-      inset: -0.1em;
-      z-index: -1;
-      border: 0.1em solid var(--glow-color);
-      border-radius: 0.85em;
-      opacity: calc(var(--active) * 0.7);
-      transition: opacity 0.25s;
+      width: 8px;
+      height: 8px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.5);
+      animation: sparkleAnim 1s infinite;
+      animation-play-state: paused;
     }
 
-    /* ── SPARK ICON (FOR “C” KEY) ───────────────────────────────────────── */
-    .sparkle-button#c-sparkle-button button .sparkle {
-      inline-size: 1.25em;
-      translate: -25% -5%;
-      filter: drop-shadow(0 0 5px var(--glow-color));
-      /* Only show on active = 1 */
-      opacity: var(--active);
-      transition: opacity 0.25s;
-    }
-
-    /* ── TEXT INSIDE KEYS ───────────────────────────────────────────────── */
-    .sparkle-button button .text {
-      letter-spacing: 0.01ch;
-      translate: 2% -6%;
-      background: linear-gradient(
-        90deg,
-        hsl(0 0% calc((var(--active) * 35%) + 65%)),
-        hsl(0 0% calc((var(--active) * 60%) + 26%))
-      );
-      -webkit-background-clip: text;
-      color: transparent;
-      transition: background 0.25s;
-    }
-
-    /* Inactive keys use a solid grey text */
-    .sparkle-button:not(.active) .text {
-      background: none;
-      color: var(--text-inactive);
-      transition: color 0.25s;
-    }
-
-    /* ── SPARKLE SVG PATHS (C KEY ICON) ────────────────────────────────── */
-    .sparkle path {
-      color: hsl(0 0% calc((var(--active, 0) * 70%) + 40%));
-      transform-box: fill-box;
-      transform-origin: center;
-      fill: currentColor;
-      stroke: currentColor;
-      animation-duration: 0.6s;
-      animation-delay: calc((0.25s * 1.5) + (var(--delay) * 1s));
-      transition: color 0.25s;
-    }
-
-    /* Bounce animation on the “C” icon */
-    .sparkle-button#c-sparkle-button.active .sparkle path {
-      animation-name: bounce;
-    }
-    @keyframes bounce {
-      35%, 65% { scale: var(--scale); }
-    }
-    .sparkle path:nth-of-type(1) { --scale: 0.5; --delay: 0.1; --base: 40%; }
-    .sparkle path:nth-of-type(2) { --scale: 1.5; --delay: 0.2; --base: 20%; }
-    .sparkle path:nth-of-type(3) { --scale: 2.5; --delay: 0.35; --base: 30%; }
-
-    /* Hide sparkles when not active */
-    .sparkle-button:not(.active) .sparkle {
-      display: none;
-    }
-
-    /* ── “FLIP” CONIC GRADIENT BEHIND C KEY ─────────────────────────────── */
-    .sparkle-button#c-sparkle-button.active .spark {
-      position: absolute;
-      inset: 0;
-      border-radius: 0.75em;
-      rotate: 0deg;
-      overflow: hidden;
-      mask: linear-gradient(white, transparent 50%);
-      animation: flip 3.6s infinite steps(2, end);
-    }
-    .sparkle-button#c-sparkle-button:not(.active) .spark {
-      display: none;
-    }
-    @keyframes flip {
-      to { rotate: 360deg; }
-    }
-    .sparkle-button#c-sparkle-button .spark::before {
-      content: "";
-      position: absolute;
-      width: 200%;
-      aspect-ratio: 1;
-      top: 0%;
-      left: 50%;
-      z-index: -1;
-      translate: -50% -15%;
-      rotate: 0;
-      opacity: calc((var(--active)) + 0.4);
-      background: conic-gradient(
-        from 0deg,
-        transparent 0 340deg,
-        var(--glow-color) 360deg
-      );
-      animation: rotate 1.8s linear infinite both;
-      transition: opacity 0.25s;
-    }
-    @keyframes rotate {
-      to { transform: rotate(90deg); }
-    }
-    .sparkle-button#c-sparkle-button .spark::after {
-      content: "";
-      position: absolute;
-      inset: var(--cut);
-      border-radius: 0.7em;
-    }
-
-    /* ── PARTICLE PEN: CONTAINS SVG PARTICLES THAT “FLOAT INWARD” ─────── */
-    .sparkle-button#c-sparkle-button .particle-pen {
-      position: absolute;
-      width: 200%;
-      aspect-ratio: 1;
-      top: 50%;
-      left: 50%;
-      translate: -50% -50%;
-      -webkit-mask: radial-gradient(white, transparent 65%);
-      z-index: -1;
-      opacity: var(--active, 0);
-      transition: opacity 0.25s;
-      overflow: visible;
-    }
-    .sparkle-button#c-sparkle-button:not(.active) .particle-pen {
-      display: none;
-    }
-
-    /* Each particle: we’ll invert the keyframes so they move FROM OUTER → CENTER */
-    .sparkle-button#c-sparkle-button.active .particle {
-      fill: var(--glow-color);
-      width: calc(var(--size, 0.25) * 1rem);
-      aspect-ratio: 1;
-      position: absolute;
-      /* Position them randomly outside the key, we’ll animate them inward */
-      top: calc(var(--y) * 1%);
-      left: calc(var(--x) * 1%);
-      opacity: var(--alpha, 1);
-      animation: float-in calc(var(--duration, 1) * 1s) calc(var(--delay) * 1s) infinite linear;
-      transform-origin: var(--origin-x, 1000%) var(--origin-y, 1000%);
-      z-index: -1;
-      animation-play-state: var(--play-state, paused);
-    }
-    /* Hide default fill/stroke on path copies in “blueprint” SVGs */
-    .particle path {
-      fill: var(--glow-color);
-      stroke: none;
-    }
-    /* Alternate direction if even */
-    .particle:nth-of-type(even) {
-      animation-direction: reverse;
-    }
-
-    /* ── KEYFRAMES FOR “FLOAT IN” (outside → inward) ─────────────────── */
-    @keyframes float-in {
+    /* Define keyframes for “sparkleAnim”: 
+       - Start invisible at center
+       - Fade in quickly
+       - Move outward along a given direction and fade out
+       - Return to center at the end
+    */
+    @keyframes sparkleAnim {
       0% {
-        /* Start off far away (randomized by --origin-x/y) with 0 opacity */
         opacity: 0;
-        transform: translate3d(0, 0, 0) scale(0.1);
+        transform: translate(-50%, -50%) scale(0.3);
       }
-      50% {
-        /* Partway: low opacity, halfway in */
-        opacity: 0.4;
-        scale: 0.5;
+      10% {
+        opacity: 1;
+        transform: translate(var(--dx), var(--dy)) scale(1);
+      }
+      40% {
+        opacity: 0.5;
+        transform: translate(calc(var(--dx) * 0.8), calc(var(--dy) * 0.8)) scale(0.6);
+      }
+      80% {
+        opacity: 0.2;
+        transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) scale(0.4);
       }
       100% {
-        /* End exactly in the middle of key, fully visible for a brief moment */
-        opacity: var(--alpha, 1);
-        transform: translate3d(
-          calc(50% - var(--x) * 1%), 
-          calc(50% - var(--y) * 1%), 
-          0
-        ) scale(1);
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3);
       }
     }
 
-    /* ── SVG OVERFLOW: ALWAYS VISIBLE ─────────────────────────────────── */
-    svg {
-      overflow: visible !important;
+    /* When .keyboard has .active, run the sparkle animations: */
+    .keyboard.active .sparkle {
+      animation-play-state: running;
+    }
+
+    /* We'll assign each sparkle a different direction (dx, dy) and a small delay */
+    .sparkle:nth-child(1) { /* Up */
+      --dx: -50%, -120%;
+      animation-delay: 0s;
+    }
+    .sparkle:nth-child(2) { /* Up-Right */
+      --dx: 50%, -120%;
+      animation-delay: 0.1s;
+    }
+    .sparkle:nth-child(3) { /* Right */
+      --dx: 120%, -50%;
+      animation-delay: 0.2s;
+    }
+    .sparkle:nth-child(4) { /* Down-Right */
+      --dx: 120%, 50%;
+      animation-delay: 0.3s;
+    }
+    .sparkle:nth-child(5) { /* Down */
+      --dx: 50%, 120%;
+      animation-delay: 0.4s;
+    }
+    .sparkle:nth-child(6) { /* Down-Left */
+      --dx: -50%, 120%;
+      animation-delay: 0.5s;
+    }
+    .sparkle:nth-child(7) { /* Left */
+      --dx: -120%, 50%;
+      animation-delay: 0.6s;
+    }
+    .sparkle:nth-child(8) { /* Up-Left */
+      --dx: -120%, -50%;
+      animation-delay: 0.7s;
+    }
+
+    /* Position all sparkles so that their “0,0” (center) is exactly at the green key’s center */
+    .sparkle {
+      /* We will set these manually in JS so that each sparkle’s “top/left” is the green key’s center */
+      top: 0;
+      left: 0;
     }
   </style>
 </head>
-
 <body>
 
-  <div class="keypad-container">
-    <!-- ── “Ctrl” KEY ─────────────────────────────────────────────────────── -->
-    <div class="sparkle-button" id="ctrl-sparkle-button">
-      <button>
-        <span class="text">Ctrl</span>
-      </button>
-      <span aria-hidden="true" class="particle-pen">
-        <!-- We keep the same star‐style particle SVGs, but they will only run when “Ctrl” is pressed.
-             (Optionally remove these if you only want “C” to sparkle—they’re here for completeness.) -->
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <!-- (…you can add more if you like, up to 12–15 for density.) -->
-      </span>
-    </div>
+  <!-- ========================== -->
+  <!--    KEYBOARD MARKUP HTML   -->
+  <!-- ========================== -->
+  <div class="keyboard" id="keyboard">
+    <div class="key">Ctrl</div>
+    <div class="key">C</div>
+    <div class="key green" id="greenKey"></div>
+    <div class="key">V</div>
 
-    <!-- ── “C” KEY (PRIMARY, CENTER) ──────────────────────────────────────── -->
-    <div class="sparkle-button" id="c-sparkle-button">
-      <button class="main-button">
-        <span class="spark"></span>
-        <span class="backdrop"></span>
-        <!-- This is the sparkle‐icon SVG (3 small paths) -->
-        <svg class="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14.187 8.096L15 5.25L15.813 8.096C16.0231 8.83114 16.4171 9.50062 16.9577 10.0413C17.4984 10.5819 18.1679 10.9759 18.903 11.186L21.75 12L18.904 12.813C18.1689 13.0231 17.4994 13.4171 16.9587 13.9577C16.4181 14.4984 16.0241 15.1679 15.814 15.903L15 18.75L14.187 15.904C13.9769 15.1689 13.5829 14.4994 13.0423 13.9587C12.5016 13.4181 11.8321 13.0241 11.097 12.814L8.25 12L11.096 11.187C11.8311 10.9769 12.5006 10.5829 13.0413 10.0423C13.5819 9.50162 13.9759 8.83214 14.186 8.097L14.187 8.096Z" />
-          <path d="M6 14.25L5.741 15.285C5.59267 15.8785 5.28579 16.4206 4.85319 16.8532C4.42059 17.2858 3.87853 17.5927 3.285 17.741L2.25 18L3.285 18.259C3.87853 18.4073 4.42059 18.7142 4.85319 19.1468C5.28579 19.5794 5.59267 20.1215 5.741 20.715L6 21.75L6.259 20.715C6.40725 20.1216 6.71398 19.5796 7.14639 19.147C7.5788 18.7144 8.12065 18.4075 8.714 18.259L9.75 18L8.714 17.741C8.12065 17.5925 7.5788 17.2856 7.14639 16.853C6.71398 16.4204 6.40725 15.8784 6.259 15.285L6 14.25Z" />
-          <path d="M6.5 4L6.303 4.5915C6.24777 4.75718 6.15472 4.90774 6.03123 5.03123C5.90774 5.15472 5.75718 5.24777 5.5915 5.303L5 5.5L5.5915 5.697C5.75718 5.75223 5.90774 5.84528 6.03123 5.96877C6.15472 6.09226 6.24777 6.24282 6.303 6.4085L6.5 7L6.697 6.4085C6.75223 6.24282 6.84528 6.09226 6.96877 5.96877C7.09226 5.84528 7.24282 5.75223 7.4085 5.697L8 5.5L7.4085 5.303C7.24282 5.24777 7.09226 5.15472 6.96877 5.03123C6.84528 4.90774 6.75223 4.75718 6.697 4.5915L6.5 4Z" />
-        </svg>
-        <span class="text">C</span>
-      </button>
-      <span aria-hidden="true" class="particle-pen">
-        <!-- We place 12–15 of the same star‐shapes. They’ll animate from outside → center. -->
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-      </span>
-    </div>
-
-    <!-- ── “V” KEY ─────────────────────────────────────────────────────────── -->
-    <div class="sparkle-button" id="v-sparkle-button">
-      <button>
-        <span class="text">V</span>
-      </button>
-      <span aria-hidden="true" class="particle-pen">
-        <!-- Optionally: particle SVGs if you want “V” to sparkle as well -->
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-        <svg class="particle" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg">
-          <path d="M6.937 3.846L7.75 1L8.563 3.846C8.77313 4.58114 9.1671 5.25062 9.70774 5.79126C10.2484 6.3319 10.9179 6.72587 11.653 6.936L14.5 7.75L11.654 8.563C10.9189 8.77313 10.2494 9.1671 9.70874 9.70774C9.1681 10.2484 8.77413 10.9179 8.564 11.653L7.75 14.5L6.937 11.654C6.72687 10.9189 6.3329 10.2494 5.79226 9.70874C5.25162 9.1681 4.58214 8.77413 3.847 8.564L1 7.75L3.846 6.937C4.58114 6.72687 5.25062 6.3329 5.79126 5.79226C6.3319 5.25162 6.72587 4.58214 6.936 3.847L6.937 3.846Z" />
-        </svg>
-      </span>
-    </div>
+    <!-- Sparkle elements (positioned absolutely by JavaScript) -->
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
+    <span class="sparkle"></span>
   </div>
 
-  <!-- ── JAVASCRIPT (LABEL PRESS → TOGGLE “active” CLASS & VARIABLES) ─── -->
+  <!-- ========================== -->
+  <!--   JAVASCRIPT FOR LOGIC     -->
+  <!-- ========================== -->
   <script>
-    // Utility to generate a random integer ⟮min, max⟯
-    const RANDOM = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+    (function() {
+      const keyboard = document.getElementById('keyboard');
+      const greenKey = document.getElementById('greenKey');
+      const sparkles = document.querySelectorAll('.sparkle');
 
-    // We’ll assign random CSS variables to every .particle in each .particle-pen
-    document.querySelectorAll('.particle-pen .particle').forEach(el => {
-      el.style.setProperty('--x', RANDOM(0, 100));        /* horizontal %
-      */ el.style.setProperty('--y', RANDOM(0, 100));    /* vertical % */
-      el.style.setProperty('--duration', RANDOM(6, 15)); /* how many seconds */
-      el.style.setProperty('--delay', RANDOM(0, 8));     /* how long before start */
-      el.style.setProperty('--alpha', RANDOM(40, 90) / 100); /* final opacity */
-      /* random transform origin X/Y outside the view so they appear
-         * to fly “inward” toward the centre */
-      const signX = Math.random() > 0.5 ? -1 : 1;
-      const signY = Math.random() > 0.5 ? -1 : 1;
-      el.style.setProperty('--origin-x', signX * RANDOM(300, 800) + '%');
-      el.style.setProperty('--origin-y', signY * RANDOM(300, 800) + '%');
-      el.style.setProperty('--size', (RANDOM(40, 90) / 100)); /* scale factor */
-    });
+      // Whenever the user presses (mousedown or touchstart) on the green key:
+      function activateKeyboard() {
+        // 1) Add “active” class to .keyboard
+        keyboard.classList.add('active');
 
-    // Attach listeners to each spark-button container
-    document.querySelectorAll('.sparkle-button').forEach(container => {
-      const btn = container.querySelector('button');
+        // 2) Position each sparkle element exactly at the center of the green key:
+        const keyRect = greenKey.getBoundingClientRect();
+        const kbRect = keyboard.getBoundingClientRect();
 
-      // Mousedown/touchstart → add “active” class, set CSS vars
-      btn.addEventListener('mousedown', () => {
-        container.classList.add('active');
-        btn.classList.add('button-pressed');
-        container.style.setProperty('--active', 1);
-        container.style.setProperty('--play-state', 'running');
-      });
-      btn.addEventListener('touchstart', e => {
-        e.preventDefault();
-        container.classList.add('active');
-        btn.classList.add('button-pressed');
-        container.style.setProperty('--active', 1);
-        container.style.setProperty('--play-state', 'running');
+        // Calculate center of green key relative to the .keyboard container:
+        const centerX = keyRect.left + keyRect.width / 2 - kbRect.left;
+        const centerY = keyRect.top + keyRect.height / 2 - kbRect.top;
+
+        sparkles.forEach(sp => {
+          sp.style.left = centerX + 'px';
+          sp.style.top  = centerY + 'px';
+        });
+      }
+
+      // When the press is released (mouseup, touchend, mouseleave), remove “active”:
+      function deactivateKeyboard() {
+        keyboard.classList.remove('active');
+      }
+
+      // Event listeners:
+      greenKey.addEventListener('mousedown', activateKeyboard);
+      greenKey.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // prevent simultaneous mouse event
+        activateKeyboard();
       });
 
-      // Mouseup/touchend (anywhere on document) → remove “active”
-      document.addEventListener('mouseup', () => {
-        if (container.classList.contains('active')) {
-          container.classList.remove('active');
-          btn.classList.remove('button-pressed');
-          container.style.setProperty('--active', 0);
-          container.style.setProperty('--play-state', 'paused');
-        }
-      });
-      document.addEventListener('touchend', () => {
-        if (container.classList.contains('active')) {
-          container.classList.remove('active');
-          btn.classList.remove('button-pressed');
-          container.style.setProperty('--active', 0);
-          container.style.setProperty('--play-state', 'paused');
-        }
-      });
-    });
-
-    // On load, no key is “active.”
-    document.addEventListener('DOMContentLoaded', () => {
-      // Nothing to do here, since we only animate on press.
-    });
+      // On “mouseup” anywhere on the document or “touchend”, we deactivate:
+      document.addEventListener('mouseup', deactivateKeyboard);
+      document.addEventListener('mouseleave', deactivateKeyboard);
+      document.addEventListener('touchend', deactivateKeyboard);
+      document.addEventListener('touchcancel', deactivateKeyboard);
+    })();
   </script>
 </body>
 </html>
