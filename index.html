@@ -1,112 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rotating Wireframe Globe</title>
+  <style>
+    /* Make the canvas fill the entire window, with no margins or scrollbars */
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000; /* Black background */
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- The script tag below loads Three.js from the official CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r154/three.min.js"></script>
+  <script>
+    // 1) Set up the basic Three.js components: scene, camera, renderer
+    const scene = new THREE.Scene();
 
-<!DOCTYPE html><html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Collaboration Across Borders</title>
-    <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
-    <script src="https://unpkg.com/three-globe@2.27.3/dist/three-globe.min.js"></script>
-    <script src="https://unpkg.com/d3@7"></script>
-    <script src="https://unpkg.com/topojson@3"></script>
-    <script src="https://unpkg.com/three/examples/js/controls/OrbitControls.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-    <style>
-      body {
-        margin: 0;
-        background: black;
-        color: white;
-        font-family: sans-serif;
-      }
-      canvas {
-        display: block;
-      }
-    </style>
-  </head>
-  <body class="h-screen w-screen grid grid-cols-1 md:grid-cols-2">
-    <div class="flex flex-col justify-center items-start px-10">
-      <p class="text-gray-400 text-sm mb-2">[ OFFICES ]</p>
-      <h1 class="text-4xl font-semibold mb-4">Collaboration<br />across borders</h1>
-      <p class="text-gray-300 mb-6 max-w-md">
-        We are hiring across all our offices in San Francisco,
-        Palo Alto, and London, UK. We prioritize in-person work
-        to support our fast-paced, collaborative projects.
-        Exceptional candidates are welcome to apply from anywhere.
-      </p>
-      <button class="border px-4 py-2 text-sm tracking-widest hover:bg-white hover:text-black transition">
-        OPEN ROLES
-      </button>
-    </div>
-    <div id="globeViz" class="h-full w-full"></div><script>
-  const Globe = new ThreeGlobe()
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-    .arcsData([
-      {
-        startLat: 37.6145,
-        startLng: -122.3945,
-        endLat: 35.1495,
-        endLng: -90.049,
-        color: ['orange']
-      },
-      {
-        startLat: 37.6145,
-        startLng: -122.3945,
-        endLat: 51.5053,
-        endLng: -0.121,
-        color: ['orange']
-      }
-    ])
-    .arcColor('color')
-    .arcAltitude(0.25)
-    .arcStroke(1.5)
-    .arcDashLength(0.4)
-    .arcDashGap(2)
-    .arcDashInitialGap(() => Math.random() * 5)
-    .arcDashAnimateTime(4000)
-    .pointsData([
-      { lat: 37.6145, lng: -122.3945, size: 0.5 }, // Palo Alto
-      { lat: 35.1495, lng: -90.049, size: 0.5 },    // Memphis
-      { lat: 51.5053, lng: -0.121, size: 0.5 }      // London
-    ])
-    .pointAltitude(0.01)
-    .pointColor(() => 'orange')
-    .pointRadius(0.2);
+    // PerspectiveCamera( fov, aspect, near, far )
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      2000
+    );
+    camera.position.set(0, 0, 600);
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera();
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  camera.position.z = 300;
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById('globeViz').appendChild(renderer.domElement);
-
-  scene.add(Globe);
-
-  const ambientLight = new THREE.AmbientLight(0xbbbbbb);
-  scene.add(ambientLight);
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-  directionalLight.position.set(1, 1, 1);
-  scene.add(directionalLight);
-
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableZoom = false;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 1.5;
-
-  function animate() {
-    controls.update();
-    renderer.render(scene, camera);
-    requestAnimationFrame(animate);
-  }
-
-  animate();
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-</script>
+    renderer.setClearColor(0x000000, 1); // black background
+    document.body.appendChild(renderer.domElement);
 
-  </body>
+    // 2) Create a wireframe sphere (globe “outline”)
+    const RADIUS = 200;
+    const WIDTH_SEGMENTS = 64;
+    const HEIGHT_SEGMENTS = 64;
+
+    // (a) Create a regular SphereGeometry at the specified radius
+    const sphereGeo = new THREE.SphereGeometry(
+      RADIUS,
+      WIDTH_SEGMENTS,
+      HEIGHT_SEGMENTS
+    );
+
+    // (b) Convert the SphereGeometry into a WireframeGeometry
+    const wireframeGeo = new THREE.WireframeGeometry(sphereGeo);
+
+    // (c) Create a LineSegments mesh with thin white lines
+    const wireframeMat = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      linewidth: 1,
+      transparent: true,
+      opacity: 0.9,
+    });
+
+    const globeWireframe = new THREE.LineSegments(wireframeGeo, wireframeMat);
+    scene.add(globeWireframe);
+
+    // 3) Add a subtle ambient light and a dim directional light (for slight depth)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    dirLight.position.set(5, 10, 7.5);
+    scene.add(dirLight);
+
+    // 4) Track time to make the globe “swing” left-and-right
+    let clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Compute elapsed time
+      const t = clock.getElapsedTime();
+
+      // Use a sine wave to oscillate rotation around the Y axis
+      const swingAmplitude = 0.6; // max radians (~34°) to left/right
+      const swingSpeed = 0.5;     // how fast it swings back-and-forth
+
+      globeWireframe.rotation.y = Math.sin(t * swingSpeed) * swingAmplitude;
+
+      // You can also add a slight rotation around X or Z if you like:
+      // globeWireframe.rotation.x = 0.1 * Math.sin(t * 0.2);
+      // globeWireframe.rotation.z = 0.1 * Math.sin(t * 0.1);
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // 5) Handle window resizing
+    window.addEventListener("resize", onWindowResize);
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+  </script>
+</body>
 </html>
