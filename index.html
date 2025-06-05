@@ -1,179 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grok Think Animation</title>
-  <style>
-    body {
-      margin: 0;
-      background: #000;
-      color: white;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .container {
-      width: 520px;
-    }
-
-    .box {
-      background: #111;
-      border-radius: 16px;
-      padding: 24px;
-      width: 100%;
-      min-height: 120px;
-      border: 1px solid #333;
-      box-shadow: 0 0 10px #000;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .typing {
-      font-size: 18px;
-      white-space: nowrap;
-      overflow: hidden;
-      border-right: 2px solid #ccc;
-      width: 0;
-      animation: typing 2s steps(30, end) forwards, blink 0.6s step-end infinite;
-    }
-
-    @keyframes typing {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-
-    @keyframes blink {
-      50% { border-color: transparent; }
-    }
-
-    .thinking {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 16px;
-    }
-
-    .spinner {
-      border: 3px solid #333;
-      border-top: 3px solid white;
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      animation: spin 1s linear infinite;
-      margin-top: 3px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .scrolling-text {
-      margin-top: 10px;
-      height: 60px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .scrolling-text p {
-      position: absolute;
-      width: 100%;
-      animation: scrollText 4s linear infinite;
-      color: #aaa;
-      font-size: 14px;
-    }
-
-    @keyframes scrollText {
-      0% { top: 0; }
-      100% { top: -100%; }
-    }
-
-    .innerResultBox {
-      background-color: #222;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 16px;
-      width: 500px;
-      height: 360px;
-      box-sizing: border-box;
-      overflow-y: auto;
-      font-size: 14px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .thought-header {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Collaboration across borders - x.ai (clone)</title>
+    <style>
+       body {
+         margin: 0;
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         color: #000;
+         background: #fff;
+       }
+       .section {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         padding: 40px;
+       }
+       .text-col {
+         flex: 1;
+         max-width: 500px;
+         margin-right: 40px;
+       }
+       .text-col h2 {
+         font-size: 1.8em;
+         margin-bottom: 0.5em;
+       }
+       .text-col p {
+         font-size: 1em;
+         line-height: 1.5em;
+         margin-bottom: 1em;
+       }
+       .text-col .btn {
+         display: inline-block;
+         margin-bottom: 1em;
+         padding: 0.5em 1em;
+         border: 2px solid #000;
+         border-radius: 4px;
+         text-transform: uppercase;
+         text-decoration: none;
+         font-weight: bold;
+         color: #000;
+       }
+       .locations p {
+         margin: 0.5em 0;
+         font-size: 0.9em;
+       }
+       .locations p strong {
+         display: block;
+         font-size: 1em;
+         margin-bottom: 0.2em;
+       }
+       .globe-col {
+         width: 600px;
+         height: 600px;
+       }
+       #globeCanvas {
+         width: 600px;
+         height: 600px;
+         display: block;
+       }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="box" id="box">
-      <div class="typing" id="typingText">What is the meaning of life?</div>
-    </div>
-  </div>
-
-  <script>
-    const box = document.getElementById('box');
-    const typingText = document.getElementById('typingText');
-
-    const finalAnswer = `
-      <div class="innerResultBox">
-        <div class="thought-header">Thought for 5 seconds</div>
-        The question "What is the meaning of life?" is one that has puzzled humanity for centuries,
-        and it’s not something that comes with a single, universal answer. Instead, it’s a deeply
-        personal and complex idea that can look very different depending on who’s asking and what they value.<br><br>
-
-        <strong>A Range of Perspectives</strong><br>
-        People have approached this question from many angles:<br><br>
-
-        <strong>Philosophical Views:</strong> Some philosophers, like existentialists, suggest that life doesn’t
-        come with a built-in meaning. Instead, we create our own through actions, experiences, and relationships.
+  <section class="section">
+    <div class="text-col">
+      <h2>Collaboration across borders</h2>
+      <p>We are hiring across all our offices in San Francisco, Palo Alto, and London, UK. We prioritize in-person work to support our fast-paced, collaborative projects. Exceptional candidates are welcome to apply from anywhere.</p>
+      <a href="#" class="btn">Open roles</a>
+      <div class="locations">
+        <p><strong>London</strong> 51.5053&deg;N, 0.121&deg;W</p>
+        <p><strong>San Francisco &bull; Palo Alto</strong> 37.6145&deg;N, 122.3945&deg;W</p>
+        <p><strong>Memphis</strong> 35.1495&deg;N, 90.049&deg;W</p>
       </div>
-    `;
+    </div>
+    <div class="globe-col">
+      <canvas id="globeCanvas" width="600" height="600"></canvas>
+    </div>
+  </section>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+  <script>
+    // Setup scene, camera, and renderer
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    const camera = new THREE.PerspectiveCamera(50, 600/600, 1, 1000);
+    camera.position.z = 400;
+    const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('globeCanvas'), antialias: true});
+    renderer.setSize(600, 600);
 
-    function showThinking() {
-      box.innerHTML = `
-        <div class="thinking">
-          <div class="spinner"></div>
-          <div><strong>Thinking for <span id="counter">1</span> seconds...</strong></div>
-        </div>
-        <div class="scrolling-text">
-          <p>Analyzing question... Evaluating dimensions... Connecting abstract patterns... Synthesizing perspectives...</p>
-        </div>
-      `;
+    // Lights for shading
+    scene.add(new THREE.AmbientLight(0x888888));
+    const light = new THREE.DirectionalLight(0xffffff, 0.6);
+    light.position.set(100, 50, 100).normalize();
+    scene.add(light);
 
-      let sec = 1;
-      const interval = setInterval(() => {
-        sec++;
-        document.getElementById("counter").textContent = sec;
-        if (sec === 5) {
-          clearInterval(interval);
-          setTimeout(() => {
-            box.innerHTML = finalAnswer;
-            setTimeout(startLoop, 5000); // restart after showing result
-          }, 1000);
+    // Group containing the globe and connections
+    const globeGroup = new THREE.Group();
+    scene.add(globeGroup);
+
+    // Create the Earth sphere
+    const R = 200;
+    const earthGeo = new THREE.SphereGeometry(R, 64, 64);
+    const earthMat = new THREE.MeshPhongMaterial({ color: 0x2266cc, shininess: 8 });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    globeGroup.add(earthMesh);
+
+    // Convert lat/lon to 3D vector on unit sphere
+    function latLonToVector(lat, lon, radius) {
+      const latRad = lat * Math.PI/180;
+      const lonRad = -lon * Math.PI/180;
+      const x = Math.cos(latRad) * Math.cos(lonRad) * radius;
+      const y = Math.sin(latRad) * radius;
+      const z = Math.cos(latRad) * Math.sin(lonRad) * radius;
+      return new THREE.Vector3(x, y, z);
+    }
+
+    // Office coordinates (lat, lon). West longitudes given as positive values (we invert sign in formula).
+    const offices = [
+      { lat: 51.5053, lon: 0.121  },  // London
+      { lat: 37.6145, lon: 122.3945 },// SF / Palo Alto
+      { lat: 35.1495, lon: 90.049  }  // Memphis
+    ];
+    // Materials and storage for lines
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
+    const lines = [];
+
+    // Pairs of offices to connect
+    const connections = [
+      [offices[0], offices[1]], // London - SF
+      [offices[1], offices[2]], // SF - Memphis
+      [offices[2], offices[0]]  // Memphis - London
+    ];
+
+    // Create curved tube between each pair of offices
+    connections.forEach(pair => {
+      const p1 = latLonToVector(pair[0].lat, pair[0].lon, 1);
+      const p2 = latLonToVector(pair[1].lat, pair[1].lon, 1);
+      const points = [];
+      // Generate points along great-circle with a bulge
+      for (let i = 0; i <= 20; i++) {
+        const v = new THREE.Vector3().lerpVectors(p1, p2, i/20);
+        v.normalize().multiplyScalar(R * (1 + 0.1 * Math.sin(Math.PI * i/20)));
+        points.push(v);
+      }
+      const curve = new THREE.CatmullRomCurve3(points);
+      const tubeGeo = new THREE.TubeGeometry(curve, 50, 1.5, 8, false);
+      const tubeMesh = new THREE.Mesh(tubeGeo, lineMat.clone());
+      globeGroup.add(tubeMesh);
+      lines.push(tubeMesh);
+    });
+
+    // Animation loop: rotate globe and fade in lines
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+      lines.forEach((line, idx) => {
+        const start = 1 + idx * 0.8; // stagger each line
+        if (t > start) {
+          line.material.opacity = Math.min((t - start) / 1.5, 1);
         }
-      }, 1000);
+      });
+      globeGroup.rotation.y += 0.002;  // auto-rotate
+      renderer.render(scene, camera);
     }
-
-    function startLoop() {
-      box.innerHTML = `<div class="typing" id="typingText">What is the meaning of life?</div>`;
-      const textElem = document.getElementById("typingText");
-      setTimeout(showThinking, 2500);
-    }
-
-    // Start initial loop
-    window.onload = () => {
-      setTimeout(showThinking, 2500);
-    };
+    animate();
   </script>
 </body>
 </html>
