@@ -3,81 +3,155 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Skewed Box</title>
+  <title>3D Keypad with Sparkle Animation</title>
   <style>
-    /* ------------------------------------- */
-    /*   YOUR ORIGINAL CSS (slightly adapted) */
-    /* ------------------------------------- */
     body {
       margin: 0;
-      height: 100vh;
       background: #01087d;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    .box {
+    .keyboard {
+      display: flex;
+      gap: 10px;
+      background: #1b1b1b;
+      padding: 20px 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      transform: translateY(0);
+      transition: transform 0.15s ease;
       position: relative;
-      width: 200px;    /* base width for the “top” face */
-      height: 55px;    /* total height of the “front” face (not the skewed top) */
-      transform-style: preserve-3d;
-      perspective: 800px;
     }
 
-    .side {
-      box-sizing: border-box;
+    .key {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-family: sans-serif;
+      font-size: 18px;
+      color: white;
+      background: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      transition: all 0.2s ease;
+    }
+
+    .key.green {
+      background: #00ffae;
+      box-shadow: 0 0 20px rgba(0,255,174,0.6);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .key.green.pressed {
+      box-shadow: 0 0 35px 10px rgba(0,255,174,0.8);
+    }
+
+    .keyboard.pressed {
+      transform: translateY(6px);
+    }
+
+    .sparkles {
       position: absolute;
-      /* we'll override width/height per face */
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
     }
 
-    /* Top face (skewed) */
-    .top {
-      width: 200px;
-      height: 40px;             /* thickness of the top plane */
-      background: #51aef9;
-      transform-origin: top left;
-      transform: skew(55deg, -35deg);
-      z-index: 3;
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      animation: sparkleLoop 1.2s infinite;
+      opacity: 0;
     }
 
-    /* Left face (skewed vertically) */
-    .left {
-      width: 57px;              /* the width corresponds roughly to the “depth” of the left face */
-      height: 55px;
-      background: #8ffce7;
-      transform-origin: bottom left;
-      transform: skew(0, 35deg);
-      top: 40px;                /* push it down so it meets the bottom of the “top” face */
-      left: -23px;              /* shift it left so that its left edge is flush */
-      z-index: 2;
-    }
-
-    /* Right (front) face, skewed */
-    .right {
-      width: 200px;             /* same base width as “top” */
-      height: 55px;
-      background: #3460f2;
-      transform-origin: bottom left;
-      transform: skew(0, -35deg);
-      top: 40px;                /* align under the “top” face */
-      left: 34px;               /* shift right so it aligns with the right edge of the top */
-      z-index: 1;
+    @keyframes sparkleLoop {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0;
+      }
+      30% {
+        opacity: 1;
+      }
+      50% {
+        transform: translate(var(--x), var(--y)) scale(1.2);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(0, 0) scale(0.8);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="box">
-    <!-- Top face -->
-    <div class="side top"></div>
+<div class="keyboard" id="keyboard">
+  <div class="key">Ctrl</div>
+  <div class="key green" id="mainKey">C</div>
+  <div class="key">V</div>
+  <div class="sparkles" id="sparkleContainer"></div>
+</div>
 
-    <!-- Left face -->
-    <div class="side left"></div>
+<script>
+  const mainKey = document.getElementById("mainKey");
+  const keyboard = document.getElementById("keyboard");
+  const sparkles = document.getElementById("sparkleContainer");
 
-    <!-- Right/front face -->
-    <div class="side right"></div>
-  </div>
+  const createSparkles = () => {
+    sparkles.innerHTML = ""; // Clear old sparkles
+    for (let i = 0; i < 12; i++) {
+      const s = document.createElement("div");
+      s.className = "sparkle";
+      const angle = (Math.PI * 2 / 12) * i;
+      const distance = 60;
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance;
+      s.style.setProperty("--x", `${x}px`);
+      s.style.setProperty("--y", `${y}px`);
+      sparkles.appendChild(s);
+    }
+  };
+
+  mainKey.addEventListener("mousedown", () => {
+    mainKey.classList.add("pressed");
+    keyboard.classList.add("pressed");
+    sparkles.style.display = "block";
+    createSparkles();
+  });
+
+  document.addEventListener("mouseup", () => {
+    mainKey.classList.remove("pressed");
+    keyboard.classList.remove("pressed");
+    sparkles.style.display = "none";
+  });
+
+  mainKey.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    mainKey.classList.add("pressed");
+    keyboard.classList.add("pressed");
+    sparkles.style.display = "block";
+    createSparkles();
+  }, { passive: false });
+
+  document.addEventListener("touchend", () => {
+    mainKey.classList.remove("pressed");
+    keyboard.classList.remove("pressed");
+    sparkles.style.display = "none";
+  });
+</script>
 
 </body>
 </html>
