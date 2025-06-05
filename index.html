@@ -3,337 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Process Animation</title>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Interactive 3D Universe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
         body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000; /* Black background */
+            overflow: hidden; /* Hide scrollbars */
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background-color: #1a1a1a; /* Dark background */
-            font-family: 'Inter', sans-serif;
-            color: #f0f0f0;
-            overflow: hidden;
-        }
-
-        .animation-card {
-            background-color: #2c2c2c;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            padding: 25px;
-            width: 350px; /* Compact width */
-            min-height: 250px; /* Increased height to accommodate more steps */
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start; /* Align content to the left */
-            box-sizing: border-box;
-            position: relative; /* For absolute positioning of response text */
-        }
-
-        .status-line {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 1rem;
-            color: #ccc;
-            width: 100%; /* Ensure it takes full width */
-        }
-
-        .status-icon-container {
-            margin-right: 15px;
-            width: 24px; /* Fixed width for consistent alignment */
-            text-align: center;
-        }
-
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid #f0f0f0;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .checkmark {
-            font-size: 1.2em;
-            color: #4CAF50;
-            display: none; /* Hidden by default */
-        }
-
-        .status-message {
-            flex-grow: 1; /* Allow text to take remaining space */
-            color: #f0f0f0; /* Active message color */
-        }
-
-        .search-engines {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 10px;
-            margin-left: 39px; /* Align with text by compensating for icon-container */
-            margin-bottom: 15px;
-            gap: 8px;
-            display: none; /* Hidden by default */
-        }
-
-        .search-engines span {
-            background-color: #3a3a3a;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8em;
-            color: #aaa;
-        }
-
-        .response-content {
-            margin-top: 10px;
-            font-size: 0.95rem;
-            color: #e0e0e0;
-            line-height: 1.6;
-            overflow: hidden; /* Important for scrolling effect */
-            max-height: 120px; /* Max height for the scrolling text */
             position: relative;
+        }
+        canvas {
+            display: block;
             width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0; /* Ensure canvas is behind everything else */
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
             display: none; /* Hidden by default */
-        }
-
-        .response-text {
-            white-space: pre-wrap; /* Preserve line breaks */
-            animation: scrollText linear infinite;
-            animation-play-state: paused; /* Paused by default */
-        }
-
-        @keyframes scrollText {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(calc(-100% + 120px)); /* Adjust 120px to max-height */ }
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 80%; /* Limit width on smaller screens */
+            word-wrap: break-word; /* Ensure long messages wrap */
         }
     </style>
 </head>
-<body>
-    <div class="animation-card" id="animationCard">
-        <!-- Step 1: Thought for X seconds -->
-        <div class="status-line" id="thought1Line">
-            <div class="status-icon-container">
-                <div class="spinner" id="thought1Spinner"></div>
-                <i class="fas fa-check-circle checkmark" id="thought1Checkmark"></i>
-            </div>
-            <span class="status-message" id="thought1Message">Thought for 0 seconds</span>
-        </div>
-
-        <!-- Step 2: Searched X websites -->
-        <div class="status-line" id="search1Line">
-            <div class="status-icon-container">
-                <div class="spinner" id="search1Spinner"></div>
-                <i class="fas fa-check-circle checkmark" id="search1Checkmark"></i>
-            </div>
-            <span class="status-message" id="search1Message">Searched 0 websites</span>
-        </div>
-
-        <!-- Step 3: Thought for X seconds -->
-        <div class="status-line" id="thought2Line">
-            <div class="status-icon-container">
-                <div class="spinner" id="thought2Spinner"></div>
-                <i class="fas fa-check-circle checkmark" id="thought2Checkmark"></i>
-            </div>
-            <span class="status-message" id="thought2Message">Thought for 0 seconds</span>
-        </div>
-
-        <!-- Step 4: Searching the web... -->
-        <div class="status-line" id="search2Line">
-            <div class="status-icon-container">
-                <div class="spinner" id="search2Spinner"></div>
-                <i class="fas fa-check-circle checkmark" id="search2Checkmark"></i>
-            </div>
-            <span class="status-message" id="search2Message">Searching the web...</span>
-        </div>
-        <div class="search-engines" id="search2Engines">
-            <span>google.com</span>
-            <span>bing.com</span>
-        </div>
-
-        <!-- AI Response Content -->
-        <div class="response-content" id="responseContent">
-            <div class="response-text" id="responseText">
-                <!-- AI generated response will be inserted here -->
-            </div>
-        </div>
+<body class="bg-black text-white">
+    <div id="loading-indicator" class="message-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="mt-2">Loading 3D Universe...</span>
     </div>
 
+    <div id="custom-message-box" class="message-box"></div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const animationCard = document.getElementById('animationCard');
+        let scene, camera, renderer, controls;
+        let lines = [];
+        let dots = [];
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let currentIntersected = null; // To keep track of the currently hovered object
+        let lastClickedDot = null; // To keep track of the dot that was last clicked
+        let messageIsPersistent = false; // Flag to control message persistence
 
-            const thought1Line = document.getElementById('thought1Line');
-            const thought1Spinner = document.getElementById('thought1Spinner');
-            const thought1Checkmark = document.getElementById('thought1Checkmark');
-            const thought1Message = document.getElementById('thought1Message');
+        // Predefined AI messages inspired by your images
+        const aiMessages = [
+            "DO OTHER MINDS INHABIT THE STARS?",
+            "HOW DOES CONSCIOUSNESS EMERGE FROM MATTER?",
+            "HOW DO BLACK HOLES RESHAPE REALITY?",
+            "WHAT BINDS THE FABRIC OF SPACETIME?",
+            "IS THE UNIVERSE INFINITE, OR DOES IT HAVE A BOUNDARY?",
+            "ARE THERE PARALLEL UNIVERSES?",
+            "WHAT IS DARK MATTER AND DARK ENERGY?",
+            "HOW DID LIFE BEGIN IN THE COSMOS?"
+        ];
+        let messageIndex = 0; // To cycle through messages on click
 
-            const search1Line = document.getElementById('search1Line');
-            const search1Spinner = document.getElementById('search1Spinner');
-            const search1Checkmark = document.getElementById('search1Checkmark');
-            const search1Message = document.getElementById('search1Message');
+        // Function to show a custom message box
+        // Duration 0 means it stays until explicitly hidden (e.g., mouseleave, or new click)
+        function showMessageBox(message) { // Removed duration parameter as it's now controlled by logic
+            const messageBox = document.getElementById('custom-message-box');
+            messageBox.textContent = message;
+            messageBox.style.display = 'block';
+            clearTimeout(messageBox.hideTimeout); // Clear any existing hide timeout
+        }
 
-            const thought2Line = document.getElementById('thought2Line');
-            const thought2Spinner = document.getElementById('thought2Spinner');
-            const thought2Checkmark = document.getElementById('thought2Checkmark');
-            const thought2Message = document.getElementById('thought2Message');
+        // Function to hide the message box
+        function hideMessageBox() {
+            const messageBox = document.getElementById('custom-message-box');
+            messageBox.style.display = 'none';
+            clearTimeout(messageBox.hideTimeout); // Clear any existing hide timeout
+        }
 
-            const search2Line = document.getElementById('search2Line');
-            const search2Spinner = document.getElementById('search2Spinner');
-            const search2Checkmark = document.getElementById('search2Checkmark');
-            const search2Message = document.getElementById('search2Message');
-            const search2Engines = document.getElementById('search2Engines');
+        function init() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            loadingIndicator.style.display = 'flex'; // Show loading indicator
 
-            const responseContent = document.getElementById('responseContent');
-            const responseText = document.getElementById('responseText');
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000); // Black background
 
-            let thought1Interval;
-            let thought1Seconds = 0;
-            let thought2Interval;
-            let thought2Seconds = 0;
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 250; // Initial zoom out position
 
-            const sampleResponse = `The question "What is the meaning of life?" is one that has puzzled humanity for centuries, and it's not something that comes with a single, universal answer. Instead, it's a deeply personal and complex idea that can look very different depending on who's asking and what they value.
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
 
-A Range of Perspectives:
-Philosophers, theologians, and thinkers throughout history have offered countless interpretations. Some common themes include:
-- Finding purpose: Believing life has an inherent goal or mission.
-- Experiencing joy: Focusing on happiness, pleasure, and positive emotions.
-- Contributing to others: Making a positive impact on the world and people around you.
-- Seeking knowledge: Understanding the universe, oneself, and the nature of reality.
-- Creating meaning: Actively constructing one's own values and purpose.
+            // OrbitControls for 360-degree interaction
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // Smooth camera movement
+            controls.dampingFactor = 0.05;
+            controls.enablePan = false; // Disable panning (fixed position)
+            controls.maxDistance = 500; // Limit zoom out
+            controls.minDistance = 50; // Limit zoom in (prevent going through the center)
 
-Ultimately, the "meaning of life" is often a journey of self-discovery and reflection, rather than a single destination or definitive answer.`;
+            // Generate lines and dots
+            const numElements = 200;
+            const lineLength = 150; // Fixed length for all lines
 
-            function resetAllSteps() {
-                clearInterval(thought1Interval);
-                clearInterval(thought2Interval);
+            for (let i = 0; i < numElements; i++) {
+                // Generate a random direction vector
+                const direction = new THREE.Vector3(
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2
+                ).normalize();
 
-                const allSpinners = [thought1Spinner, search1Spinner, thought2Spinner, search2Spinner];
-                const allCheckmarks = [thought1Checkmark, search1Checkmark, thought2Checkmark, search2Checkmark];
-                const allLines = [thought1Line, search1Line, thought2Line, search2Line];
-                const allMessages = [thought1Message, search1Message, thought2Message, search2Message];
+                // Calculate the end point based on the fixed lineLength
+                const startPoint = new THREE.Vector3(0, 0, 0); // All lines originate from the center
+                const endPoint = direction.clone().multiplyScalar(lineLength);
 
-                allSpinners.forEach(spinner => spinner.style.display = 'none');
-                allCheckmarks.forEach(checkmark => {
-                    checkmark.style.display = 'none';
-                    checkmark.classList.remove('green-check');
+                // Line
+                const points = [startPoint, endPoint];
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }); // White, semi-transparent
+                const line = new THREE.Line(geometry, material);
+                scene.add(line);
+                lines.push(line);
+
+                // Dot (small cube) at the end of the line
+                // Increased size for easier interaction area
+                const dotGeometry = new THREE.BoxGeometry(7, 7, 7);
+                const dotMaterial = new THREE.MeshBasicMaterial({ color: 0x93c5fd }); // Light blue
+                const dot = new THREE.Mesh(dotGeometry, dotMaterial);
+                dot.position.copy(endPoint); // Position dot explicitly at the end of the line
+                dot.originalColor = dotMaterial.color.getHex(); // Store original color for hover effect
+                scene.add(dot);
+                dots.push(dot);
+            }
+
+            // Event Listeners for mouse interaction
+            renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+            renderer.domElement.addEventListener('click', onClick, false);
+            // Add touch event listeners for mobile devices
+            renderer.domElement.addEventListener('touchstart', onTouchStart, false);
+            renderer.domElement.addEventListener('touchend', onTouchEnd, false);
+            renderer.domElement.addEventListener('touchmove', onTouchMove, false);
+
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+
+            loadingIndicator.style.display = 'none'; // Hide loading indicator
+        }
+
+        function onMouseMove(event) {
+            // Calculate mouse position in normalized device coordinates (-1 to +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update the raycaster with the camera and mouse position
+            raycaster.setFromCamera(mouse, camera);
+
+            // Calculate objects intersecting the raycaster
+            const intersects = raycaster.intersectObjects(dots);
+
+            if (intersects.length > 0) {
+                const intersectedObject = intersects[0].object;
+
+                // If a new object is intersected, unhighlight the previous one (if not the last clicked)
+                if (currentIntersected && currentIntersected !== intersectedObject && currentIntersected !== lastClickedDot) {
+                    currentIntersected.material.color.setHex(currentIntersected.originalColor);
+                }
+
+                // Highlight the current intersected object
+                if (intersectedObject.material.color.getHex() !== 0xff0000) { // Avoid re-setting if already highlighted
+                    intersectedObject.material.color.setHex(0xff0000); // Highlight with red on hover
+                }
+                currentIntersected = intersectedObject;
+
+                // Show message on hover, but only if no persistent message is active
+                if (!messageIsPersistent || lastClickedDot !== intersectedObject) {
+                    showMessageBox(aiMessages[messageIndex % aiMessages.length]);
+                }
+
+            } else {
+                // If no intersection
+                if (currentIntersected && currentIntersected !== lastClickedDot) {
+                    currentIntersected.material.color.setHex(currentIntersected.originalColor);
+                }
+                currentIntersected = null;
+
+                // Hide message only if no persistent message is active
+                if (!messageIsPersistent) {
+                    hideMessageBox();
+                }
+            }
+        }
+
+        function onClick(event) {
+            // Calculate mouse position in normalized device coordinates (-1 to +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update the raycaster with the camera and mouse position
+            raycaster.setFromCamera(mouse, camera);
+
+            // Calculate objects intersecting the raycaster
+            const intersects = raycaster.intersectObjects(dots);
+
+            if (intersects.length > 0) {
+                const clickedDot = intersects[0].object;
+
+                // If a different dot is clicked, or if no dot was previously clicked
+                if (lastClickedDot !== clickedDot) {
+                    // Restore color of previously clicked dot if it exists and is not currently hovered
+                    if (lastClickedDot && lastClickedDot !== currentIntersected) {
+                        lastClickedDot.material.color.setHex(lastClickedDot.originalColor);
+                    }
+                    lastClickedDot = clickedDot;
+                    messageIsPersistent = true; // Make message persistent
+
+                    // Highlight the clicked dot
+                    clickedDot.material.color.setHex(0xff0000);
+
+                    // Cycle to the next message and display it persistently
+                    messageIndex = (messageIndex + 1) % aiMessages.length;
+                    showMessageBox(aiMessages[messageIndex]); // No duration
+                } else {
+                    // If the same dot is clicked again, cycle message but keep persistence
+                    messageIndex = (messageIndex + 1) % aiMessages.length;
+                    showMessageBox(aiMessages[messageIndex]);
+                }
+            } else {
+                // If click happened on empty space, clear persistent message
+                if (lastClickedDot) {
+                    lastClickedDot.material.color.setHex(lastClickedDot.originalColor);
+                }
+                lastClickedDot = null;
+                messageIsPersistent = false;
+                hideMessageBox();
+            }
+        }
+
+        // Touch event handlers for mobile
+        function onTouchStart(event) {
+            if (event.touches.length > 0) {
+                // Prevent default touch behavior (like scrolling) for the canvas
+                event.preventDefault();
+                // Simulate mouse move for hover effect
+                onMouseMove({
+                    clientX: event.touches[0].clientX,
+                    clientY: event.touches[0].clientY
                 });
-                allLines.forEach(line => line.style.color = '#ccc'); // Inactive color
-
-                thought1Message.textContent = 'Thought for 0 seconds';
-                search1Message.textContent = 'Searched 0 websites';
-                thought2Message.textContent = 'Thought for 0 seconds';
-                search2Message.textContent = 'Searching the web...';
-
-                search2Engines.style.display = 'none';
-                responseContent.style.display = 'none';
-                responseText.style.animationPlayState = 'paused';
-                responseText.style.transform = 'translateY(0)';
-                responseText.textContent = '';
             }
+        }
 
-            function animateSequence() {
-                resetAllSteps(); // Reset all elements to initial state
+        function onTouchEnd(event) {
+            // Simulate a click on touch end if an object was intersected
+            // The onClick function will handle persistence and message update
+            onClick({
+                clientX: event.changedTouches[0].clientX,
+                clientY: event.changedTouches[0].clientY
+            });
 
-                // Phase 1: Thought for 15 seconds
-                thought1Seconds = 0;
-                thought1Spinner.style.display = 'block';
-                thought1Message.textContent = `Thought for ${thought1Seconds} seconds`;
-                thought1Line.style.color = '#f0f0f0'; // Active color
-
-                thought1Interval = setInterval(() => {
-                    thought1Seconds++;
-                    thought1Message.textContent = `Thought for ${thought1Seconds} seconds`;
-                }, 1000);
-
-                setTimeout(() => {
-                    clearInterval(thought1Interval);
-                    thought1Spinner.style.display = 'none';
-                    thought1Checkmark.style.display = 'block';
-                    thought1Checkmark.classList.add('green-check');
-                    thought1Line.style.color = '#ccc'; // Inactive color
-
-                    // Phase 2: Searched 4 websites (instant completion after thought1)
-                    setTimeout(() => {
-                        search1Checkmark.style.display = 'block';
-                        search1Checkmark.classList.add('green-check');
-                        search1Message.textContent = 'Searched 4 websites';
-                        search1Line.style.color = '#ccc'; // Inactive color
-
-                        // Phase 3: Thought for 6 seconds
-                        setTimeout(() => {
-                            thought2Seconds = 0;
-                            thought2Spinner.style.display = 'block';
-                            thought2Message.textContent = `Thought for ${thought2Seconds} seconds`;
-                            thought2Line.style.color = '#f0f0f0'; // Active color
-
-                            thought2Interval = setInterval(() => {
-                                thought2Seconds++;
-                                thought2Message.textContent = `Thought for ${thought2Seconds} seconds`;
-                            }, 1000);
-
-                            setTimeout(() => {
-                                clearInterval(thought2Interval);
-                                thought2Spinner.style.display = 'none';
-                                thought2Checkmark.style.display = 'block';
-                                thought2Checkmark.classList.add('green-check');
-                                thought2Line.style.color = '#ccc'; // Inactive color
-
-                                // Phase 4: Searching the web... (with spinner and search engines)
-                                setTimeout(() => {
-                                    search2Spinner.style.display = 'block';
-                                    search2Message.textContent = 'Searching the web...';
-                                    search2Engines.style.display = 'flex'; // Show search engines
-                                    search2Line.style.color = '#f0f0f0'; // Active color
-
-                                    setTimeout(() => {
-                                        search2Spinner.style.display = 'none';
-                                        search2Checkmark.style.display = 'block';
-                                        search2Checkmark.classList.add('green-check');
-                                        search2Message.textContent = 'Searched 7 websites';
-                                        search2Engines.style.display = 'none'; // Hide search engines
-                                        search2Line.style.color = '#ccc'; // Inactive color
-
-                                        // Final Phase: Display Response and start scrolling
-                                        setTimeout(() => {
-                                            responseContent.style.display = 'block';
-                                            responseText.textContent = sampleResponse;
-
-                                            // Calculate animation duration based on content height
-                                            const contentHeight = responseText.scrollHeight;
-                                            const containerHeight = responseText.clientHeight;
-                                            if (contentHeight > containerHeight) {
-                                                const scrollDistance = contentHeight - containerHeight;
-                                                const duration = scrollDistance / 20; // Adjust for scroll speed
-                                                responseText.style.animationDuration = `${duration}s`;
-                                                responseText.style.animationPlayState = 'running';
-                                                responseText.style.animationIterationCount = 'infinite';
-                                            }
-
-                                            // Loop the animation after a delay
-                                            setTimeout(() => {
-                                                animateSequence(); // Restart the animation
-                                            }, 8000); // Wait 8 seconds after response appears before restarting
-                                        }, 500); // Small delay before showing response
-                                    }, 3000); // Simulate search2 time (3 seconds)
-                                }, 500); // Small delay before starting search2 after thought2 completes
-                            }, 6000); // Simulate thought2 time (6 seconds)
-                        }, 500); // Small delay before starting thought2 after search1 completes
-                    }, 500); // Small delay after thought1 completes
-                }, 5000); // Simulate thought1 time (5 seconds)
+            // After touch ends, if no dot was clicked, or if the message is not persistent, hide it
+            if (!messageIsPersistent) {
+                hideMessageBox();
             }
+        }
 
-            // Start the animation automatically on page load
-            animateSequence();
-        });
+        function onTouchMove(event) {
+            if (event.touches.length > 0) {
+                event.preventDefault(); // Prevent scrolling while dragging
+                // Update mouse position for raycasting
+                onMouseMove({
+                    clientX: event.touches[0].clientX,
+                    clientY: event.touches[0].clientY
+                });
+            }
+        }
+
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // Only required if controls.enableDamping or controls.autoRotate are set to true
+            renderer.render(scene, camera);
+        }
+
+        // Start the animation on window load.
+        window.onload = function () {
+            try {
+                init();
+                animate();
+            } catch (error) {
+                console.error("Error initializing 3D scene:", error);
+                showMessageBox("Failed to load 3D universe. Please try again or check console for errors.");
+                document.getElementById('loading-indicator').style.display = 'none'; // Hide loading indicator on error
+            }
+        }
     </script>
 </body>
 </html>
-
