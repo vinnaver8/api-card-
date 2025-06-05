@@ -2,21 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Custom Sparkle Button (Green, 150×150)</title>
+  <title>Green 3D Key + Inward-Moving Dots</title>
   <style>
     /* ================================================
-       1) Reset & Base (only for csb‐prefixed elements)
+       1) Reset & Ensure No Global Conflicts
+       All rules are under the “csb-” prefix.
     ================================================ */
     .csb-*, 
-    .csb-*:after, 
-    .csb-*:before {
+    .csb-*:before, 
+    .csb-*:after {
       box-sizing: border-box;
     }
 
     /* ================================================
-       2) Container & Centering
+       2) Body & Centering
     ================================================ */
-    .csb-container {
+    .csb-body {
+      margin: 0;
+      padding: 0;
       width: 100vw;
       height: 100vh;
       background: #121212;
@@ -24,15 +27,14 @@
       justify-content: center;
       align-items: center;
       overflow: hidden;
-      margin: 0; 
-      padding: 0;
+      font-family: system-ui, sans-serif;
     }
 
     /* ================================================
        3) The Green 3D Button (150×150 px)
-       - Unique class: .csb-button
-       - Tilted in 3D, gradient background
-       - Shadow/bevel for a “keycap” look
+       - Class: .csb-button
+       - Gradient + shadows
+       - 3D tilt via rotateX/rotateY
     ================================================ */
     .csb-button {
       position: relative;
@@ -41,25 +43,26 @@
       background: linear-gradient(145deg, #00c08b, #00a078);
       border-radius: 12px;
       box-shadow:
-        /* Outer shadow lifts it from background */
+        /* Outer shadow lifts from background */
         0 8px 20px rgba(0, 0, 0, 0.5),
-        /* Inner highlight at top-left */
+        /* Inner highlight top-left */
         inset 0 4px 8px rgba(255, 255, 255, 0.15),
-        /* Inner shadow at bottom-right */
+        /* Inner shadow bottom-right */
         inset 0 -4px 8px rgba(0, 0, 0, 0.2);
       transform: rotateX(15deg) rotateY(-10deg);
       transform-style: preserve-3d;
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      overflow: visible; /* so dots can appear outside if needed */
+      overflow: visible; /* so dots can appear outside */
       display: flex;
       justify-content: center;
       align-items: center;
       user-select: none;
+      border: none; /* Remove default button border */
     }
 
     /* ================================================
-       4) “Pressed” State (push in + darker shadow)
+       4) Pressed State (push-in + darker shadow)
     ================================================ */
     .csb-button.csb-pressed {
       transform: rotateX(10deg) rotateY(-8deg) translateZ(-6px);
@@ -81,7 +84,7 @@
     }
 
     /* ================================================
-       6) Center Icon (“Swirl”) Inside Button
+       6) Swirl Icon Inside Button
     ================================================ */
     .csb-icon {
       position: absolute;
@@ -95,8 +98,8 @@
     }
 
     /* ================================================
-       7) Inward‐Moving Dot (“sparkle”) Style
-       - Unique class: .csb-dot
+       7) Inward-Moving Dot (“sparkle”) Style
+       - Class: .csb-dot
     ================================================ */
     .csb-dot {
       position: absolute;
@@ -112,64 +115,63 @@
   </style>
 </head>
 
-<body>
-  <div class="csb-container">
-    <!--
-      The single green button (150×150) with a swirl icon.
-      Press & hold → glows + spawns inward‐moving dots.
-    -->
-    <div class="csb-button" id="csb-button">
-      <div class="csb-icon">🔄</div>
-      <!-- Dots will be dynamically injected here -->
-    </div>
-  </div>
+<body class="csb-body">
+  <!-- ===================================================
+       A normal HTML <button>—we only give it class="csb-button"
+       so it turns into a 150×150 green 3D key from the screenshot.
+     =================================================== -->
+  <button class="csb-button" id="csbKey">
+    <!-- Swirl icon placed absolutely centered -->
+    <div class="csb-icon">🔄</div>
+    <!-- Dots will be injected here by JavaScript -->
+  </button>
 
   <script>
     (function() {
-      const btn = document.getElementById("csb-button");
+      const btn = document.getElementById("csbKey");
       let isHolding = false;
       let spawnInterval = null;
 
       // Dot parameters
       const DOT_SIZE = 10;        // px
-      const SPAWN_RATE = 150;     // ms between batches
-      const DOTS_PER_BATCH = 5;   // how many dots each time
+      const SPAWN_RATE = 150;     // ms between each batch
+      const DOTS_PER_BATCH = 5;   // number of dots per spawn
 
-      // Return a random angle [0, 2π)
+      // Utility: random angle between 0 and 2π
       function randomAngle() {
         return Math.random() * Math.PI * 2;
       }
 
-      // Spawn a single dot that animates inward
+      // Spawn one dot that moves inward to the button's center
       function spawnDot() {
-        // 1) Measure current button size
+        // 1) Measure current button size/position
         const rect = btn.getBoundingClientRect();
         const KEY_W = rect.width;
         const KEY_H = rect.height;
 
-        // 2) Compute spawn radius = 0.8 × max(width, height)
+        // 2) Compute spawn radius ≈ 0.8 × max(width, height)
         const RADIUS = Math.max(KEY_W, KEY_H) * 0.8;
 
-        // 3) Pick a random angle θ
+        // 3) Choose a random angle θ
         const θ = randomAngle();
         const centerX = KEY_W / 2;
         const centerY = KEY_H / 2;
 
-        // 4) Starting coordinates (relative to .csb-button)
+        // 4) Starting coordinates (relative to button's top-left)
         const startX = centerX + Math.cos(θ) * RADIUS - DOT_SIZE / 2;
         const startY = centerY + Math.sin(θ) * RADIUS - DOT_SIZE / 2;
 
-        // 5) Create a <div class="csb-dot">
+        // 5) Create the dot element
         const dot = document.createElement("div");
         dot.className = "csb-dot";
         dot.style.left = startX + "px";
         dot.style.top = startY + "px";
         dot.style.opacity = "1";
 
-        // 6) Append inside the button
+        // 6) Add it inside the button
         btn.appendChild(dot);
 
-        // 7) Force reflow so transition can run
+        // 7) Force reflow so CSS transition will run
         dot.offsetHeight;
 
         // 8) Move to exact center & fade out
@@ -179,7 +181,7 @@
         dot.style.top = centerPosY + "px";
         dot.style.opacity = "0";
 
-        // 9) Remove after 0.75 s
+        // 9) Clean up after transition (0.7s)
         setTimeout(() => {
           if (dot.parentNode === btn) {
             btn.removeChild(dot);
@@ -203,7 +205,7 @@
         spawnInterval = null;
       }
 
-      // On press/hold: add pressed + glow, begin spawning
+      // On press/hold: add “pressed” + “glow” classes, start dots
       function handleHoldStart(e) {
         e.preventDefault();
         if (isHolding) return;
@@ -213,7 +215,7 @@
         startSpawning();
       }
 
-      // On release: remove pressed + glow, stop spawning
+      // On release: remove classes, stop dots
       function handleHoldEnd() {
         if (!isHolding) return;
         isHolding = false;
@@ -222,7 +224,7 @@
         stopSpawning();
       }
 
-      // Attach mouse/touch events
+      // Attach mouse + touch events
       btn.addEventListener("mousedown", handleHoldStart);
       btn.addEventListener("touchstart", handleHoldStart, { passive: false });
 
