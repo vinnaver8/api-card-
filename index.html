@@ -2,166 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>3D Key + Spin & Sparkle Animation</title>
+  <title>3D Glow Key with Sparkles</title>
   <style>
-    /* ----------------------------------------
-       1) Make the page background dark so the key pops
-    ---------------------------------------- */
     body {
       margin: 0;
       padding: 0;
       height: 100vh;
+      background: #060e15;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #0a0a0a;
+      overflow: hidden;
     }
 
-    /* ----------------------------------------
-       2) Container for the key/button
-    ---------------------------------------- */
-    .key-container {
-      perspective: 600px; /* enable 3D perspective */
-    }
-
-    /* ----------------------------------------
-       3) The key itself
-       - 3D look: slight rotateX + box-shadow
-       - Greenish color like the example
-       - Fixed size (100px × 100px)
-    ---------------------------------------- */
     .key {
       position: relative;
       width: 100px;
       height: 100px;
       background: #00c08b;
       border-radius: 12px;
-      box-shadow:
-        0 3px 0 #00805f,   /* small dark shadow below to look raised */
-        inset 0 3px 0 rgba(255, 255, 255, 0.15); /* light gloss at top */
-      transform: rotateX(15deg); /* tilt it slightly toward viewer */
-      transform-style: preserve-3d;
+      box-shadow: 0 3px 0 #00805f;
+      transform: rotateX(15deg);
       cursor: pointer;
-      overflow: visible; /* allow sparkles outside */
-      user-select: none;
+      transition: box-shadow 0.3s, transform 0.3s;
+      z-index: 10;
     }
 
-    /* ----------------------------------------
-       4) The swirl icon (centered text)
-       - Using a Unicode swirl “🔄” as a placeholder.
-       - Will spin on click.
-    ---------------------------------------- */
+    .key.glow {
+      box-shadow:
+        0 0 20px #00ffc3,
+        0 0 40px #00ffc3,
+        inset 0 0 10px white;
+      transform: rotateX(5deg) scale(1.05);
+    }
+
     .swirl {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 2.4rem;
+      font-size: 2.5rem;
       color: white;
-      transition: transform 0.2s ease-out;
-      display: inline-block;
+      pointer-events: none;
     }
 
-    /* When .key has .animating, spin the .swirl once */
-    .key.animating .swirl {
-      animation: spinIcon 0.6s ease-in-out;
-    }
-
-    @keyframes spinIcon {
-      0%   { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    /* ----------------------------------------
-       5) Sparkle dots
-       - We place 8 small dots around the key.
-       - Each dot will animate inward then fade out.
-       - On click, we add the “animating” class to .key,
-         causing each sparkle to play its keyframe.
-    ---------------------------------------- */
     .sparkle {
       position: absolute;
-      width: 8px;
-      height: 8px;
-      background: white;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
+      background: white;
       opacity: 0;
+      pointer-events: none;
+      z-index: 1;
     }
 
-    /* Position each sparkle around the key (corners + mid-sides) */
-    .sparkle:nth-child(1) { top: -10px;  left: 50%; transform: translateX(-50%); }
-    .sparkle:nth-child(2) { top: 50%;   left: -10px; transform: translateY(-50%); }
-    .sparkle:nth-child(3) { top: 50%;   right: -10px; transform: translateY(-50%); }
-    .sparkle:nth-child(4) { bottom: -10px; left: 50%; transform: translateX(-50%); }
-    .sparkle:nth-child(5) { top: -10px;  left: -10px; }
-    .sparkle:nth-child(6) { top: -10px;  right: -10px; }
-    .sparkle:nth-child(7) { bottom: -10px; left: -10px; }
-    .sparkle:nth-child(8) { bottom: -10px; right: -10px; }
-
-    /* Define the sparkle animation */
-    @keyframes sparkleIn {
+    @keyframes sparkle3D {
       0% {
-        opacity: 1;
-        transform: translate(0, 0) scale(1);
+        transform: scale(0.2) translate3d(0, 0, 0);
+        opacity: 0.2;
       }
-      40% {
+      50% {
         opacity: 1;
-        transform: translate(calc(-50% + 50px), calc(-50% + 50px)) scale(1.2);
       }
       100% {
+        transform: scale(1.5) translate3d(0px, 0px, 100px);
         opacity: 0;
-        transform: translate(0, 0) scale(0.3);
       }
     }
-
-    /* When .key has .animating, play the sparkle animation on each .sparkle */
-    .key.animating .sparkle {
-      animation: sparkleIn 0.8s forwards;
-    }
-
-    /* Stagger the delays so they come in a small “ring” */
-    .key.animating .sparkle:nth-child(1) { animation-delay: 0s; }
-    .key.animating .sparkle:nth-child(2) { animation-delay: 0.1s; }
-    .key.animating .sparkle:nth-child(3) { animation-delay: 0.15s; }
-    .key.animating .sparkle:nth-child(4) { animation-delay: 0.2s; }
-    .key.animating .sparkle:nth-child(5) { animation-delay: 0.25s; }
-    .key.animating .sparkle:nth-child(6) { animation-delay: 0.3s; }
-    .key.animating .sparkle:nth-child(7) { animation-delay: 0.35s; }
-    .key.animating .sparkle:nth-child(8) { animation-delay: 0.4s; }
   </style>
 </head>
 <body>
-  <div class="key-container">
-    <div class="key" id="chatgptKey">
-      <!-- 8 sparkles around the edge -->
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
 
-      <!-- The swirl icon in the center -->
-      <div class="swirl">🔄</div>
-    </div>
+  <div class="key" id="gptKey">
+    <div class="swirl">🔄</div>
   </div>
 
   <script>
-    // Grab the key element
-    const key = document.getElementById('chatgptKey');
+    const key = document.getElementById("gptKey");
+    let isHolding = false;
+    let sparkleInterval;
 
-    key.addEventListener('click', () => {
-      // Add the "animating" class to start both icon spin + sparkles
-      key.classList.add('animating');
+    // Create and animate 3D sparkle
+    function createSparkle() {
+      const sparkle = document.createElement("div");
+      sparkle.className = "sparkle";
 
-      // After the animation finishes (about 0.8s), remove the class
-      // so that the next click can replay it again.
+      // Random angle around the key
+      const angle = Math.random() * 2 * Math.PI;
+      const radius = 120 + Math.random() * 80;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+
+      sparkle.style.left = 50 + x + "px";
+      sparkle.style.top = 50 + y + "px";
+
+      sparkle.style.animation = "sparkle3D 1.2s linear forwards";
+
+      key.appendChild(sparkle);
+
       setTimeout(() => {
-        key.classList.remove('animating');
-      }, 900);
-    });
+        sparkle.remove();
+      }, 1200);
+    }
+
+    // Start sparkle loop
+    function startSparkles() {
+      if (sparkleInterval) return;
+      sparkleInterval = setInterval(() => {
+        for (let i = 0; i < 3; i++) createSparkle();
+      }, 200);
+    }
+
+    // Stop sparkle loop
+    function stopSparkles() {
+      clearInterval(sparkleInterval);
+      sparkleInterval = null;
+    }
+
+    // Mouse & touch events
+    const holdStart = () => {
+      isHolding = true;
+      key.classList.add("glow");
+      startSparkles();
+    };
+
+    const holdEnd = () => {
+      isHolding = false;
+      key.classList.remove("glow");
+      stopSparkles();
+    };
+
+    key.addEventListener("mousedown", holdStart);
+    key.addEventListener("touchstart", holdStart);
+    document.addEventListener("mouseup", holdEnd);
+    document.addEventListener("touchend", holdEnd);
   </script>
 </body>
 </html>
