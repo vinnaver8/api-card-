@@ -1,446 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Animated Grid (Dark Mode, 3D Toggle)</title>
-  <style>
-        @font-face {
-      font-family: "Geist Sans";
-      src: url("https://assets.codepen.io/605876/GeistVF.ttf") format("truetype");
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-    }
-
-    body {
-      display: grid;
-      place-items: center;
-      background-color: #0D0D0D; /* Dark background */
-      color: #0D0D0D;            /* Light text for dark mode */
-      font-family: "Geist Sans", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-      line-height: 1.4;
-      overflow: hidden;
-    }
-
-    /*──────────────────────────────────────────────────────────────────────────
-      ROOT VARIABLES
-    ──────────────────────────────────────────────────────────────────────────*/
-    :root {
-      /* Speed of the vertical slide animation (in seconds) */
-      --speed: 10s;
-
-      /* Control how “deep” each item pops in 3D when hovered */
-      --hover-z: 24px;
-
-      /* Transition timing for hover states */
-      --transition: 0.15s;
-    }
-
-    /*──────────────────────────────────────────────────────────────────────────
-      ARTICLE / CENTER BOX
-    ──────────────────────────────────────────────────────────────────────────*/
-    main {
-      width: 100%;
-      max-width: 500px;
-      margin: 2rem;
-    }
-
-    article {
-      position: relative; /* for absolutely-positioned controls */
-      background-color: #0D0D0D;         /* slightly lighter than body */
-      border: 1px solid #0D0D0D;
-      border-radius: 6px;
-      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.7);
-      overflow: hidden;
-    }
-
-    .window {
-      /* maintain a fixed-height “viewport” for the scene */
-      height: 400px;
-      width: 500px;
-      transform-style: preserve-3d;
-    }
-
-    .scene {
-      --buff: 3rem; /* used for masking edges */
-      height: 100%;
-      width: 100%;
-      mask:
-        linear-gradient(transparent, white var(--buff), white calc(100% - var(--buff)), transparent),
-        linear-gradient(90deg, transparent, white var(--buff), white calc(100% - var(--buff)), transparent);
-      mask-composite: intersect;
-      -webkit-mask-composite: destination-in;
-    }
-
-    /*──────────────────────────────────────────────────────────────────────────
-      GLOBAL GRID & LIST ITEMS (DARK MODE STYLING)
-    ──────────────────────────────────────────────────────────────────────────*/
-    .grid {
-      --count: 6;   /* total columns (used in animation timing) */
-      --inset: 0;   /* offset at entry */
-      --outset: 2.5;/* offset at exit */
-
-      height: 100%;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      padding: 0 1rem;
-      transform-style: preserve-3d;
-      transition: transform 0.5s ease;
-    }
-
-    /* When #dimension is checked, rotate/skew the entire grid in 3D */
-    :root:has(#dimension:checked) .grid {
-      transform:
-        rotateX(calc(1 * 20deg))
-        rotateZ(calc(1 * -20deg))
-        skewX(calc(1 * 20deg));
-    }
-
-    .grid li {
-      list-style: none;
-      position: relative;
-      width: 100%;
-      min-height: 60px;
-      transform-style: preserve-3d;
-      z-index: calc(1 + var(--active, 0));
-      animation: slide var(--speed) calc((var(--speed) / var(--count)) * (var(--index) - 8)) infinite linear;
-      translate: 0% calc(((var(--count) - var(--index)) + var(--inset)) * 100%);
-    }
-
-    .grid:hover li {
-      animation-play-state: paused;
-    }
-
-    /* Shadow under each item when active */
-    .grid li::before {
-      content: "";
-      position: absolute;
-      inset: 4px 4px -2px -2px;
-      border-radius: 6px;
-      background: rgba(0, 0, 0, 0.3);
-      filter: blur(calc(var(--active, 0) * 8px));
-      z-index: -1;
-      transition: 
-        transform var(--transition),
-        opacity var(--transition),
-        filter var(--transition);
-      transform-origin: 50% 0;
-      transform: scale(1) scaleY(calc(1 + (var(--active, 0) * 0.05)));
-      opacity: calc(1 - var(--active, 0));
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.6),
-                  0 2px 4px -2px rgba(0,0,0,0.6);
-    }
-
-    /* Individual “tile” styling (darked out) */
-    .item {
-      background-color: #111;
-      border: 1px solid #333;
-      border-radius: 6px;
-      color: #eee;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      padding: 1.25rem;
-      text-align: center;
-      cursor: pointer;
-      transform: translate3d(0, 0, calc(var(--active) * var(--hover-z)));
-      transition: 
-        transform var(--transition),
-        scale var(--transition),
-        background-color 0.25s,
-        color 0.25s,
-        border-color 0.25s,
-        box-shadow 0.25s;
-      scale: calc(1 + (var(--active) * 0.05));
-    }
-
-    .item__icon {
-      width: 24px;
-      color: rgb(124, 58, 237);
-      flex-shrink: 0;
-    }
-
-    .item__text {
-      flex: 1;
-      font-size: 1rem;
-    }
-
-    /* Each <li> gets an --index for the animation delay */
-    li:nth-of-type(1)  { --index: 0; }
-    li:nth-of-type(2)  { --index: 0; }
-    li:nth-of-type(3)  { --index: 1; }
-    li:nth-of-type(4)  { --index: 1; }
-    li:nth-of-type(5)  { --index: 2; }
-    li:nth-of-type(6)  { --index: 2; }
-    li:nth-of-type(7)  { --index: 3; }
-    li:nth-of-type(8)  { --index: 3; }
-    li:nth-of-type(9)  { --index: 4; }
-    li:nth-of-type(10) { --index: 4; }
-    li:nth-of-type(11) { --index: 5; }
-    li:nth-of-type(12) { --index: 5; }
-
-    @container (width < 400px) {
-      .grid {
-        --count: 12;
-        --inset: 0;
-        --outset: 3;
-        grid-template-columns: 1fr;
-      }
-      li:nth-of-type(1)  { --index: 0; }
-      li:nth-of-type(2)  { --index: 1; }
-      li:nth-of-type(3)  { --index: 2; }
-      li:nth-of-type(4)  { --index: 3; }
-      li:nth-of-type(5)  { --index: 4; }
-      li:nth-of-type(6)  { --index: 5; }
-      li:nth-of-type(7)  { --index: 6; }
-      li:nth-of-type(8)  { --index: 7; }
-      li:nth-of-type(9)  { --index: 8; }
-      li:nth-of-type(10) { --index: 9; }
-      li:nth-of-type(11) { --index: 10; }
-      li:nth-of-type(12) { --index: 11; }
-      li {
-        --duration: calc(var(--speed) * 2);
-        --delay: calc((var(--duration) / var(--count)) * (var(--index) - 8));
-      }
-    }
-
-    @media(prefers-reduced-motion: no-preference) {
-      .grid {
-        gap: 1rem;
-      }
-      li {
-        --duration: calc(var(--speed) * 1);
-        --delay: calc((var(--duration) / var(--count)) * (var(--index) - 8));
-        animation: slide var(--duration) var(--delay) infinite linear;
-        translate: 0% calc(((var(--count) - var(--index)) + var(--inset)) * 100%);
-      }
-      li:hover {
-        --active: 1;
-      }
-      @keyframes slide {
-        100% {
-          translate: 0% calc(calc((var(--index) + var(--outset)) * -100%));
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Universe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000; /* Black background */
+            overflow: hidden; /* Hide scrollbars */
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
         }
-      }
-      @container (width < 400px) {
-        li {
-          --duration: calc(var(--speed) * 2);
-          --delay: calc((var(--duration) / var(--count)) * (var(--index) - 8));
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0; /* Ensure canvas is behind everything else */
         }
-      }
-    }
-
-    /*──────────────────────────────────────────────────────────────────────────
-      “3D” CONTROL STYLING (positioned over the box)
-    ──────────────────────────────────────────────────────────────────────────*/
-    .controls {
-      position: absolute;
-      top: 80%;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(0, 0, 0, 0.7);
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 0.5rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #eee;
-      z-index: 10;
-      font-size: 0.9rem;
-    }
-
-    .controls label {
-      cursor: pointer;
-    }
-
-    .controls input[type="checkbox"] {
-      width: 1.2rem;
-      height: 1.2rem;
-      accent-color: #db2777;
-      cursor: pointer;
-    }
-  </style>
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 80%; /* Limit width on smaller screens */
+            word-wrap: break-word; /* Ensure long messages wrap */
+        }
+    </style>
 </head>
-<body>
-  <main>
-    <article>
-      <!--─ “3D” Checkbox (only control left) ──────────────────────────────────-->
-      <div class="controls">
-        <label for="dimension">3D</label>
-        <input type="checkbox" id="dimension" checked />
-      </div>
+<body class="bg-black text-white">
+    <div id="loading-indicator" class="message-box" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="mt-2">Loading 3D Universe...</span>
+    </div>
 
-      <!--─ MAIN VISUAL “WINDOW” ────────────────────────────────────────────────-->
-      <div class="window">
-        <div class="scene">
-          <ul class="grid">
-            <!-- Each <li> will animate in a vertical loop; hover pops it forward -->
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <!-- Example SVG icon (replace with your own) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M17.834 6.166a8.25 8.25 0 1 0 0 11.668.75.75 0 0 1 1.06 1.06c-3.807 3.808-9.98 3.808-13.788 0-3.808-3.807-3.808-9.98 0-13.788 3.807-3.808 9.98-3.808 13.788 0A9.722 9.722 0 0 1 21.75 12c0 .975-.296 1.887-.809 2.571-.514.685-1.28 1.179-2.191 1.179-.904 0-1.666-.487-2.18-1.164a5.25 5.25 0 1 1-.82-6.26V8.25a.75.75 0 0 1 1.5 0V12c0 .682.208 1.27.509 1.671.3.401.659.579.991.579.332 0 .69-.178.991-.579.3-.4.509-.99.509-1.671a8.222 8.222 0 0 0-2.416-5.834ZM15.75 12a3.75 3.75 0 1 0-7.5 0 3.75 3.75 0 0 0 7.5 0Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">INDOX</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M10.5 3.798v5.02a3 3 0 0 1-.879 2.121l-2.377 2.377a9.845 9.845 0 0 1 5.091 1.013 8.315 8.315 0 0 0 5.713.636l.285-.071-3.954-3.955a3 3 0 0 1-.879-2.121v-5.02a23.614 23.614 0 0 0-3 0Zm4.5.138a.75.75 0 0 0 .093-1.495A24.837 24.837 0 0 0 12 2.25a25.048 25.048 0 0 0-3.093.191A.75.75 0 0 0 9 3.936v4.882a1.5 1.5 0 0 1-.44 1.06l-6.293 6.294c-1.62 1.621-.903 4.475 1.471 4.88 2.686.46 5.447.698 8.262.698 2.816 0 5.576-.239 8.262-.697 2.373-.406 3.092-3.26 1.47-4.881L15.44 9.879A1.5 1.5 0 0 1 15 8.818V3.936Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Creative</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Performant</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M6.32 2.577a49.255 49.255 0 0 1 11.36 0c1.497.174 2.57 1.46 2.57 2.93V21a.75.75 0 0 1-1.085.67L12 18.089l-7.165 3.583A.75.75 0 0 1 3.75 21V5.507c0-1.47 1.073-2.756 2.57-2.93Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Bookmark</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M5.337 21.718a6.707 6.707 0 0 1-.533-.074.75.75 0 0 1-.44-1.223 3.73 3.73 0 0 0 .814-1.686c.023-.115-.022-.317-.254-.543C3.274 16.587 2.25 14.41 2.25 12c0-5.03 4.428-9 9.75-9s9.75 3.97 9.75 9c0 5.03-4.428 9-9.75 9-.833 0-1.643-.097-2.417-.279a6.721 6.721 0 0 1-4.246.997Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Share</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M14.447 3.026a.75.75 0 0 1 .527.921l-4.5 16.5a.75.75 0 0 1-1.448-.394l4.5-16.5a.75.75 0 0 1 .921-.527ZM16.72 6.22a.75.75 0 0 1 1.06 0l5.25 5.25a.75.75 0 0 1 0 1.06l-5.25 5.25a.75.75 0 1 1-1.06-1.06L21.44 12l-4.72-4.72a.75.75 0 0 1 0-1.06Zm-9.44 0a.75.75 0 0 1 0 1.06L2.56 12l4.72 4.72a.75.75 0 0 1-1.06 1.06L.97 12.53a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">CSS!</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Responsive</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v.816a3.836 3.836 0 0 0-1.72.756c-.712.566-1.112 1.35-1.112 2.178 0 .829.4 1.612 1.113 2.178.502.4 1.102.647 1.719.756v2.978a2.536 2.536 0 0 1-.921-.421l-.879-.66a.75.75 0 0 0-.9 1.2l.879.66c.533.4 1.169.645 1.821.75V18a.75.75 0 0 0 1.5 0v-.81a4.124 4.124 0 0 0 1.821-.749c.745-.559 1.179-1.344 1.179-2.191 0-.847-.434-1.632-1.179-2.191a4.122 4.122 0 0 0-1.821-.75V8.354c.29.082.559.213.786.393l.415.33a.75.75 0 0 0 .933-1.175l-.415-.33a3.836 3.836 0 0 0-1.719-.755V6Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Profit</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"/>
-                  </svg>
-                </div>
-                <div class="item__text">Like</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M12 1.5a.75.75 0 0 1 .75.75V4.5a.75.75 0 0 1-1.5 0V2.25A.75.75 0 0 1 12 1.5ZM5.636 4.136a.75.75 0 0 1 1.06 0l1.592 1.591a.75.75 0 0 1-1.061 1.06l-1.591-1.59a.75.75 0 0 1 0-1.061Zm12.728 0a.75.75 0 0 1 0 1.06l-1.591 1.592a.75.75 0 0 1-1.06-1.061l1.59-1.591a.75.75 0 0 1 1.061 0Zm-6.816 4.496a.75.75 0 0 1 .82.311l5.228 7.917a.75.75 0 0 1-.777 1.148l-2.097-.43 1.045 3.9a.75.75 0 0 1-1.45.388l-1.044-3.899-1.601 1.42a.75.75 0 0 1-1.247-.606l.569-9.47a.75.75 0 0 1 .554-.68ZM3 10.5a.75.75 0 0 1 .75-.75H6a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 10.5Zm14.25 0a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5H18a.75.75 0 0 1-.75-.75Zm-8.962 3.712a.75.75 0 0 1 0 1.061l-1.591 1.591a.75.75 0 1 1-1.061-1.06l1.591-1.592a.75.75 0 0 1 1.06 0Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Hover</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9.375 3a1.875 1.875 0 0 0 0 3.75h1.875v4.5H3.375A1.875 1.875 0 0 1 1.5 9.375v-.75c0-1.036.84-1.875 1.875-1.875h3.193A3.375 3.375 0 0 1 12 2.753a3.375 3.375 0 0 1 5.432 3.997h3.943c1.035 0 1.875.84 1.875 1.875v.75c0 1.036-.84 1.875-1.875 1.875H12.75v-4.5h1.875a1.875 1.875 0 1 0-1.875-1.875V6.75h-1.5V4.875C11.25 3.839 10.41 3 9.375 3ZM11.25 12.75H3v6.75a2.25 2.25 0 0 0 2.25 2.25h6v-9ZM12.75 12.75v9h6.75a2.25 2.25 0 0 0 2.25-2.25v-6.75h-9Z"/>
-                  </svg>
-                </div>
-                <div class="item__text">Gift</div>
-              </div>
-            </li>
-            <li>
-              <div class="item">
-                <div class="item__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.004 10.407c.138.435-.216.842-.672.842h-3.465a.75.75 0 0 1-.65-.375l-1.732-3c-.229-.396-.053-.907.393-1.004a5.252 5.252 0 0 1 6.126 3.537ZM8.12 8.464c.307-.338.838-.235 1.066.16l1.732 3a.75.75 0 0 1 0 .75l-1.732 3c-.229.397-.76.5-1.067.161A5.23 5.23 0 0 1 6.75 12a5.23 5.23 0 0 1 1.37-3.536ZM10.878 17.13c-.447-.098-.623-.608-.394-1.004l1.733-3.002a.75.75 0 0 1 .65-.375h3.465c.457 0 .81.407.672.842a5.252 5.252 0 0 1-6.126 3.539Z"/>
-                    <path fill-rule="evenodd"
-                      d="M21 12.75a.75.75 0 1 0 0-1.5h-.783a8.22 8.22 0 0 0-.237-1.357l.734-.267a.75.75 0 1 0-.513-1.41l-.735.268a8.24 8.24 0 0 0-.689-1.192l.6-.503a.75.75 0 1 0-.964-1.149l-.6.504a8.3 8.3 0 0 0-1.054-.885l.391-.678a.75.75 0 1 0-1.299-.75l-.39.676a8.188 8.188 0 0 0-1.295-.47l.136-.77a.75.75 0 0 0-1.477-.26l-.136.77a8.36 8.36 0 0 0-1.377 0l-.136-.77a.75.75 0 1 0-1.477.26l.136.77c-.448.121-.88.28-1.294.47l-.39-.676a.75.75 0 1 0-1.3.75l.392.678a8.29 8.29 0 0 0-1.054.885l-.6-.504a.75.75 0 1 0-.965 1.149l.6.503a8.243 8.243 0 0 0-.689 1.192L3.8 8.216a.75.75 0 1 0-.513 1.41l.735.267a8.222 8.222 0 0 0-.238 1.356h-.783a.75.75 0 0 0 0 1.5h.783c.042.464.122.917.238 1.356l-.735.268a.75.75 0 0 0 .513 1.41l.735-.268c.197.417.428.816.69 1.191l-.6.504a.75.75 0 0 0 .963 1.15l.601-.505c.326.323.679.62 1.054.885l-.392.68a.75.75 0 0 0 1.3.75l.39-.679c.414.192.847.35 1.294.471l-.136.77a.75.75 0 0 0 1.477.261l.137-.772a8.332 8.332 0 0 0 1.376 0l.136.772a.75.75 0 1 0 1.477-.26l-.136-.771a8.19 8.19 0 0 0 1.294-.47l.391.677a.75.75 0 0 0 1.3-.75l-.393-.679a8.29 8.29 0 0 0 1.054-.885l.601.504a.75.75 0 0 0 .964-1.15l-.6-.503c.261-.375.492-.774.69-1.191l.735.267a.75.75 0 1 0 .512-1.41l-.734-.267c.115-.439.195-.892.237-1.356h.784Zm-2.657-3.06a6.744 6.744 0 0 0-1.19-2.053 6.784 6.784 0 0 0-1.82-1.51A6.705 6.705 0 0 0 12 5.25a6.8 6.8 0 0 0-1.225.11 6.7 6.7 0 0 0-2.15.793 6.784 6.784 0 0 0-2.952 3.489.76.76 0 0 1-.036.098A6.74 6.74 0 0 0 5.251 12a6.74 6.74 0 0 0 3.366 5.842l.009.005a6.704 6.704 0 0 0 2.18.798l.022.003a6.792 6.792 0 0 0 2.368-.004 6.704 6.704 0 0 0 2.205-.811 6.785 6.785 0 0 0 1.762-1.484l.009-.01.009-.01a6.743 6.743 0 0 0 1.18-2.066c.253-.707.39-1.469.39-2.263a6.74 6.74 0 0 0-.408-2.309Z"
-                      clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="item__text">Configurable</div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </article>
-  </main>
- <script>
-    const dimensionCheckbox = document.querySelector("#dimension");
-    dimensionCheckbox.addEventListener("change", () => {
-    });
-  </script>
+    <div id="custom-message-box" class="message-box"></div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let lines = [];
+        let dots = [];
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let currentIntersected = null; // To keep track of the currently hovered object
+        let lastClickedDot = null; // To keep track of the dot that was last clicked
+        let messageIsPersistent = false; // Flag to control message persistence
+
+        // Predefined AI messages inspired by your images
+        const aiMessages = [
+            "DO OTHER MINDS INHABIT THE STARS?",
+            "HOW DOES CONSCIOUSNESS EMERGE FROM MATTER?",
+            "HOW DO BLACK HOLES RESHAPE REALITY?",
+            "WHAT BINDS THE FABRIC OF SPACETIME?",
+            "IS THE UNIVERSE INFINITE, OR DOES IT HAVE A BOUNDARY?",
+            "ARE THERE PARALLEL UNIVERSES?",
+            "WHAT IS DARK MATTER AND DARK ENERGY?",
+            "HOW DID LIFE BEGIN IN THE COSMOS?"
+        ];
+        let messageIndex = 0; // To cycle through messages on click
+
+        // Function to show a custom message box
+        // Duration 0 means it stays until explicitly hidden (e.g., mouseleave, or new click)
+        function showMessageBox(message) { // Removed duration parameter as it's now controlled by logic
+            const messageBox = document.getElementById('custom-message-box');
+            messageBox.textContent = message;
+            messageBox.style.display = 'block';
+            clearTimeout(messageBox.hideTimeout); // Clear any existing hide timeout
+        }
+
+        // Function to hide the message box
+        function hideMessageBox() {
+            const messageBox = document.getElementById('custom-message-box');
+            messageBox.style.display = 'none';
+            clearTimeout(messageBox.hideTimeout); // Clear any existing hide timeout
+        }
+
+        function init() {
+            const loadingIndicator = document.getElementById('loading-indicator');
+            loadingIndicator.style.display = 'flex'; // Show loading indicator
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000); // Black background
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 250; // Initial zoom out position
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // OrbitControls for 360-degree interaction
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // Smooth camera movement
+            controls.dampingFactor = 0.05;
+            controls.enablePan = false; // Disable panning (fixed position)
+            controls.maxDistance = 500; // Limit zoom out
+            controls.minDistance = 50; // Limit zoom in (prevent going through the center)
+
+            // Generate lines and dots
+            const numElements = 200;
+            const lineLength = 150; // Fixed length for all lines
+
+            for (let i = 0; i < numElements; i++) {
+                // Generate a random direction vector
+                const direction = new THREE.Vector3(
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2
+                ).normalize();
+
+                // Calculate the end point based on the fixed lineLength
+                const startPoint = new THREE.Vector3(0, 0, 0); // All lines originate from the center
+                const endPoint = direction.clone().multiplyScalar(lineLength);
+
+                // Line
+                const points = [startPoint, endPoint];
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }); // White, semi-transparent
+                const line = new THREE.Line(geometry, material);
+                scene.add(line);
+                lines.push(line);
+
+                // Dot (small cube) at the end of the line
+                // Increased size for easier interaction area
+                const dotGeometry = new THREE.BoxGeometry(7, 7, 7);
+                const dotMaterial = new THREE.MeshBasicMaterial({ color: 0x93c5fd }); // Light blue
+                const dot = new THREE.Mesh(dotGeometry, dotMaterial);
+                dot.position.copy(endPoint); // Position dot explicitly at the end of the line
+                dot.originalColor = dotMaterial.color.getHex(); // Store original color for hover effect
+                scene.add(dot);
+                dots.push(dot);
+            }
+
+            // Event Listeners for mouse interaction
+            renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+            renderer.domElement.addEventListener('click', onClick, false);
+            // Add touch event listeners for mobile devices
+            renderer.domElement.addEventListener('touchstart', onTouchStart, false);
+            renderer.domElement.addEventListener('touchend', onTouchEnd, false);
+            renderer.domElement.addEventListener('touchmove', onTouchMove, false);
+
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+
+            loadingIndicator.style.display = 'none'; // Hide loading indicator
+        }
+
+        function onMouseMove(event) {
+            // Calculate mouse position in normalized device coordinates (-1 to +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update the raycaster with the camera and mouse position
+            raycaster.setFromCamera(mouse, camera);
+
+            // Calculate objects intersecting the raycaster
+            const intersects = raycaster.intersectObjects(dots);
+
+            if (intersects.length > 0) {
+                const intersectedObject = intersects[0].object;
+
+                // If a new object is intersected, unhighlight the previous one (if not the last clicked)
+                if (currentIntersected && currentIntersected !== intersectedObject && currentIntersected !== lastClickedDot) {
+                    currentIntersected.material.color.setHex(currentIntersected.originalColor);
+                }
+
+                // Highlight the current intersected object
+                if (intersectedObject.material.color.getHex() !== 0xff0000) { // Avoid re-setting if already highlighted
+                    intersectedObject.material.color.setHex(0xff0000); // Highlight with red on hover
+                }
+                currentIntersected = intersectedObject;
+
+                // Show message on hover, but only if no persistent message is active
+                if (!messageIsPersistent || lastClickedDot !== intersectedObject) {
+                    showMessageBox(aiMessages[messageIndex % aiMessages.length]);
+                }
+
+            } else {
+                // If no intersection
+                if (currentIntersected && currentIntersected !== lastClickedDot) {
+                    currentIntersected.material.color.setHex(currentIntersected.originalColor);
+                }
+                currentIntersected = null;
+
+                // Hide message only if no persistent message is active
+                if (!messageIsPersistent) {
+                    hideMessageBox();
+                }
+            }
+        }
+
+        function onClick(event) {
+            // Calculate mouse position in normalized device coordinates (-1 to +1)
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Update the raycaster with the camera and mouse position
+            raycaster.setFromCamera(mouse, camera);
+
+            // Calculate objects intersecting the raycaster
+            const intersects = raycaster.intersectObjects(dots);
+
+            if (intersects.length > 0) {
+                const clickedDot = intersects[0].object;
+
+                // If a different dot is clicked, or if no dot was previously clicked
+                if (lastClickedDot !== clickedDot) {
+                    // Restore color of previously clicked dot if it exists and is not currently hovered
+                    if (lastClickedDot && lastClickedDot !== currentIntersected) {
+                        lastClickedDot.material.color.setHex(lastClickedDot.originalColor);
+                    }
+                    lastClickedDot = clickedDot;
+                    messageIsPersistent = true; // Make message persistent
+
+                    // Highlight the clicked dot
+                    clickedDot.material.color.setHex(0xff0000);
+
+                    // Cycle to the next message and display it persistently
+                    messageIndex = (messageIndex + 1) % aiMessages.length;
+                    showMessageBox(aiMessages[messageIndex]); // No duration
+                } else {
+                    // If the same dot is clicked again, cycle message but keep persistence
+                    messageIndex = (messageIndex + 1) % aiMessages.length;
+                    showMessageBox(aiMessages[messageIndex]);
+                }
+            } else {
+                // If click happened on empty space, clear persistent message
+                if (lastClickedDot) {
+                    lastClickedDot.material.color.setHex(lastClickedDot.originalColor);
+                }
+                lastClickedDot = null;
+                messageIsPersistent = false;
+                hideMessageBox();
+            }
+        }
+
+        // Touch event handlers for mobile
+        function onTouchStart(event) {
+            if (event.touches.length > 0) {
+                // Prevent default touch behavior (like scrolling) for the canvas
+                event.preventDefault();
+                // Simulate mouse move for hover effect
+                onMouseMove({
+                    clientX: event.touches[0].clientX,
+                    clientY: event.touches[0].clientY
+                });
+            }
+        }
+
+        function onTouchEnd(event) {
+            // Simulate a click on touch end if an object was intersected
+            // The onClick function will handle persistence and message update
+            onClick({
+                clientX: event.changedTouches[0].clientX,
+                clientY: event.changedTouches[0].clientY
+            });
+
+            // After touch ends, if no dot was clicked, or if the message is not persistent, hide it
+            if (!messageIsPersistent) {
+                hideMessageBox();
+            }
+        }
+
+        function onTouchMove(event) {
+            if (event.touches.length > 0) {
+                event.preventDefault(); // Prevent scrolling while dragging
+                // Update mouse position for raycasting
+                onMouseMove({
+                    clientX: event.touches[0].clientX,
+                    clientY: event.touches[0].clientY
+                });
+            }
+        }
+
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // Only required if controls.enableDamping or controls.autoRotate are set to true
+            renderer.render(scene, camera);
+        }
+
+        // Start the animation on window load.
+        window.onload = function () {
+            try {
+                init();
+                animate();
+            } catch (error) {
+                console.error("Error initializing 3D scene:", error);
+                showMessageBox("Failed to load 3D universe. Please try again or check console for errors.");
+                document.getElementById('loading-indicator').style.display = 'none'; // Hide loading indicator on error
+            }
+        }
+    </script>
 </body>
 </html>
