@@ -2,121 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>4-Key 3D Keyboard Layout with Main Glowing Key</title>
+  <title>Custom Sparkle Button (Green, 150×150)</title>
   <style>
-    /* ----------------------------
-       1) Page & Centering
-    ---------------------------- */
-    body {
-      margin: 0;
-      padding: 0;
+    /* ================================================
+       1) Reset & Base (only for csb‐prefixed elements)
+    ================================================ */
+    .csb-*, 
+    .csb-*:after, 
+    .csb-*:before {
+      box-sizing: border-box;
+    }
+
+    /* ================================================
+       2) Container & Centering
+    ================================================ */
+    .csb-container {
+      width: 100vw;
       height: 100vh;
+      background: #121212;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #121212;
       overflow: hidden;
-      user-select: none;
-      font-family: sans-serif;
+      margin: 0; 
+      padding: 0;
     }
 
-    /* ----------------------------
-       2) Keyboard Container
-       - 2×2 grid of equal‐sized keys
-    ---------------------------- */
-    .keyboard {
-      display: grid;
-      grid-template-columns: repeat(2, 120px);
-      grid-template-rows: repeat(2, 120px);
-      gap: 12px;
-      perspective: 1000px;
-    }
-
-    /* ----------------------------
-       3) Base Key Styling
-       - 120×120 px each
-       - 3D tilt with rotateX/rotateY
-       - Default inset/outer shadows for a keycap look
-       - Transition on transform & box-shadow
-    ---------------------------- */
-    .key {
+    /* ================================================
+       3) The Green 3D Button (150×150 px)
+       - Unique class: .csb-button
+       - Tilted in 3D, gradient background
+       - Shadow/bevel for a “keycap” look
+    ================================================ */
+    .csb-button {
       position: relative;
-      width: 120px;
-      height: 120px;
-      background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
-      border-radius: 8px;
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(145deg, #00c08b, #00a078);
+      border-radius: 12px;
       box-shadow:
-        /* Outer shadow to lift off the page */
-        0 6px 15px rgba(0, 0, 0, 0.5),
-        /* Inner highlight top-left */
-        inset 0 3px 6px rgba(255, 255, 255, 0.1),
-        /* Inner shadow bottom-right */
-        inset 0 -3px 6px rgba(0, 0, 0, 0.3);
+        /* Outer shadow lifts it from background */
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        /* Inner highlight at top-left */
+        inset 0 4px 8px rgba(255, 255, 255, 0.15),
+        /* Inner shadow at bottom-right */
+        inset 0 -4px 8px rgba(0, 0, 0, 0.2);
       transform: rotateX(15deg) rotateY(-10deg);
       transform-style: preserve-3d;
       cursor: pointer;
-      user-select: none;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      overflow: visible; /* so dots can appear outside if needed */
       display: flex;
       justify-content: center;
       align-items: center;
-      color: white;
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      user-select: none;
     }
 
-    /* ----------------------------
-       4) Pressed State (all keys)
-       - Slightly push in
-    ---------------------------- */
-    .key.pressed {
+    /* ================================================
+       4) “Pressed” State (push in + darker shadow)
+    ================================================ */
+    .csb-button.csb-pressed {
       transform: rotateX(10deg) rotateY(-8deg) translateZ(-6px);
       box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.6),
-        inset 0 2px 4px rgba(255, 255, 255, 0.08),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+        0 4px 12px rgba(0, 0, 0, 0.6),
+        inset 0 2px 4px rgba(255, 255, 255, 0.1),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.15);
     }
 
-    /* ----------------------------
-       5) Main Key Specific Styling
-       - Green background with glow on hold
-       - Contains swirl icon
-    ---------------------------- */
-    .main-key {
-      background: linear-gradient(145deg, #00c08b, #00a078);
-      box-shadow:
-        0 6px 15px rgba(0, 0, 0, 0.5),
-        inset 0 3px 6px rgba(255, 255, 255, 0.15),
-        inset 0 -3px 6px rgba(0, 0, 0, 0.2);
-      font-size: 1.5rem;
-    }
-
-    /* Glow effect when holding main key */
-    .main-key.glow {
+    /* ================================================
+       5) Glow Effect While Holding
+    ================================================ */
+    .csb-button.csb-glow {
       box-shadow:
         0 0 20px #00ffc3,
         0 0 40px #00ffc3,
-        inset 0 0 10px white;
+        inset 0 0 12px white;
       transform: rotateX(10deg) rotateY(-8deg) translateZ(-6px) scale(1.02);
     }
 
-    /* Swirl icon in the center of the main key */
-    .main-key .swirl {
+    /* ================================================
+       6) Center Icon (“Swirl”) Inside Button
+    ================================================ */
+    .csb-icon {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 2.5rem;
+      font-size: 3rem;
       color: white;
       pointer-events: none;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
-    /* ----------------------------
-       6) Dot ("sparkle") Style
-    ---------------------------- */
-    .dot {
+    /* ================================================
+       7) Inward‐Moving Dot (“sparkle”) Style
+       - Unique class: .csb-dot
+    ================================================ */
+    .csb-dot {
       position: absolute;
       width: 10px;
       height: 10px;
@@ -131,121 +113,81 @@
 </head>
 
 <body>
-  <!-- ===============================
-       Four‐key keyboard layout
-       [Ctrl]  [C]
-       [V]     [ Main (Swirl) ]
-  =============================== -->
-  <div class="keyboard">
-    <!-- Top‐Left: "Ctrl" key -->
-    <div class="key default-key" data-label="Ctrl">Ctrl</div>
-
-    <!-- Top‐Right: "C" key -->
-    <div class="key default-key" data-label="C">C</div>
-
-    <!-- Bottom‐Left: "V" key -->
-    <div class="key default-key" data-label="V">V</div>
-
-    <!-- Bottom‐Right: Main swirling key -->
-    <div class="key main-key" id="mainKey">
-      <div class="swirl">🔄</div>
-      <!-- Dots will be injected here -->
+  <div class="csb-container">
+    <!--
+      The single green button (150×150) with a swirl icon.
+      Press & hold → glows + spawns inward‐moving dots.
+    -->
+    <div class="csb-button" id="csb-button">
+      <div class="csb-icon">🔄</div>
+      <!-- Dots will be dynamically injected here -->
     </div>
   </div>
 
   <script>
-    /**********************************************************
-     * 1) Add 3D “pressed” effect to the three default keys   *
-     **********************************************************/
-    document.querySelectorAll(".default-key").forEach((keyEl) => {
-      keyEl.addEventListener("mousedown", () => {
-        keyEl.classList.add("pressed");
-      });
-      keyEl.addEventListener("mouseup", () => {
-        keyEl.classList.remove("pressed");
-      });
-      keyEl.addEventListener("mouseleave", () => {
-        keyEl.classList.remove("pressed");
-      });
-      // Touch support
-      keyEl.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        keyEl.classList.add("pressed");
-      });
-      keyEl.addEventListener("touchend", () => {
-        keyEl.classList.remove("pressed");
-      });
-      keyEl.addEventListener("touchcancel", () => {
-        keyEl.classList.remove("pressed");
-      });
-    });
-
-    /**********************************************************
-     * 2) Main Key: Glow + Inward‐Moving Dot Animation         *
-     **********************************************************/
-    (function () {
-      const mainKey = document.getElementById("mainKey");
+    (function() {
+      const btn = document.getElementById("csb-button");
       let isHolding = false;
       let spawnInterval = null;
 
       // Dot parameters
-      const DOT_SIZE = 10;         // px
-      const SPAWN_RATE = 150;      // ms between batches
-      const DOTS_PER_BATCH = 5;    // how many dots each batch
+      const DOT_SIZE = 10;        // px
+      const SPAWN_RATE = 150;     // ms between batches
+      const DOTS_PER_BATCH = 5;   // how many dots each time
 
-      // Utility: random angle (0 to 2π)
+      // Return a random angle [0, 2π)
       function randomAngle() {
         return Math.random() * Math.PI * 2;
       }
 
-      // Spawn a single dot inside mainKey
+      // Spawn a single dot that animates inward
       function spawnDot() {
-        // Read mainKey dimensions & position
-        const rect = mainKey.getBoundingClientRect();
+        // 1) Measure current button size
+        const rect = btn.getBoundingClientRect();
         const KEY_W = rect.width;
         const KEY_H = rect.height;
 
-        // Compute radius: ~ 0.8 × max(width, height)
+        // 2) Compute spawn radius = 0.8 × max(width, height)
         const RADIUS = Math.max(KEY_W, KEY_H) * 0.8;
 
-        // Random angle 
+        // 3) Pick a random angle θ
         const θ = randomAngle();
         const centerX = KEY_W / 2;
         const centerY = KEY_H / 2;
 
-        // Starting coordinates relative to mainKey’s top-left
+        // 4) Starting coordinates (relative to .csb-button)
         const startX = centerX + Math.cos(θ) * RADIUS - DOT_SIZE / 2;
         const startY = centerY + Math.sin(θ) * RADIUS - DOT_SIZE / 2;
 
-        // Create the dot element
+        // 5) Create a <div class="csb-dot">
         const dot = document.createElement("div");
-        dot.className = "dot";
+        dot.className = "csb-dot";
         dot.style.left = startX + "px";
         dot.style.top = startY + "px";
         dot.style.opacity = "1";
 
-        // Attach to mainKey
-        mainKey.appendChild(dot);
+        // 6) Append inside the button
+        btn.appendChild(dot);
 
-        // Force reflow so the transition can occur
+        // 7) Force reflow so transition can run
         dot.offsetHeight;
 
-        // Move to exact center; fade out
+        // 8) Move to exact center & fade out
         const centerPosX = centerX - DOT_SIZE / 2;
         const centerPosY = centerY - DOT_SIZE / 2;
         dot.style.left = centerPosX + "px";
         dot.style.top = centerPosY + "px";
         dot.style.opacity = "0";
 
-        // Remove after 750ms (transition is 0.7s)
+        // 9) Remove after 0.75 s
         setTimeout(() => {
-          if (dot.parentNode === mainKey) {
-            mainKey.removeChild(dot);
+          if (dot.parentNode === btn) {
+            btn.removeChild(dot);
           }
         }, 750);
       }
 
-      // Start spawning batches of dots
+      // Start spawning small batches of dots
       function startSpawning() {
         if (spawnInterval) return;
         spawnInterval = setInterval(() => {
@@ -255,39 +197,39 @@
         }, SPAWN_RATE);
       }
 
-      // Stop spawning
+      // Stop spawning new dots
       function stopSpawning() {
         clearInterval(spawnInterval);
         spawnInterval = null;
       }
 
-      // On press/hold
+      // On press/hold: add pressed + glow, begin spawning
       function handleHoldStart(e) {
         e.preventDefault();
         if (isHolding) return;
         isHolding = true;
-        mainKey.classList.add("pressed");
-        mainKey.classList.add("glow");
+        btn.classList.add("csb-pressed");
+        btn.classList.add("csb-glow");
         startSpawning();
       }
 
-      // On release
+      // On release: remove pressed + glow, stop spawning
       function handleHoldEnd() {
         if (!isHolding) return;
         isHolding = false;
-        mainKey.classList.remove("pressed");
-        mainKey.classList.remove("glow");
+        btn.classList.remove("csb-pressed");
+        btn.classList.remove("csb-glow");
         stopSpawning();
       }
 
-      // Mouse events
-      mainKey.addEventListener("mousedown", handleHoldStart);
-      mainKey.addEventListener("mouseup", handleHoldEnd);
-      mainKey.addEventListener("mouseleave", handleHoldEnd);
-      // Touch events
-      mainKey.addEventListener("touchstart", handleHoldStart);
-      mainKey.addEventListener("touchend", handleHoldEnd);
-      mainKey.addEventListener("touchcancel", handleHoldEnd);
+      // Attach mouse/touch events
+      btn.addEventListener("mousedown", handleHoldStart);
+      btn.addEventListener("touchstart", handleHoldStart, { passive: false });
+
+      document.addEventListener("mouseup", handleHoldEnd);
+      document.addEventListener("touchend", handleHoldEnd);
+      document.addEventListener("touchcancel", handleHoldEnd);
+      btn.addEventListener("mouseleave", handleHoldEnd);
     })();
   </script>
 </body>
