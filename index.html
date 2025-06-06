@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Static Globe — Memphis to London (Fixed)</title>
+  <title>Multi‐Arc Globe with Horizontal Drag</title>
   <style>
     html, body {
       margin: 0;
@@ -19,83 +19,113 @@
 <body>
   <!-- 1) three.js core -->
   <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
-  <!-- 2) d3 (must come _before_ three-globe) -->
+  <!-- 2) d3 (must come BEFORE three-globe) -->
   <script src="https://unpkg.com/d3@7"></script>
-  <!-- 3) three-globe (will register itself to THREE using d3 internally) -->
+  <!-- 3) three-globe (will register itself to THREE using d3) -->
   <script src="https://unpkg.com/three-globe@2.27.0"></script>
+  <!-- 4) OrbitControls for horizontal dragging -->
+  <script src="https://unpkg.com/three/examples/js/controls/OrbitControls.js"></script>
 
   <script>
-    // ————— Renderer / Scene / Camera Setup —————
+    // ————— Renderer / Scene / Camera —————
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
 
-    // Wide field of view and camera pulled back so the globe is fully visible
+    // Use a wide FOV to ensure the globe fits on smaller screens
     const camera = new THREE.PerspectiveCamera(
-      60, 
-      window.innerWidth / window.innerHeight, 
-      0.1, 
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
       1000
     );
+    // Pull the camera back so the entire globe is visible
     camera.position.z = 350;
+
+    // ————— Define Multiple Arcs —————
+    // Each arc has startLat, startLng, endLat, endLng.
+    const arcs = [
+      {
+        startLat: 35.1495,   // Memphis, TN
+        startLng: -90.0490,
+        endLat: 51.5053,     // London, UK
+        endLng: -0.1218,
+        labelStart: "MEMPHIS\n35.1495°N,\n90.0490°W",
+        labelEnd:   "LONDON\n51.5053°N,\n0.1218°W"
+      },
+      {
+        startLat: 40.7128,   // New York, NY
+        startLng: -74.0060,
+        endLat: 48.8566,     // Paris, France
+        endLng: 2.3522,
+        labelStart: "NEW YORK\n40.7128°N,\n74.0060°W",
+        labelEnd:   "PARIS\n48.8566°N,\n2.3522°E"
+      },
+      {
+        startLat: 35.6895,   // Tokyo, Japan
+        startLng: 139.6917,
+        endLat: -33.8688,    // Sydney, Australia
+        endLng: 151.2093,
+        labelStart: "TOKYO\n35.6895°N,\n139.6917°E",
+        labelEnd:   "SYDNEY\n33.8688°S,\n151.2093°E"
+      }
+    ];
+
+    // Build an array of all label‐points (each endpoint)
+    const labelPoints = arcs.flatMap(arc => ([
+      { lat: arc.startLat, lng: arc.startLng, label: arc.labelStart },
+      { lat: arc.endLat,   lng: arc.endLng,   label: arc.labelEnd   }
+    ]));
 
     // ————— Create the Globe —————
     const globe = new ThreeGlobe()
       // Dark‐theme Earth texture
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
-      // Single arc from Memphis → London
-      .arcsData([
-        {
-          startLat: 35.1495,
-          startLng: -90.0490,
-          endLat: 51.5053,
-          endLng: -0.1218
-        }
-      ])
-      // Solid orange line (no dash animation)
+      // Supply all arcs at once
+      .arcsData(arcs)
+      // Make each arc a solid orange line (no dashing)
       .arcColor(() => '#ff5500')
       .arcStroke(1.5)
-      .arcDashLength(1)      // full stroke (no dashing)
-      .arcDashGap(0)         // no gaps
-      .arcDashAnimateTime(0) // disable any dash‐anim
-      // Two labels: one at Memphis, one at London
-      .labelsData([
-        {
-          lat: 35.1495,
-          lng: -90.0490,
-          label: "MEMPHIS\n35.1495°N,\n90.049°W"
-        },
-        {
-          lat: 51.5053,
-          lng: -0.1218,
-          label: "LONDON\n51.5053°N,\n0.121°W"
-        }
-      ])
+      .arcDashLength(1)      // full stroke length
+      .arcDashGap(0)         // zero gap
+      .arcDashAnimateTime(0) // disable dash animation
+      // Display a white label at each endpoint
+      .labelsData(labelPoints)
       .labelText(d => d.label)
       .labelSize(2.7)
-      .labelDotRadius(0)      // hide default dot
+      .labelDotRadius(0)     // hide the default dot
       .labelColor(() => 'white');
 
     scene.add(globe);
 
-    // ————— Place Orange Square Markers at Both Endpoints —————
+    // ————— Place Orange Square Markers at All Endpoints —————
     const markerSize = 2.5;
     const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff5500 });
-    const putMarker = (lat, lng) => {
-      const geometry = new THREE.BoxGeometry(markerSize, markerSize, markerSize);
-      const mesh = new THREE.Mesh(geometry, markerMaterial);
-      // three-globe provides getCoords(lat, lng, radius)
-      const { x, y, z } = globe.getCoords(lat, lng, globe.getGlobeRadius());
-      mesh.position.set(x, y, z);
-      scene.add(mesh);
-    };
+    arcs.forEach(arc => {
+      // For start‐point:
+      const geoStart = new THREE.BoxGeometry(markerSize, markerSize, markerSize);
+      const boxStart = new THREE.Mesh(geoStart, markerMaterial);
+      const { x: xs, y: ys, z: zs } = globe.getCoords(
+        arc.startLat, 
+        arc.startLng, 
+        globe.getGlobeRadius()
+      );
+      boxStart.position.set(xs, ys, zs);
+      scene.add(boxStart);
 
-    // Memphis marker
-    putMarker(35.1495, -90.0490);
-    // London marker
-    putMarker(51.5053, -0.1218);
+      // For end‐point:
+      const geoEnd = new THREE.BoxGeometry(markerSize, markerSize, markerSize);
+      const boxEnd = new THREE.Mesh(geoEnd, markerMaterial);
+      const { x: xe, y: ye, z: ze } = globe.getCoords(
+        arc.endLat, 
+        arc.endLng, 
+        globe.getGlobeRadius()
+      );
+      boxEnd.position.set(xe, ye, ze);
+      scene.add(boxEnd);
+    });
 
     // ————— Lighting —————
     scene.add(new THREE.AmbientLight(0x888888));
@@ -103,15 +133,25 @@
     dirLight.position.set(0, 0, 400);
     scene.add(dirLight);
 
-    // ————— Simple Auto-Rotate Loop (No user controls) —————
+    // ————— OrbitControls (Lock Vertical Movement) —————
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = false;
+    // Prevent the user from rotating up/down:
+    controls.minPolarAngle = Math.PI / 2;
+    controls.maxPolarAngle = Math.PI / 2;
+
+    // ————— Animate (Auto‐Rotate & Render) —————
     function animate() {
-      globe.rotation.y += 0.002; // slow rightward rotation
+      // Auto‐rotate the globe slowly to the right
+      globe.rotation.y += 0.0015;
+
+      controls.update();
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
     animate();
 
-    // ————— Handle Window Resize —————
+    // ————— Handle Resize for Responsive View —————
     window.addEventListener('resize', () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
