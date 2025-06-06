@@ -1,167 +1,430 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Soft-Body Button Demo</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Infinite Vertical Scroller</title>
+
+  <!--─── CSS: Normalize + base/demo layers ──────────────────────────────────-->
   <style>
-    body {
-      margin: 0;
-      background: #1c1c1c;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
+    /* 1) Pull in Normalize.css into the “normalize” layer */
+    @import url('https://unpkg.com/normalize.css') layer(normalize);
+
+    /* 2) Declare layers */
+    @layer normalize, base, demo;
+
+    /* 3) DEMO LAYER: styles for the scroller */
+    @layer demo {
+      .container {
+        --font-level: 8;
+        opacity: 0;
+        height: 3lh; /* “lh” = 1× line-height */
+        display: flex;
+        place-items: center;
+        mask: linear-gradient(
+          #0000 0.25lh,
+          #fff calc(50% - 0.5lh) calc(50% + 0.5lh),
+          #0000 calc(100% - 0.25lh)
+        );
+        color: color-mix(in lch, canvasText, canvas 15%);
+        text-align: center;
+        position: relative;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+        text-transform: uppercase;
+        line-height: 1;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold',
+          sans-serif;
+        height: 1lh;
+        display: inline-grid;
+        position: relative;
+        padding-inline: 0.25em;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .indicator {
+        --c: 0.175em;
+
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        height: 1lh;
+        translate: -50% -50%;
+        border: 0.05em solid oklch(0.75 1 var(--h, 320));
+        transition: width 0.25s, border-color 0.25s;
+        width: calc((var(--width) * 1px) + var(--c));
+
+        /* create little rounded-corner mask around the word */
+        clip-path: polygon(
+          0 0,
+          var(--c) 0,
+          var(--c) var(--c),
+          0 var(--c),
+          0 100%,
+          0 calc(100% - var(--c)),
+          var(--c) calc(100% - var(--c)),
+          var(--c) 100%,
+          0 100%,
+          calc(100% - var(--c)) 100%,
+          calc(100% - var(--c)) calc(100% - var(--c)),
+          100% calc(100% - var(--c)),
+          100% 100%,
+          100% var(--c),
+          calc(100% - var(--c)) var(--c),
+          calc(100% - var(--c)) 0,
+          100% 0,
+          100% 100%,
+          0 100%
+        );
+      }
+
+      li {
+        display: inline-block;
+        width: fit-content;
+        height: 1lh;
+        grid-area: 1 / 1;
+        line-height: 1.2;
+      }
     }
-    #canvas-container {
-      width: 100%;
-      height: 100%;
+
+    /* 4) BASE LAYER: fluid typography + background grid + utilities */
+    @layer base {
+      :root {
+        --font-size-min: 16;
+        --font-size-max: 20;
+        --font-ratio-min: 1.2;
+        --font-ratio-max: 1.33;
+        --font-width-min: 375;
+        --font-width-max: 1500;
+      }
+
+      html {
+        color-scheme: light dark;
+      }
+      [data-theme='light'] {
+        color-scheme: light only;
+      }
+      [data-theme='dark'] {
+        color-scheme: dark only;
+      }
+
+      /* .fluid makes font “fluid” between min/max */
+      :where(.fluid) {
+        --fluid-min: calc(
+          var(--font-size-min) *
+            pow(var(--font-ratio-min), var(--font-level, 0))
+        );
+        --fluid-max: calc(
+          var(--font-size-max) *
+            pow(var(--font-ratio-max), var(--font-level, 0))
+        );
+        --fluid-preferred: calc(
+          (var(--fluid-max) - var(--fluid-min)) /
+            (var(--font-width-max) - var(--font-width-min))
+        );
+        --fluid-type: clamp(
+          (var(--fluid-min) / 16) * 1rem,
+          ((var(--fluid-min) / 16) * 1rem) -
+            (((var(--fluid-preferred) * var(--font-width-min)) / 16) * 1rem) +
+            (var(--fluid-preferred) * var(--variable-unit, 100vi)),
+          (var(--fluid-max) / 16) * 1rem
+        );
+        font-size: var(--fluid-type);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        font-family: 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial,
+          sans-serif, system-ui;
+        margin: 0;
+      }
+
+      body::before {
+        --size: 45px;
+        --line: color-mix(in hsl, canvasText, transparent 70%);
+        content: '';
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        background: linear-gradient(
+            90deg,
+            var(--line) 1px,
+            transparent 1px var(--size)
+          )
+          50% 50% / var(--size) var(--size),
+          linear-gradient(var(--line) 1px, transparent 1px var(--size))
+          50% 50% / var(--size) var(--size);
+        mask: linear-gradient(-20deg, transparent 50%, white);
+        top: 0;
+        transform-style: flat;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .bear-link {
+        color: canvasText;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        width: 48px;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        opacity: 0.8;
+      }
+      :where(.x-link, .bear-link):is(:hover, :focus-visible) {
+        opacity: 1;
+      }
+      .bear-link svg {
+        width: 75%;
+      }
+
+      /* Screenreader-only helper (not used here) */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
     }
   </style>
 </head>
-<body>
-  <div id="canvas-container"></div>  <!-- Three.js -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>  <!-- Ammo.js -->  <script src="https://cdn.jsdelivr.net/npm/ammo.js"></script>  <script>
-    let scene, camera, renderer, physicsWorld, softBody;
-    let mouse = new THREE.Vector2();
-    let raycaster = new THREE.Raycaster();
-    let intersected = false;
 
-    Ammo().then((AmmoLib) => {
-      Ammo = AmmoLib;
-      init();
-      animate();
+<body data-theme="system">
+  <!--───────────────────────────────────────────────────────────────────────────-->
+  <!-- Container with indicator + UL → your vertical words                        -->
+  <div class="container fluid">
+    <div class="indicator"></div>
+    <ul>
+      <li>you can prototype.</li>
+      <li>you can solve.</li>
+      <li>you can build.</li>
+      <li>you can develop.</li>
+      <li>you can debug.</li>
+      <li>you can learn.</li>
+      <li>you can cook.</li>
+      <li>ship.</li>
+      <li>prompt.</li>
+      <li>collaborate.</li>
+      <li>create.</li>
+      <li>inspire.</li>
+      <li>follow.</li>
+      <li>innovate.</li>
+      <li>test.</li>
+      <li>optimize.</li>
+      <li>teach.</li>
+      <li>visualize.</li>
+      <li>transform.</li>
+      <li>scale.</li>
+      <li>do it.</li>
+    </ul>
+  </div>
+
+  <!-- Bear link in top-left -->
+  <a
+    class="bear-link"
+    href="https://twitter.com/intent/follow?screen_name=jh3yy"
+    target="_blank"
+    rel="noreferrer noopener"
+    aria-label="Follow on Twitter"
+  >
+    <svg
+      class="w-9"
+      viewBox="0 0 969 955"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="161.191"
+        cy="320.191"
+        r="133.191"
+        stroke="currentColor"
+        stroke-width="20"
+      ></circle>
+      <circle
+        cx="806.809"
+        cy="320.191"
+        r="133.191"
+        stroke="currentColor"
+        stroke-width="20"
+      ></circle>
+      <circle
+        cx="695.019"
+        cy="587.733"
+        r="31.4016"
+        fill="currentColor"
+      ></circle>
+      <circle
+        cx="272.981"
+        cy="587.733"
+        r="31.4016"
+        fill="currentColor"
+      ></circle>
+      <path
+        d="M564.388 712.083C564.388 743.994 526.035 779.911 483.372 779.911C440.709 779.911 402.356 743.994 402.356 712.083C402.356 680.173 440.709 664.353 483.372 664.353C526.035 664.353 564.388 680.173 564.388 712.083Z"
+        fill="currentColor"
+      ></path>
+      <rect
+        x="310.42"
+        y="448.31"
+        width="343.468"
+        height="51.4986"
+        fill="#FF1E1E"
+      ></rect>
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M745.643 288.24C815.368 344.185 854.539 432.623 854.539 511.741H614.938V454.652C614.938 433.113 597.477 415.652 575.938 415.652H388.37C366.831 415.652 349.37 433.113 349.37 454.652V511.741L110.949 511.741C110.949 432.623 150.12 344.185 219.845 288.24C289.57 232.295 384.138 200.865 482.744 200.865C581.35 200.865 675.918 232.295 745.643 288.24Z"
+        fill="currentColor"
+      ></path>
+    </svg>
+  </a>
+
+  <!--───────────────────────────────────────────────────────────────────────────-->
+  <!-- JS MODULE: Tweakpane + GSAP Setup + Infinite Scroll Logic                 -->
+  <script type="module">
+    import { Pane } from 'https://cdn.skypack.dev/tweakpane@4.0.4';
+    import gsap from 'https://cdn.skypack.dev/gsap@3.12.0';
+
+    // ── Tweakpane for theme switching (optional) ─────────────────────────────────
+    const config = {
+      theme: 'system',
+    };
+
+    const ctrl = new Pane({
+      title: 'Config',
+      expanded: true,
     });
 
-    function init() {
-      // Scene & Camera
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x1c1c1c);
-      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 2000);
-      camera.position.set(0, 2, 6);
+    const update = () => {
+      document.documentElement.dataset.theme = config.theme;
+    };
 
-      // Renderer
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.getElementById('canvas-container').appendChild(renderer.domElement);
+    const sync = (event) => {
+      if (
+        !document.startViewTransition ||
+        event.target.controller.view.labelElement.innerText !== 'Theme'
+      )
+        return update();
+      document.startViewTransition(() => update());
+    };
 
-      // Lights
-      const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-      dirLight.position.set(5, 10, 7.5);
-      scene.add(dirLight);
-      scene.add(new THREE.AmbientLight(0x404040));
+    ctrl.addBinding(config, 'theme', {
+      label: 'Theme',
+      options: {
+        System: 'system',
+        Light: 'light',
+        Dark: 'dark',
+      },
+    });
 
-      // Physics World
-      const collisionConfig = new Ammo.btSoftBodyRigidBodyCollisionConfiguration();
-      const dispatcher = new Ammo.btCollisionDispatcher(collisionConfig);
-      const broadphase = new Ammo.btDbvtBroadphase();
-      const solver = new Ammo.btSequentialImpulseConstraintSolver();
-      const softBodySolver = new Ammo.btDefaultSoftBodySolver();
-      physicsWorld = new Ammo.btSoftRigidDynamicsWorld(dispatcher, broadphase, solver, collisionConfig, softBodySolver);
-      physicsWorld.setGravity(new Ammo.btVector3(0, -9.8, 0));
-      physicsWorld.getWorldInfo().set_m_gravity(new Ammo.btVector3(0, -9.8, 0));
+    ctrl.on('change', sync);
+    update();
 
-      const softBodyHelpers = new Ammo.btSoftBodyHelpers();
+    // ── GSAP INFINITE VERTICAL SCROLLER ──────────────────────────────────────────
+    gsap.defaults({
+      duration: 1,
+    });
 
-      // Create Soft-Body Sphere (Button)
-      const radius = 1;
-      const detail = 20;
-      const sphereGeometry = new THREE.SphereGeometry(radius, detail, detail);
-      const material = new THREE.MeshStandardMaterial({
-        color: 0x4b6eaf,
-        roughness: 0.5,
-        metalness: 0.1,
-      });
-      const sphereMesh = new THREE.Mesh(sphereGeometry, material);
-      sphereMesh.castShadow = true;
-      sphereMesh.receiveShadow = true;
-      scene.add(sphereMesh);
+    // 1) Create a paused timeline for each <li>
+    const tl = gsap.timeline({ paused: true });
+    const lines = gsap.utils.toArray('ul li');
 
-      const center = new Ammo.btVector3(0, 0, 0);
-      const softBodyVolume = softBodyHelpers.CreateEllipsoid(
-        physicsWorld.getWorldInfo(),
-        center,
-        new Ammo.btVector3(radius, radius, radius),
-        512
-      );
+    // 2) Initially place each <li> off-screen (below) by 300% of its own height
+    gsap.set('ul li', { yPercent: 300 });
 
-      const sbConfig = softBodyVolume.get_m_cfg();
-      sbConfig.set_viterations(40);
-      sbConfig.set_piterations(40);
+    // 3) Duplicate the array so that it can loop seamlessly
+    const paddedLines = [...lines, ...lines, ...lines];
 
-      softBodyVolume.setTotalMass(0.5, false);
-      Ammo.castObject(softBodyVolume, Ammo.btCollisionObject).getCollisionShape().setMargin(0.05);
-      physicsWorld.addSoftBody(softBodyVolume, 1, -1);
+    paddedLines.forEach((line, index) => {
+      // Each line has its own mini-timeline: move up by 600% (= from +300% to -300%)
+      const lineTl = gsap.timeline()
+        .set(line, { yPercent: 300 })
+        .to(
+          line,
+          {
+            yPercent: '-=600',
+            repeatRefresh: true,
+            immediateRender: false,
+            ease: 'none',
+            duration: 6,
+          },
+          0
+        );
+      tl.add(lineTl, index);
+    });
 
-      softBody = softBodyVolume;
-      sphereMesh.userData.physicsBody = softBodyVolume;
-      sphereMesh.userData.geometry = sphereGeometry;
-      softBodyVolume.setActivationState(4);
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('resize', onWindowResize);
-    }
-
-    function onMouseMove(event) {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    }
-
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
-
-    function applyInflateForce() {
-      const body = softBody;
-      const nodes = body.get_m_nodes();
-      const numNodes = nodes.size();
-      for (let i = 0; i < numNodes; i++) {
-        const node = nodes.at(i);
-        const nodePos = node.get_m_x();
-        const nodePos3 = new THREE.Vector3(nodePos.x(), nodePos.y(), nodePos.z());
-        const dir = new THREE.Vector3().subVectors(nodePos3, new THREE.Vector3(0, 0, 0));
-        dir.normalize();
-        const force = dir.multiplyScalar(20);
-        node.m_v.op_add(new Ammo.btVector3(force.x, force.y, force.z));
+    // 4) Create a “scrubber” timeline that drives the totalTime of tl
+    const scrubber = gsap.timeline({ paused: true }).fromTo(
+      tl,
+      {
+        totalTime: lines.length + 1,
+      },
+      {
+        totalTime: lines.length * 2 + 1,
+        ease: 'none',
+        duration: lines.length,
+        repeat: -1,
       }
-    }
+    );
 
-    function animate() {
-      requestAnimationFrame(animate);
-      updatePhysics(1 / 60);
-      renderer.render(scene, camera);
-    }
+    // 5) Seed the scrubber’s starting position so items start halfway
+    gsap.set(scrubber, { totalTime: lines.length + 2 });
 
-    function updatePhysics(deltaTime) {
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children);
-      if (intersects.length > 0 && intersects[0].object.userData.physicsBody) {
-        if (!intersected) {
-          intersected = true;
-          applyInflateForce();
-        }
-      } else {
-        intersected = false;
-      }
+    // 6) The “indicator” must wrap exactly around the currently visible word
+    let index = 0;
+    gsap.set('.indicator', {
+      '--width': lines[index].getBoundingClientRect().width,
+    });
 
-      physicsWorld.stepSimulation(deltaTime, 10);
-
-      // Update mesh vertices
-      scene.traverse((child) => {
-        if (child.userData.physicsBody) {
-          const volume = child.userData.physicsBody;
-          const geometry = child.geometry;
-          const nodes = volume.get_m_nodes();
-          for (let i = 0; i < nodes.size(); i++) {
-            const node = nodes.at(i);
-            const pos = node.get_m_x();
-            geometry.attributes.position.setXYZ(i, pos.x(), pos.y(), pos.z());
-          }
-          geometry.attributes.position.needsUpdate = true;
-          geometry.computeVertexNormals();
-        }
+    // 7) On each repeat, advance “index” and update the indicator’s width & hue
+    const syncIndicator = () => {
+      index += 1;
+      gsap.set('.indicator', {
+        '--width': lines[index % lines.length].getBoundingClientRect()
+          .width,
+        '--h': gsap.utils.random(0, 359),
       });
-    }
-  </script></body>
+    };
+
+    gsap.to(scrubber, {
+      delay: 1,
+      totalTime: '+=1',
+      duration: 1,
+      repeat: -1,
+      repeatDelay: 1,
+      repeatRefresh: true,
+      onStart: syncIndicator,
+      onRepeat: syncIndicator,
+      ease: 'elastic.out(1, 0.875)',
+    });
+
+    // 8) Finally, fade the <div class="container"> in
+    gsap.set('.container', { opacity: 1 });
+  </script>
+</body>
 </html>
