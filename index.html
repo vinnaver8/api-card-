@@ -8,15 +8,14 @@
   />
   <title>Infinite Vertical Scroller</title>
 
-  <!--─── CSS: Normalize + base/demo layers ──────────────────────────────────-->
   <style>
-    /* 1) Pull in Normalize.css into the “normalize” layer */
+    /* Pull in Normalize.css for consistency */
     @import url('https://unpkg.com/normalize.css') layer(normalize);
 
-    /* 2) Declare layers */
+    /* Declare layers */
     @layer normalize, base, demo;
 
-    /* 3) DEMO LAYER: styles for the scroller */
+    /* DEMO LAYER: styles for the scroller */
     @layer demo {
       .container {
         --font-level: 8;
@@ -32,6 +31,7 @@
         color: color-mix(in lch, canvasText, canvas 15%);
         text-align: center;
         position: relative;
+        background: #000; /* force dark background */
       }
 
       ul {
@@ -98,7 +98,7 @@
       }
     }
 
-    /* 4) BASE LAYER: fluid typography + background grid + utilities */
+    /* BASE LAYER: fluid typography + utilities */
     @layer base {
       :root {
         --font-size-min: 16;
@@ -107,16 +107,6 @@
         --font-ratio-max: 1.33;
         --font-width-min: 375;
         --font-width-max: 1500;
-      }
-
-      html {
-        color-scheme: light dark;
-      }
-      [data-theme='light'] {
-        color-scheme: light only;
-      }
-      [data-theme='dark'] {
-        color-scheme: dark only;
       }
 
       /* .fluid makes font “fluid” between min/max */
@@ -153,80 +143,24 @@
         display: grid;
         place-items: center;
         min-height: 100vh;
-        font-family: 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial,
-          sans-serif, system-ui;
         margin: 0;
-      }
-
-      body::before {
-        --size: 45px;
-        --line: color-mix(in hsl, canvasText, transparent 70%);
-        content: '';
-        height: 100vh;
-        width: 100vw;
-        position: fixed;
-        background: linear-gradient(
-            90deg,
-            var(--line) 1px,
-            transparent 1px var(--size)
-          )
-          50% 50% / var(--size) var(--size),
-          linear-gradient(var(--line) 1px, transparent 1px var(--size))
-          50% 50% / var(--size) var(--size);
-        mask: linear-gradient(-20deg, transparent 50%, white);
-        top: 0;
-        transform-style: flat;
-        pointer-events: none;
-        z-index: -1;
-      }
-
-      .bear-link {
-        color: canvasText;
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        width: 48px;
-        aspect-ratio: 1;
-        display: grid;
-        place-items: center;
-        opacity: 0.8;
-      }
-      :where(.x-link, .bear-link):is(:hover, :focus-visible) {
-        opacity: 1;
-      }
-      .bear-link svg {
-        width: 75%;
-      }
-
-      /* Screenreader-only helper (not used here) */
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border-width: 0;
+        background: #000; /* ensure dark background */
       }
     }
   </style>
 </head>
 
-<body data-theme="system">
-  <!--───────────────────────────────────────────────────────────────────────────-->
-  <!-- Container with indicator + UL → your vertical words                        -->
+<body>
   <div class="container fluid">
     <div class="indicator"></div>
     <ul>
-      <li>you can prototype.</li>
-      <li>you can solve.</li>
-      <li>you can build.</li>
-      <li>you can develop.</li>
-      <li>you can debug.</li>
-      <li>you can learn.</li>
-      <li>you can cook.</li>
+      <li>prototype.</li>
+      <li>solve.</li>
+      <li>build.</li>
+      <li>develop.</li>
+      <li>debug.</li>
+      <li>learn.</li>
+      <li>cook.</li>
       <li>ship.</li>
       <li>prompt.</li>
       <li>collaborate.</li>
@@ -244,124 +178,25 @@
     </ul>
   </div>
 
-  <!-- Bear link in top-left -->
-  <a
-    class="bear-link"
-    href="https://twitter.com/intent/follow?screen_name=jh3yy"
-    target="_blank"
-    rel="noreferrer noopener"
-    aria-label="Follow on Twitter"
-  >
-    <svg
-      class="w-9"
-      viewBox="0 0 969 955"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <circle
-        cx="161.191"
-        cy="320.191"
-        r="133.191"
-        stroke="currentColor"
-        stroke-width="20"
-      ></circle>
-      <circle
-        cx="806.809"
-        cy="320.191"
-        r="133.191"
-        stroke="currentColor"
-        stroke-width="20"
-      ></circle>
-      <circle
-        cx="695.019"
-        cy="587.733"
-        r="31.4016"
-        fill="currentColor"
-      ></circle>
-      <circle
-        cx="272.981"
-        cy="587.733"
-        r="31.4016"
-        fill="currentColor"
-      ></circle>
-      <path
-        d="M564.388 712.083C564.388 743.994 526.035 779.911 483.372 779.911C440.709 779.911 402.356 743.994 402.356 712.083C402.356 680.173 440.709 664.353 483.372 664.353C526.035 664.353 564.388 680.173 564.388 712.083Z"
-        fill="currentColor"
-      ></path>
-      <rect
-        x="310.42"
-        y="448.31"
-        width="343.468"
-        height="51.4986"
-        fill="#FF1E1E"
-      ></rect>
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M745.643 288.24C815.368 344.185 854.539 432.623 854.539 511.741H614.938V454.652C614.938 433.113 597.477 415.652 575.938 415.652H388.37C366.831 415.652 349.37 433.113 349.37 454.652V511.741L110.949 511.741C110.949 432.623 150.12 344.185 219.845 288.24C289.57 232.295 384.138 200.865 482.744 200.865C581.35 200.865 675.918 232.295 745.643 288.24Z"
-        fill="currentColor"
-      ></path>
-    </svg>
-  </a>
-
-  <!--───────────────────────────────────────────────────────────────────────────-->
-  <!-- JS MODULE: Tweakpane + GSAP Setup + Infinite Scroll Logic                 -->
   <script type="module">
-    import { Pane } from 'https://cdn.skypack.dev/tweakpane@4.0.4';
     import gsap from 'https://cdn.skypack.dev/gsap@3.12.0';
 
-    // ── Tweakpane for theme switching (optional) ─────────────────────────────────
-    const config = {
-      theme: 'system',
-    };
-
-    const ctrl = new Pane({
-      title: 'Config',
-      expanded: true,
-    });
-
-    const update = () => {
-      document.documentElement.dataset.theme = config.theme;
-    };
-
-    const sync = (event) => {
-      if (
-        !document.startViewTransition ||
-        event.target.controller.view.labelElement.innerText !== 'Theme'
-      )
-        return update();
-      document.startViewTransition(() => update());
-    };
-
-    ctrl.addBinding(config, 'theme', {
-      label: 'Theme',
-      options: {
-        System: 'system',
-        Light: 'light',
-        Dark: 'dark',
-      },
-    });
-
-    ctrl.on('change', sync);
-    update();
-
-    // ── GSAP INFINITE VERTICAL SCROLLER ──────────────────────────────────────────
     gsap.defaults({
       duration: 1,
     });
 
-    // 1) Create a paused timeline for each <li>
+    // Create a paused timeline for each <li>
     const tl = gsap.timeline({ paused: true });
     const lines = gsap.utils.toArray('ul li');
 
-    // 2) Initially place each <li> off-screen (below) by 300% of its own height
+    // Initially place each <li> off-screen (below) by 300% of its own height
     gsap.set('ul li', { yPercent: 300 });
 
-    // 3) Duplicate the array so that it can loop seamlessly
+    // Duplicate the array so that it can loop seamlessly
     const paddedLines = [...lines, ...lines, ...lines];
 
     paddedLines.forEach((line, index) => {
-      // Each line has its own mini-timeline: move up by 600% (= from +300% to -300%)
+      // Each line has its own mini-timeline: move up by 600% (from +300% to -300%)
       const lineTl = gsap.timeline()
         .set(line, { yPercent: 300 })
         .to(
@@ -378,7 +213,7 @@
       tl.add(lineTl, index);
     });
 
-    // 4) Create a “scrubber” timeline that drives the totalTime of tl
+    // Create a “scrubber” timeline that drives the totalTime of tl
     const scrubber = gsap.timeline({ paused: true }).fromTo(
       tl,
       {
@@ -392,16 +227,16 @@
       }
     );
 
-    // 5) Seed the scrubber’s starting position so items start halfway
+    // Seed the scrubber’s starting position so items start halfway
     gsap.set(scrubber, { totalTime: lines.length + 2 });
 
-    // 6) The “indicator” must wrap exactly around the currently visible word
+    // The “indicator” must wrap exactly around the currently visible word
     let index = 0;
     gsap.set('.indicator', {
       '--width': lines[index].getBoundingClientRect().width,
     });
 
-    // 7) On each repeat, advance “index” and update the indicator’s width & hue
+    // On each repeat, advance “index” and update the indicator’s width & hue
     const syncIndicator = () => {
       index += 1;
       gsap.set('.indicator', {
@@ -423,7 +258,7 @@
       ease: 'elastic.out(1, 0.875)',
     });
 
-    // 8) Finally, fade the <div class="container"> in
+    // Fade the container in
     gsap.set('.container', { opacity: 1 });
   </script>
 </body>
