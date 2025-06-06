@@ -1,60 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>COBE Globe Test</title>
-    <style>
-      body {
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background: #000;
-      }
-      canvas {
-        width: 500px;
-        height: 500px;
-      }
-    </style>
-  </head>
-  <body>
-    <canvas
-      id="cobe"
-      width="1000"
-      height="1000"
-    ></canvas>
+<head>
+  <meta charset="UTF-8" />
+  <title>3D GitHub-Style Globe</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
+  <script src="https://unpkg.com/three-globe@2.27.0"></script>
+  <script src="https://unpkg.com/d3@7.8.5"></script>
 
-    <script type="module">
-      import createGlobe from 'https://cdn.skypack.dev/cobe'
+  <script>
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-      let phi = 0
-      const canvas = document.getElementById("cobe")
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera();
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    camera.position.z = 300;
 
-      const globe = createGlobe(canvas, {
-        devicePixelRatio: 2,
-        width: 1000,
-        height: 1000,
-        phi: 0,
-        theta: 0,
-        dark: 0,
-        diffuse: 1.2,
-        scale: 1,
-        mapSamples: 16000,
-        mapBrightness: 6,
-        baseColor: [1, 1, 1],
-        markerColor: [1, 0.5, 1],
-        glowColor: [1, 1, 1],
-        offset: [0, 0],
-        markers: [
-          { location: [37.7595, -122.4367], size: 0.03 },
-          { location: [40.7128, -74.006], size: 0.1 },
-        ],
-        onRender: (state) => {
-          state.phi = phi
-          phi += 0.01
-        },
-      })
-    </script>
-  </body>
+    const globe = new ThreeGlobe()
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+      .arcsData([
+        { startLat: 37.7749, startLng: -122.4194, endLat: 51.5074, endLng: -0.1278 },
+        { startLat: 40.7128, startLng: -74.006, endLat: 35.6895, endLng: 139.6917 }
+      ])
+      .arcColor(() => 'lime')
+      .arcAltitude(() => 0.3)
+      .arcStroke(() => 1.5)
+      .arcDashLength(0.4)
+      .arcDashGap(4)
+      .arcDashInitialGap(() => Math.random() * 5)
+      .arcDashAnimateTime(1000);
+
+    scene.add(globe);
+
+    const ambientLight = new THREE.AmbientLight(0xbbbbbb);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight.position.set(0, 0, 100);
+    scene.add(directionalLight);
+
+    function animate() {
+      globe.rotation.y += 0.001;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
 </html>
