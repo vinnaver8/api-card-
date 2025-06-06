@@ -1,134 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Working Globe with Arcs</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animated Bookmark Button</title>
   <style>
-    html, body {
+    * {
       margin: 0;
       padding: 0;
-      background: #000;
-      overflow: hidden;
+      box-sizing: border-box;
     }
+
+    html {
+      background-color: #111317;
+    }
+
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100%;
+      min-height: 100dvh;
+      font-family: "Helvetica Neue", Helvetica, sans-serif;
+      overflow: hidden;
+      text-align: center;
+      line-height: 1.8;
+      min-width: 380px;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100%;
+      min-height: 100dvh;
+      width: 100%;
+      margin: 0 auto;
+      padding: 10%;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #727780;
+      transition: opacity 2.5s ease;
+      transition-delay: 200ms;
+      user-select: auto;
+    }
+    h1 span {
+      display: inline-flex;
+    }
+    h1.fadeIn {
+      opacity: 0.8;
+    }
+
     canvas {
-      display: block;
+      width: 100%;
+      width: calc(100vmin - 100px);
+      max-width: 640px;
+      min-width: 320px;
+      height: 100%;
+      aspect-ratio: 4 / 3;
+      z-index: 100;
+      user-select: none;
+      transition: opacity 1.1s ease, transform 1.3s ease;
+      transform: translate3d(0px, 0px, 0px) scale3d(0.92, 0.92, 1) !important;
+      border-radius: clamp(22px, 6vw, 42px);
+      opacity: 0;
+      margin-bottom: clamp(20px, 5vw, 40px);
+    }
+    canvas.fadeIn {
+      opacity: 1;
+      transform: scale3d(1, 1, 1) !important;
+    }
+
+    .canvas-wrapper {
+      display: flex;
+      position: relative;
+    }
+
+    .loader {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.2);
+      width: 90%;
+      max-width: 150px;
+      height: 2px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transition: opacity 500ms ease, visibility 500ms ease;
+    }
+    .loader.hide {
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+    .loader span {
+      display: flex;
+      background-color: white;
+      height: 100%;
+      animation: loader 1.3s infinite alternate ease-in-out;
+      width: 25%;
+    }
+
+    @keyframes loader {
+      0% {
+        opacity: 0;
+        transform: translateX(0%);
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(300%);
+      }
+    }
+
+    .bookmark-btn {
+      position: absolute;
+      width: 16.5%;
+      height: 32%;
+      background-color: red;
+      left: 50%;
+      top: 50%;
+      z-index: 9999;
+      transform: translate(-43%, -52.5%);
+      border-radius: 12px;
+      opacity: 0;
+      cursor: pointer;
+      transition: width 1s ease-out, height 1s ease-out, transform 1s ease-out;
+      transition-delay: 50ms;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .bookmark-btn.disabled {
+      pointer-events: none;
+      visibility: hidden;
+    }
+    .bookmark-btn.active {
+      width: 18.5%;
+      height: 34%;
+      transform: translate(-43%, -55.5%);
+      transition-delay: 300ms;
     }
   </style>
 </head>
 <body>
-  <!-- Scripts -->
-  <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
-  <script src="https://unpkg.com/d3@7"></script>
-  <script src="https://unpkg.com/three-globe@2.27.0"></script>
-  <script src="https://unpkg.com/three/examples/js/controls/OrbitControls.js"></script>
+  <main>
+    <div class="canvas-wrapper">
+      <div class="bookmark-btn disabled"></div>
+      <canvas width="1600" height="1200"></canvas>
+    </div>
+    <h1><span>Click on icon to animate</span></h1>
+    <div class="loader"><span></span></div>
+  </main>
 
   <script>
-    // Basic Setup
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    // Select DOM elements
+    const canvas = document.querySelector("canvas");
+    const bookmarkBtn = document.querySelector(".bookmark-btn");
+    const loader = document.querySelector(".loader");
+    const description = document.querySelector("h1");
+    const ctx = canvas.getContext("2d");
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 400;
+    // Total number of frames in the sequence
+    const totalFrames = 157;
+    let images = new Array(totalFrames + 1);
+    let currentFrame = 0;
+    let isBookmarked = false;
+    let animationFrame = null;
+    let isAnimating = true;
 
-    // Controls
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = false;
-    controls.minPolarAngle = Math.PI / 2;
-    controls.maxPolarAngle = Math.PI / 2;
-
-    // Globe setup
-    const globe = new ThreeGlobe()
-      .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe@2.27.0/example/img/earth-dark.jpg')
-      .arcsData([
-        {
-          startLat: 35.1495,
-          startLng: -90.049,
-          endLat: 51.5053,
-          endLng: -0.1218
-        },
-        {
-          startLat: 40.7128,
-          startLng: -74.0060,
-          endLat: 48.8566,
-          endLng: 2.3522
-        },
-        {
-          startLat: 35.6895,
-          startLng: 139.6917,
-          endLat: -33.8688,
-          endLng: 151.2093
-        }
-      ])
-      .arcColor(() => '#ff5500')
-      .arcStroke(1.5)
-      .arcDashLength(1)
-      .arcDashGap(0)
-      .arcDashAnimateTime(0)
-      .labelsData([
-        { lat: 35.1495, lng: -90.049, label: "MEMPHIS" },
-        { lat: 51.5053, lng: -0.1218, label: "LONDON" },
-        { lat: 40.7128, lng: -74.0060, label: "NEW YORK" },
-        { lat: 48.8566, lng: 2.3522, label: "PARIS" },
-        { lat: 35.6895, lng: 139.6917, label: "TOKYO" },
-        { lat: -33.8688, lng: 151.2093, label: "SYDNEY" }
-      ])
-      .labelText(d => d.label)
-      .labelSize(2.5)
-      .labelColor(() => 'white')
-      .labelDotRadius(0);
-
-    scene.add(globe);
-
-    // Light
-    scene.add(new THREE.AmbientLight(0xbbbbbb));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    dirLight.position.set(0, 0, 400);
-    scene.add(dirLight);
-
-    // Wait for globe texture to load before placing square markers
-    globe.globeImageUrl && globe.globeReady.then(() => {
-      console.log("✅ Globe is ready");
-
-      // Square markers
-      const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff5500 });
-      const markerSize = 2.5;
-
-      const endpoints = [
-        [35.1495, -90.049],
-        [51.5053, -0.1218],
-        [40.7128, -74.0060],
-        [48.8566, 2.3522],
-        [35.6895, 139.6917],
-        [-33.8688, 151.2093]
-      ];
-
-      endpoints.forEach(([lat, lng]) => {
-        const geometry = new THREE.BoxGeometry(markerSize, markerSize, markerSize);
-        const mesh = new THREE.Mesh(geometry, markerMaterial);
-        const { x, y, z } = globe.getCoords(lat, lng, globe.getGlobeRadius());
-        mesh.position.set(x, y, z);
-        scene.add(mesh);
-      });
-    });
-
-    // Animate
-    function animate() {
-      globe.rotation.y += 0.0015;
-      controls.update();
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
+    // Preload Images Function
+    function preloadImages(callback) {
+      let loadedImages = 0;
+      for (let i = 0; i <= totalFrames; i++) {
+        const img = new Image();
+        img.src = `https://www.cerpow.com/bookmark/${i
+          .toString()
+          .padStart(5, "0")}.jpg`;
+        img.onload = () => {
+          if (++loadedImages === totalFrames + 1) callback();
+        };
+        images[i] = img;
+      }
     }
-    animate();
 
-    // Handle resize
-    window.addEventListener('resize', () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      renderer.setSize(w, h);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
+    // On window load
+    window.onload = () => {
+      setCanvasSize();
+      preloadImages(() => {
+        loader.classList.add("hide");
+        setTimeout(() => {
+          drawFrame(0);
+          canvas.classList.add("fadeIn");
+          description.classList.add("fadeIn");
+          bookmarkBtn.classList.remove("disabled");
+          isAnimating = false;
+        }, 350);
+      });
+    };
+
+    // Set Canvas Size for Retina Displays
+    const setCanvasSize = () => {
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = canvas.clientWidth * ratio;
+      canvas.height = canvas.clientHeight * ratio;
+      ctx.scale(ratio, ratio);
+      drawFrame(currentFrame);
+    };
+
+    // Redraw on window resize
+    window.addEventListener("resize", setCanvasSize);
+
+    // Draw a specific frame
+    function drawFrame(frame) {
+      if (images[frame]?.complete) {
+        ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+        ctx.drawImage(images[frame], 0, 0, canvas.clientWidth, canvas.clientHeight);
+      }
+    }
+
+    // Animate frames smoothly using requestAnimationFrame
+    function animateFrames(start, end, callback) {
+      if (isAnimating) return;
+      isAnimating = true;
+      let frame = start;
+      function step() {
+        if (frame <= end) {
+          currentFrame = frame;
+          drawFrame(frame);
+          frame++;
+          animationFrame = requestAnimationFrame(step);
+        } else {
+          cancelAnimationFrame(animationFrame);
+          isAnimating = false;
+          if (callback) callback();
+        }
+      }
+      animationFrame = requestAnimationFrame(step);
+    }
+
+    // Handle bookmark button click
+    document.addEventListener("DOMContentLoaded", () => {
+      bookmarkBtn.addEventListener("click", () => {
+        if (isAnimating) return;
+        if (!isBookmarked) {
+          bookmarkBtn.classList.add("active");
+          animateFrames(0, 102, () => {
+            isBookmarked = true;
+          });
+        } else {
+          bookmarkBtn.classList.remove("active");
+          animateFrames(102, totalFrames, () => {
+            isBookmarked = false;
+          });
+        }
+      });
     });
   </script>
 </body>
