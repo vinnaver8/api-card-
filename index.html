@@ -2,101 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3D Animation Button</title>
+  <title>Rive Bookmark Animation</title>
+  <script src="https://unpkg.com/@rive-app/webgl"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body, html {
-      height: 100%;
+    html, body {
+      margin: 0;
       background: #111317;
-      font-family: sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
+      height: 100vh;
     }
     canvas {
-      width: 80vw;
-      max-width: 600px;
-      aspect-ratio: 4 / 3;
+      width: 300px;
+      height: 300px;
       border-radius: 20px;
-      transition: 0.3s ease;
-      opacity: 0;
-    }
-    canvas.fadeIn {
-      opacity: 1;
-    }
-    .button {
-      width: 100px;
-      height: 100px;
-      background: transparent;
-      border: 2px solid white;
-      border-radius: 50%;
-      cursor: pointer;
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-
-  <canvas id="canvas" width="1600" height="1200"></canvas>
-  <button class="button" id="playButton">Play</button>
+  <canvas id="riveCanvas"></canvas>
 
   <script>
-    const totalFrames = 100; // adjust to match your total image frames
-    const images = [];
-    let currentFrame = 0;
-    let isPlaying = false;
-    let animationFrame;
-
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const button = document.getElementById("playButton");
-
-    function preloadImages(callback) {
-      let loaded = 0;
-      for (let i = 0; i <= totalFrames; i++) {
-        const img = new Image();
-        img.src = `https://cdn.dribbble.com/userupload/42555433/file/original-cffbccaa62f132222cc39aac83d4c318.png?resize=752x&vertical=center/${i.toString().padStart(5, '0')}.jpg`;
-        img.onload = () => {
-          if (++loaded === totalFrames + 1) callback();
-        };
-        images[i] = img;
-      }
-    }
-
-    function drawFrame(frame) {
-      if (images[frame]?.complete) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(images[frame], 0, 0, canvas.width, canvas.height);
-      }
-    }
-
-    function animateFrames() {
-      if (currentFrame > totalFrames) {
-        cancelAnimationFrame(animationFrame);
-        return;
-      }
-      drawFrame(currentFrame++);
-      animationFrame = requestAnimationFrame(animateFrames);
-    }
-
-    window.onload = () => {
-      preloadImages(() => {
-        drawFrame(0);
-        canvas.classList.add("fadeIn");
-        button.disabled = false;
-      });
-    };
-
-    button.onclick = () => {
-      if (!isPlaying) {
-        isPlaying = true;
-        currentFrame = 0;
-        animateFrames();
-      }
-    };
+    const rive = new rive.Rive({
+      src: 'https://public.rive.app/community/runtime-files/2160-34217-bookmark.riv',
+      canvas: document.getElementById('riveCanvas'),
+      autoplay: true,
+      stateMachines: ['State Machine 1'],
+      onLoad: () => {
+        console.log('Rive animation loaded!');
+      },
+    });
   </script>
-
 </body>
 </html>
