@@ -1,51 +1,167 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Image Crossfade Animation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Soft-Body Button Demo</title>
   <style>
     body {
       margin: 0;
-      background: #000;
+      background: #1c1c1c;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      overflow: hidden;
     }
-    .fade-container {
-      position: relative;
-      width: 600px; /* Adjust size as needed */
-      height: 400px;
-    }
-    .fade-container img {
-      position: absolute;
+    #canvas-container {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      opacity: 0;
-      transition: opacity 2s ease-in-out;
-    }
-    .fade-container img.active {
-      opacity: 1;
     }
   </style>
 </head>
 <body>
-  <div class="fade-container">
-    <img src="314.jpg" class="active" id="img1" />
-    <img src="314.2.jpg" id="img2" />
-  </div>
+  <div id="canvas-container"></div>  <!-- Three.js -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>  <!-- Ammo.js -->  <script src="https://cdn.jsdelivr.net/npm/ammo.js"></script>  <script>
+    let scene, camera, renderer, physicsWorld, softBody;
+    let mouse = new THREE.Vector2();
+    let raycaster = new THREE.Raycaster();
+    let intersected = false;
 
-  <script>
-    const images = document.querySelectorAll('.fade-container img');
-    let current = 0;
+    Ammo().then((AmmoLib) => {
+      Ammo = AmmoLib;
+      init();
+      animate();
+    });
 
-    setInterval(() => {
-      images[current].classList.remove('active');
-      current = (current + 1) % images.length;
-      images[current].classList.add('active');
-    }, 4000); // Change every 4 seconds
-  </script>
-</body>
+    function init() {
+      // Scene & Camera
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1c1c1c);
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.2, 2000);
+      camera.position.set(0, 2, 6);
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+      // Lights
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+      dirLight.position.set(5, 10, 7.5);
+      scene.add(dirLight);
+      scene.add(new THREE.AmbientLight(0x404040));
+
+      // Physics World
+      const collisionConfig = new Ammo.btSoftBodyRigidBodyCollisionConfiguration();
+      const dispatcher = new Ammo.btCollisionDispatcher(collisionConfig);
+      const broadphase = new Ammo.btDbvtBroadphase();
+      const solver = new Ammo.btSequentialImpulseConstraintSolver();
+      const softBodySolver = new Ammo.btDefaultSoftBodySolver();
+      physicsWorld = new Ammo.btSoftRigidDynamicsWorld(dispatcher, broadphase, solver, collisionConfig, softBodySolver);
+      physicsWorld.setGravity(new Ammo.btVector3(0, -9.8, 0));
+      physicsWorld.getWorldInfo().set_m_gravity(new Ammo.btVector3(0, -9.8, 0));
+
+      const softBodyHelpers = new Ammo.btSoftBodyHelpers();
+
+      // Create Soft-Body Sphere (Button)
+      const radius = 1;
+      const detail = 20;
+      const sphereGeometry = new THREE.SphereGeometry(radius, detail, detail);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0x4b6eaf,
+        roughness: 0.5,
+        metalness: 0.1,
+      });
+      const sphereMesh = new THREE.Mesh(sphereGeometry, material);
+      sphereMesh.castShadow = true;
+      sphereMesh.receiveShadow = true;
+      scene.add(sphereMesh);
+
+      const center = new Ammo.btVector3(0, 0, 0);
+      const softBodyVolume = softBodyHelpers.CreateEllipsoid(
+        physicsWorld.getWorldInfo(),
+        center,
+        new Ammo.btVector3(radius, radius, radius),
+        512
+      );
+
+      const sbConfig = softBodyVolume.get_m_cfg();
+      sbConfig.set_viterations(40);
+      sbConfig.set_piterations(40);
+
+      softBodyVolume.setTotalMass(0.5, false);
+      Ammo.castObject(softBodyVolume, Ammo.btCollisionObject).getCollisionShape().setMargin(0.05);
+      physicsWorld.addSoftBody(softBodyVolume, 1, -1);
+
+      softBody = softBodyVolume;
+      sphereMesh.userData.physicsBody = softBodyVolume;
+      sphereMesh.userData.geometry = sphereGeometry;
+      softBodyVolume.setActivationState(4);
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function onMouseMove(event) {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function applyInflateForce() {
+      const body = softBody;
+      const nodes = body.get_m_nodes();
+      const numNodes = nodes.size();
+      for (let i = 0; i < numNodes; i++) {
+        const node = nodes.at(i);
+        const nodePos = node.get_m_x();
+        const nodePos3 = new THREE.Vector3(nodePos.x(), nodePos.y(), nodePos.z());
+        const dir = new THREE.Vector3().subVectors(nodePos3, new THREE.Vector3(0, 0, 0));
+        dir.normalize();
+        const force = dir.multiplyScalar(20);
+        node.m_v.op_add(new Ammo.btVector3(force.x, force.y, force.z));
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      updatePhysics(1 / 60);
+      renderer.render(scene, camera);
+    }
+
+    function updatePhysics(deltaTime) {
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children);
+      if (intersects.length > 0 && intersects[0].object.userData.physicsBody) {
+        if (!intersected) {
+          intersected = true;
+          applyInflateForce();
+        }
+      } else {
+        intersected = false;
+      }
+
+      physicsWorld.stepSimulation(deltaTime, 10);
+
+      // Update mesh vertices
+      scene.traverse((child) => {
+        if (child.userData.physicsBody) {
+          const volume = child.userData.physicsBody;
+          const geometry = child.geometry;
+          const nodes = volume.get_m_nodes();
+          for (let i = 0; i < nodes.size(); i++) {
+            const node = nodes.at(i);
+            const pos = node.get_m_x();
+            geometry.attributes.position.setXYZ(i, pos.x(), pos.y(), pos.z());
+          }
+          geometry.attributes.position.needsUpdate = true;
+          geometry.computeVertexNormals();
+        }
+      });
+    }
+  </script></body>
 </html>
