@@ -69,9 +69,9 @@
 
         position: absolute;
         top: 50%;
-        right: 20%;
+        right: 15%;
         height: 1lh;
-        translate: -50% -50%; /* Center the indicator */
+        translate: -45% -45%; /* Center the indicator */
         border: 0.05em solid oklch(0.75 1 var(--h, 320)); /* Dynamic border color */
         transition: width 0.25s, border-color 0.25s; /* Smooth transitions for width and color */
         width: calc((var(--width) * 1px) + (var(--c) * 2)); /* Adjust width based on word width + padding */
@@ -92,8 +92,8 @@
     /* BASE LAYER: fluid typography + utilities */
     @layer base {
       :root {
-        --font-size-min: 12; /* Minimum font size in px */
-        --font-size-max: 16; /* Maximum font size in px */
+        --font-size-min: 16; /* Minimum font size in px */
+        --font-size-max: 20; /* Maximum font size in px */
         --font-ratio-min: 1.2; /* Minimum font ratio for scaling */
         --font-ratio-max: 1.33; /* Maximum font ratio for scaling */
         --font-width-min: 375; /* Minimum viewport width for fluid typography */
