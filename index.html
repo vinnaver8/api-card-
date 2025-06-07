@@ -65,13 +65,13 @@
 
       /* Styles for the indicator, scoped under the unique container class */
       .infinite-scroller-main-container .indicator {
-        --c: 0.2em; /* Padding around the word inside the indicator */
+        --c: 0.3em; /* Padding around the word inside the indicator */
 
         position: absolute;
         top: 50%;
         right: 15%;
         height: 1lh;
-        translate: -45% -45%; /* Center the indicator */
+        translate: -50% -50%; /* Center the indicator */
         border: 0.05em solid oklch(0.75 1 var(--h, 320)); /* Dynamic border color */
         transition: width 0.25s, border-color 0.25s; /* Smooth transitions for width and color */
         width: calc((var(--width) * 1px) + (var(--c) * 2)); /* Adjust width based on word width + padding */
