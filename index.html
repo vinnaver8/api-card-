@@ -19,7 +19,7 @@
     @layer demo {
       /* Unique class for the main scroller container */
       .infinite-scroller-main-container {
-        --font-level: 7; /* Adjusted font level for a more balanced text size */
+        --font-level: 5; /* Adjusted font level for a more balanced text size */
         opacity: 0;
         width: 600px; /* Set fixed width for larger screens */
         height: 360px; /* Set fixed height for larger screens */
@@ -60,7 +60,7 @@
         justify-content: center;
         justify-items: center;
         text-align: center;
-        width: 70%; /* Ensures the ul takes full available width for proper centering */
+        width: 100%; /* Ensures the ul takes full available width for proper centering */
       }
 
       /* Styles for the indicator, scoped under the unique container class */
@@ -69,7 +69,7 @@
 
         position: absolute;
         top: 50%;
-        left: 70%;
+        right: 50%;
         height: 1lh;
         translate: -50% -50%; /* Center the indicator */
         border: 0.05em solid oklch(0.75 1 var(--h, 320)); /* Dynamic border color */
