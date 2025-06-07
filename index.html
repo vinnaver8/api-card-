@@ -30,8 +30,8 @@
         /* Mask to show only the center line, adjusted for no cropping */
         mask: linear-gradient(
           #0000 0.25lh, /* Transparent fade from top, ends at 0.25lh */
-          #fff calc(50% - 0.6lh), /* Opaque section begins, slightly wider than 0.5lh from center */
-          #fff calc(50% + 0.6lh), /* Opaque section ends */
+          #fff calc(50% - 0.5lh), /* Opaque section begins, exactly 0.5lh from center */
+          #fff calc(50% + 0.5lh), /* Opaque section ends, exactly 0.5lh from center (total 1lh) */
           #0000 calc(100% - 0.25lh) /* Transparent fade to bottom, starts at 0.25lh from bottom */
         );
         color: color-mix(in lch, canvasText, canvas 15%);
@@ -69,15 +69,12 @@
 
         position: absolute;
         top: 50%;
-        right: 15%;
+        transform: translateY(-50%); /* Explicitly center vertically */
         height: 1lh;
-        translate: -50% -50%; /* Center the indicator */
         border: 0.05em solid oklch(0.75 1 var(--h, 320)); /* Dynamic border color */
         transition: width 0.25s, border-color 0.25s; /* Smooth transitions for width and color */
         width: calc((var(--width) * 1px) + (var(--c) * 2)); /* Adjust width based on word width + padding */
         border-radius: 8px; /* Maintain rounded corners for the box */
-
-        /* Removed clip-path to ensure the box is a complete rectangle */
       }
 
       /* Styles for list items, scoped under the unique container class */
@@ -231,21 +228,61 @@
 
     // The “indicator” must wrap exactly around the currently visible word
     let index = 0;
-    // Set initial width of the indicator based on the first word
-    gsap.set('.infinite-scroller-main-container .indicator', {
-      '--width': lines[index].getBoundingClientRect().width,
-    });
+    // Get the indicator element
+    const indicator = document.querySelector('.infinite-scroller-main-container .indicator');
 
     // Function to synchronize the indicator with the current word
     const syncIndicator = () => {
       index += 1; // Move to the next word
-      // Update the indicator's width and a random hue for its border color
-      gsap.set('.infinite-scroller-main-container .indicator', {
-        '--width': lines[index % lines.length].getBoundingClientRect()
-          .width, // Use modulo to loop back to the beginning of the original array
+      const currentLine = lines[index % lines.length]; // Get the currently visible line element
+      const wordWidth = currentLine.getBoundingClientRect().width;
+
+      // Calculate the `left` position to center the indicator over the current word.
+      // We get the bounding rectangles of the container, the UL, and the current LI.
+      const containerRect = document.querySelector('.infinite-scroller-main-container').getBoundingClientRect();
+      const ulRect = currentLine.closest('ul').getBoundingClientRect();
+      const lineRect = currentLine.getBoundingClientRect();
+
+      // Calculate the UL's left padding to correctly determine the word's position within the UL's content area.
+      const ulPaddingLeft = parseFloat(getComputedStyle(currentLine.closest('ul')).paddingLeft);
+
+      // Calculate the word's left position relative to the UL's content area.
+      const wordLeftInUlContent = lineRect.left - ulRect.left;
+
+      // Calculate the total left offset from the container's left edge to the word's center.
+      // This includes the UL's offset from the container, the UL's left padding, and the word's position within the UL.
+      const wordCenterXRelativeToContainer = (ulRect.left - containerRect.left) + wordLeftInUlContent + (wordWidth / 2);
+
+      // Update the indicator's width and position using GSAP.
+      // 'left' is set to the calculated center of the word, and 'xPercent: -50' centers the indicator itself.
+      gsap.set(indicator, {
+        '--width': wordWidth,
         '--h': gsap.utils.random(0, 359), // Random hue for the border color
+        left: wordCenterXRelativeToContainer,
+        xPercent: -50 // This centers the indicator horizontally based on its own width
       });
     };
+
+    // Set initial width and position of the indicator based on the first word
+    // Call syncIndicator once initially to set the correct state for the first word
+    // Note: The first call to syncIndicator() increments index, so we need to ensure the initial setup
+    // correctly references the *first* word before any increments occur.
+    // Let's explicitly set the initial state for the indicator here.
+    const initialLine = lines[0];
+    const initialWordWidth = initialLine.getBoundingClientRect().width;
+    const initialContainerRect = document.querySelector('.infinite-scroller-main-container').getBoundingClientRect();
+    const initialUlRect = initialLine.closest('ul').getBoundingClientRect();
+    const initialLineRect = initialLine.getBoundingClientRect();
+    const initialUlPaddingLeft = parseFloat(getComputedStyle(initialLine.closest('ul')).paddingLeft);
+    const initialWordLeftInUlContent = initialLineRect.left - initialUlRect.left;
+    const initialWordCenterXRelativeToContainer = (initialUlRect.left - initialContainerRect.left) + initialWordLeftInUlContent + (initialWordWidth / 2);
+
+    gsap.set(indicator, {
+      '--width': initialWordWidth,
+      left: initialWordCenterXRelativeToContainer,
+      xPercent: -50,
+      '--h': gsap.utils.random(0, 359) // Set an initial random hue
+    });
 
     // Animate the scrubber's totalTime to control the vertical scrolling
     gsap.to(scrubber, {
@@ -265,3 +302,4 @@
   </script>
 </body>
 </html>
+
