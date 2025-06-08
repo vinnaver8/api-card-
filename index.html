@@ -1,19 +1,420 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-  <title>Infinite Vertical Scroller</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI for All Humanity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
 
-  <style>
-    /* Infinite Scroller (Developer Docs section) */
+        /* Curved Scroller (Grok section) */
         @import url('https://unpkg.com/normalize.css') layer(normalize);
 
-        @layer normalize, base, demo;
+        @layer normalize, base, demo, snapping;
 
+        @layer snapping {
+            @supports (animation-timeline: scroll()) {
+                .scroller header,
+                .scroller footer {
+                    scroll-snap-align: unset;
+                }
+                .scroller header {
+                    --align: start;
+                    animation: snap both linear reverse;
+                    animation-timeline: scroll(nearest);
+                    animation-range: calc(var(--padding, 0) * 1px) 0;
+                }
+                .scroller footer {
+                    --align: end;
+                    animation: snap both linear;
+                    animation-timeline: scroll(nearest);
+                    animation-range: calc(100% - (var(--padding, 0) * 1px)) 100%;
+                }
+                @keyframes snap {
+                    to {
+                        scroll-snap-align: var(--align, start);
+                    }
+                }
+            }
+        }
+
+        @layer demo {
+            :root {
+                --size: 300px;
+                --radius: 32;
+                --padding: 64px;
+                --bg: hsl(180 0% 33%);
+                --bar: hsl(0 0% 100% / 0.5);
+                --panel: hsl(20 60% 50%);
+                timeline-scope: --scroller;
+            }
+
+            .scroller {
+                position: relative;
+                width: 100%;
+                max-width: 600px;
+                aspect-ratio: 3 / 3.5; /* Updated aspect ratio */
+                resize: none;
+                overflow: hidden;
+                padding: 1rem;
+            }
+
+            .scroller img {
+                width: 100%;
+                object-fit: cover;
+                border-radius: 6px;
+                filter: contrast(1.5) grayscale(1);
+            }
+
+            .bar__thumb,
+            .bar__track {
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+
+            [data-rounded-scroll='true'] .scroller :is(.bar__thumb, .bar__track) {
+                opacity: 1;
+            }
+
+            .scroller > svg {
+                position: absolute;
+                top: 1rem;
+                bottom: 1rem;
+                right: 1rem;
+                pointer-events: none;
+                width: calc(var(--radius) * 2px);
+                overflow: visible !important;
+                z-index: 2;
+            }
+
+            [data-rounded-scroll='true'] .scroller div::-webkit-scrollbar {
+                display: none;
+            }
+
+            [data-rounded-scroll='true'] div::-webkit-scrollbar {
+                display: none;
+                opacity: 0 !important;
+            }
+
+            [data-rounded-scroll='true'] .scroller div {
+                scrollbar-width: 0;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .scroller path {
+                stroke-width: calc(var(--stroke-width) * 1px);
+            }
+
+            .bar__thumb {
+                stroke: color-mix(
+                    in hsl,
+                    var(--color, #fff),
+                    #0000 calc((1 - var(--bar-alpha, 0.5)) * 100%)
+                );
+                stroke-dasharray: var(--thumb-size) var(--track-length);
+            }
+
+            @supports (animation-timeline: scroll()) {
+                .bar__thumb {
+                    animation: scroll both linear;
+                    animation-timeline: --scroller;
+                }
+            }
+
+            .bar__track {
+                stroke: hsl(0 0% 100% / var(--track-alpha, 0));
+            }
+
+            .scroller > div {
+                height: 100%;
+                width: 100%;
+                overflow: auto;
+                background: #0D0D0D;
+                border-radius: calc(var(--radius) * 1px);
+                display: grid;
+                grid-auto-flow: row;
+                gap: 0;
+                margin: 0;
+                padding: calc(var(--padding) * 1px) 0;
+                list-style-type: none;
+                scroll-snap-type: y mandatory;
+                scroll-timeline: --scroller;
+                scroll-behavior: smooth;
+                outline: 1px solid color-mix(in lch, canvas, canvasText);
+                outline-offset: 1px;
+
+                &::after {
+                    content: '';
+                    height: calc(var(--stroke, 4) * 1px);
+                    width: clamp(40px, 50%, 80px);
+                    background: canvasText;
+                    border-radius: 100px;
+                    position: absolute;
+                    bottom: calc(1rem + 4px);
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+            }
+
+            .scroller > div > * {
+                padding-inline: 1.25rem;
+            }
+            .scroller main :not(:last-child) {
+                margin-bottom: 2rem;
+            }
+
+            .scroller main p:last-of-type {
+                opacity: 0.4;
+            }
+
+            .scroller p {
+                opacity: 0.6;
+                font-size: 0.875rem;
+            }
+
+            .scroller header {
+                scroll-snap-align: start;
+                margin-block: 2rem;
+                text-transform: uppercase;
+                font-family: 'Reddit Mono', monospace;
+
+                div {
+                    margin-block: 4rem;
+                }
+
+                h1 {
+                    font-size: 1.25rem;
+                    font-weight: 300;
+                    margin: 0;
+                }
+                p {
+                    margin: 0;
+                    font-size: 1rem;
+                    font-weight: 300;
+                }
+            }
+
+            .scroller footer {
+                scroll-snap-align: end;
+                padding-inline: 1rem;
+                text-align: center;
+                padding-block: 1rem;
+                font-size: 0.75rem;
+                opacity: 0.5;
+            }
+        }
+
+        /* API Section Box (middle box) */
+        #api-box {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 280px;
+            background-color: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 3 / 3.5; /* Updated aspect ratio */
+        }
+        #api-typing {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #fff;
+            width: max-content;
+            max-width: 0;
+            animation:
+                api-typing-reveal 3s steps(29, end) forwards,
+                api-blink 0.6s step-end infinite alternate;
+            padding-right: 2px;
+            color: #fff;
+        }
+        @keyframes api-typing-reveal {
+            from { max-width: 0; }
+            to   { max-width: 100%; }
+        }
+        @keyframes api-blink {
+            50% { border-color: transparent; }
+        }
+        #api-thinking {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            padding: 16px;
+        }
+        #api-spinner {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #333;
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: api-spin 1s linear infinite;
+        }
+        @keyframes api-spin {
+            to { transform: rotate(360deg); }
+        }
+        #api-countText {
+            position: absolute;
+            top: 14px;
+            left: 46px;
+            font-size: 1rem;
+            white-space: nowrap;
+            color: #fff;
+        }
+        #api-scrollContainer {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        #api-scrollContent {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            line-height: 1.4rem;
+            color: #ccc;
+            font-size: 0.95rem;
+            animation: api-scrollUp 10s linear infinite;
+        }
+
+        @keyframes api-scrollUp {
+            0%   { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+        #api-final {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            height: 280px;
+            background-color: #111;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 16px;
+            box-sizing: border-box;
+            color: #fff;
+            aspect-ratio: 3 / 3.5; /* Updated aspect ratio */
+        }
+        #api-checkIcon {
+            width: 24px;
+            height: 24px;
+            fill: #4caf50;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        #api-finalHeader {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+        #api-finalContent {
+            font-size: 0.95rem;
+            line-height: 1.4rem;
+            color: #ddd;
+            height: 200px;
+            overflow-y: auto;
+        }
+        #offices-display {
+            display: none;
+            width: 100%;
+            height: 280px;
+            padding: 20px;
+            background-color: #000;
+            color: #fff;
+            overflow-y: auto;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-sizing: border-box;
+            aspect-ratio: 3 / 3.5; /* Updated aspect ratio */
+        }
+
+        #offices-display h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        #offices-display p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        #offices-display button {
+            border: 1px solid #fff;
+            background-color: transparent;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #offices-display button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        #offices-map-container {
+            flex: 1;
+            min-width: 200px;
+            margin-left: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #offices-map-container svg {
+            width: 100%;
+            height: auto;
+            max-width: 300px;
+        }
+
+        #offices-map-container text {
+            font-family: 'Inter', sans-serif;
+            font-size: 7px;
+        }
+
+        #offices-map-container .city-name {
+            font-size: 8px;
+            fill: #fff;
+        }
+        @media (max-width: 600px) {
+            #offices-display {
+                padding: 10px;
+            }
+            #offices-display h2 {
+                font-size: 1.5rem;
+            }
+            #offices-map-container {
+                margin-top: 20px;
+                margin-left: 0;
+            }
+            #offices-display .flex-container {
+                flex-direction: column;
+            }
+        }
+
+        /* Infinite Scroller (Developer Docs section) */
         @layer demo {
             .infinite-scroller-main-container {
                 --font-level: 5;
@@ -60,25 +461,38 @@
                 width: 100%;
             }
 
-            .infinite-scroller-main-container .indicator {
-                --c: 0.3em;
+            .infinite-scroller-main-container li {
+                color: #666; /* Default dim color */
+                /* No transition here, color change is instant via JS */
+            }
 
+            .infinite-scroller-main-container .indicator {
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
                 height: 1lh;
-                border: 0.05em solid oklch(0.75 1 var(--h, 320));
-                transition: width 0.25s, border-color 0.25s;
                 width: calc((var(--width) * 1px) + (var(--c) * 2));
-                border-radius: 8px;
                 opacity: 1;
-            }
+                pointer-events: none;
+                z-index: 0; /* Ensure it's behind the text */
 
-            .infinite-scroller-main-container li {
-                display: inline-block;
-                width: fit-content;
-                height: 1lh;
-                grid-area: 1 / 1;
+                /* Core changes for the [ ] effect */
+                border-style: solid;
+                border-width: 2px;
+                border-image-slice: 20 fill; /* Slice from 20px from each side, fill the middle */
+                border-image-width: 20px; /* Width of the border-image itself */
+                border-image-outset: 0; /* No outset */
+                border-image-repeat: stretch; /* Stretch the image to cover the border */
+
+                /* Dynamically generated SVG for the square brackets.
+                   The 'currentColor' within the SVG will pick up the 'color' property of .indicator
+                   This way, we can control the vibrant color via JavaScript by updating the
+                   indicator's 'color' CSS property.
+                */
+                border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0,10 L0,0 L10,0 M50,0 L60,0 L60,10 M60,50 L60,60 L50,60 M10,60 L0,60 L0,50' stroke='oklch(0.75 1 var(--h, 320))' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+
+                /* This CSS 'color' property will set the 'currentColor' inside the SVG */
+                color: oklch(0.75 1 var(--h, 320));
             }
         }
 
@@ -121,21 +535,233 @@
                 box-sizing: border-box;
             }
         }
-
-      body {
-        display: grid;
-        place-items: center;
-        min-height: 100vh;
-        margin: 0;
-        background: #000;
-        overflow: hidden;
-      }
-    }
-  </style>
+    </style>
 </head>
+<body class="bg-[#0D0D0D]">
+    <section id="section-4" class="relative min-h-[2200px] bg-[#0D0D0D] text-white overflow-hidden pt-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-32">
+            <div class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-8">
+                [ PRODUCTS ]
+            </div>
 
-<body>
-<div class="infinite-scroller-main-container fluid">
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-24 leading-tight">
+                AI for all humanity
+            </h1>
+
+            <!-- Grok Section -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
+                <div class="md:w-1/2 text-left">
+                    <h2 class="text-4xl font-semibold mb-4">Grok</h2>
+                    <p class="text-lg text-gray-300 mb-8 max-w-md">
+                        Grok is your cosmic guide, now accessible on grok.com, iOS, and Android. Explore the universe with AI.
+                    </p>
+                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                        USE NOW <span class="ml-2">&#8594;</span>
+                    </button>
+                </div>
+                <!-- Curved Scroller (Grok section) -->
+                <div class="md:w-1/2 flex justify-center items-center">
+                    <div class="scroller">
+                        <svg class="scroller__bar bar" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+                            <path class="bar__thumb" fill="none" stroke-linecap="round" />
+                            <path class="bar__track" fill="none" stroke-linecap="round" />
+                        </svg>
+                        <div>
+                            <header>
+                                <div>
+                                    <h1>023: curved scroller.</h1>
+                                    <p>Jhey Tompkins.</p>
+                                </div>
+                                <img src="https://picsum.photos/1280/720?random=12" alt="Random image" onerror="this.onerror=null;this.src='https://placehold.co/1280x720/000/FFF?text=Image+Placeholder';" />
+                            </header>
+                            <main>
+                                <p>
+                                    Lorem, ipsum, dolor sit amet consectetur adipisicing elit. Suscipit
+                                    in voluptatum, ducimus labore iste consectetur laboriosam officiis
+                                    aliquid similique reprehenderit, consequatur distinctio consequuntur
+                                    nam magnam blanditiis reiciendis eligendi laudantium a.
+                                </p>
+                                <p>
+                                    Dignissimos, nisi tenetur doloremque esse cum amet delectus
+                                    cupiditate natus quo illum quisquam perspiciatis ipsa maiores aut
+                                    soluta, facilis sunt rem eius. Alias, illum, cumque. Temporibus
+                                    doloremque praesentium in, consectetur.
+                                </p>
+                                <p>
+                                    Molestias voluptas architecto atque maiores, laboriosam, dolorem
+                                    commodi autem, id, ipsa praesentium rerum inventore! Optio maiores
+                                    nulla impedit, sapiente similique, voluptas placeat hic quas dicta a
+                                    voluptate minima alias aliquam?
+                                </p>
+                                <img src="https://picsum.photos/1280/720?random=48" alt="Random image" onerror="this.onerror=null;this.src='https://placehold.co/1280x720/000/FFF?text=Image+Placeholder';" />
+                                <p>
+                                    Suscipit repudiandae, consectetur ratione quo, ipsa inventore
+                                    doloremque quibusdam sit iusto, obcaecati natus! Tempore, tenetur
+                                    culpa, mollitia consequuntur necessitatibus minima aliquid in
+                                    recusandae, exercitationem nulla voluptates atque quaerat,
+                                    doloremque illum.
+                                </p>
+                                <p>
+                                    Quibusdam quas, soluta quisquam nobis porro odio sit, maxime libero,
+                                    optio cumque, sint! Enim, atque, velit. Iste quisquam minus deleniti
+                                    quasi saepe! Saepe assumenda iste accusantium rem, sunt repudiandae
+                                    quae!
+                                </p>
+                                <p>
+                                    Mollitia quod fuga ex, consequatur saepe. Id laboriosam aspernatur
+                                    iusto unde quo. Optio molestiae maxime officia blanditiis voluptate,
+                                    quasi impedit aperiam corrupti nihil sit doloremque dolorem harum
+                                    necessitatibus expedita laboriosam.
+                                </p>
+                                <p>
+                                    Deleniti molestiae maxime ullam officia natus, eaque nisi numquam,
+                                    aliquam sapiente doloribus atque obcaecati illum vitae modi labore,
+                                    eligendi hic illo earum doloremque. Deserunt ut aliquam a aliquid,
+                                    dolores, magni.
+                                </p>
+                                <img src="https://picsum.photos/1280/720?random=36" alt="Random image" onerror="this.onerror=null;this.src='https://placehold.co/1280x720/000/FFF?text=Image+Placeholder';" />
+                                <p>
+                                    Nesciunt dolor fugiat excepturi sunt molestias quis quam
+                                    consequatur, ea, eos officiis? Veniam totam, quas quasi eos
+                                    quibusdam, dolorem deleniti minus aperiam, nobis sapiente sit,
+                                    necessitatibus delectus quidem. Voluptate, nemo!
+                                </p>
+                                <p>
+                                    Qui fugit rerum harum, odio eos esse dicta dolore atque itaque
+                                    voluptatem, doloribus ullam tempora quidem, accusantium quae,
+                                    incidunt natus error fuga inventore expedita autem veniam in sequi
+                                    iure. Officia.
+                                </p>
+                                <p>
+                                    Ab mollitia, illum. Iusto quam enim, in sapiente sed impedit
+                                    nesciunt pariatur delectus asperiores officia hic ratione quasi eum
+                                    quidem facere quaerat ducimus dolor totam omnis itaque sequi
+                                    expedita optio?
+                                </p>
+                                <p>Find out how to do things like this and more by subscribing.</p>
+                            </main>
+                            <footer>
+                                <p>The Craft of UI&nbsp;&copy;</p>
+                            </footer>
+                        </div>
+                        <style id="scroller-frames"></style>
+                    </div>
+                </div>
+            </div>
+            <!-- Grok Section End -->
+
+            <!-- API Section -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
+                <div class="md:w-1/2 text-left">
+                    <h2 class="text-4xl font-semibold mb-4">API</h2>
+                    <p class="text-lg text-gray-300 mb-8 max-w-md">
+                        Supercharge your applications with Grok's enhanced speed, precision, and multilingual capabilities.
+                    </p>
+                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                        BUILD NOW <span class="ml-2">&#8594;</span>
+                    </button>
+                </div>
+                <div class="md:w-1/2 flex justify-center items-center">
+                    <div id="api-box" class="rounded-lg shadow-lg">
+                        <div id="api-typing">What is the meaning of life?</div>
+                        <div id="api-thinking" class="rounded-lg">
+                            <div id="api-spinner"></div>
+                            <div id="api-countText">Thinking for 1 second...</div>
+                            <div id="api-scrollContainer">
+                                <div id="api-scrollContent">
+                                    <p>First, I need to acknowledge the depth of the question. It's not something that can be answered lightly or with a simple phrase. The meaning of life encompasses philosophy, purpose, and individual experience.</p>
+                                    <p>Second, perspectives vary: some find meaning through relationships, others through achievements, and still others through self-discovery or spiritual beliefs.</p>
+                                    <p>Finally, each person's answer may evolve over time as they grow, learn, and encounter new experiences.</p>
+                                    <p>First, I need to acknowledge the depth of the question. It's not something that can be answered lightly or with a simple phrase. The meaning of life encompasses philosophy, purpose, and individual experience.</p>
+                                    <p>Second, perspectives vary: some find meaning through relationships, others through achievements, and still others through self-discovery or spiritual beliefs.</p>
+                                    <p>Finally, each person's answer may evolve over time as they grow, learn and encounter new experiences.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="api-final" class="rounded-lg shadow-lg">
+                            <div id="api-finalHeader">
+                                <svg id="api-checkIcon" viewBox="0 0 24 24">
+                                    <path d="M9 16.2l-3.5-3.5-1.4 1.4 4.9 4.9 10-10-1.4-1.4z"/>
+                                </svg>
+                                Thought for 5 seconds
+                            </div>
+                            <div id="api-finalContent">
+                                <p>The question "What is the meaning of life?" is one that has puzzled humanity for centuries, and it's not something that comes with a single, universal answer. Instead, it's a deeply personal and complex idea that can look very different depending on who's asking and what they value.</p>
+                                <h4 style="margin-top:12px; margin-bottom:8px;">A Range of Perspectives</h4>
+                                <p>People have approached this question from many angles:</p>
+                                <ul style="margin-left: 16px; color: #ddd;">
+                                    <li><strong>Philosophical Views:</strong> Some philosophers, like existentialists, suggest that life doesn't come with a built-in meaning. Instead, individuals must create their own purpose.</li>
+                                    <li><strong>Religious/Spiritual Interpretations:</strong> Many religious traditions propose that the meaning of life is to fulfill the will of a higher power, achieve spiritual enlightenment, or attain harmony with the universe.</li>
+                                    <li><strong>Scientific Approaches:</strong> From a scientific perspective, life may be seen as a process of evolution, where meaning arises from survival, reproduction, and the expansion of knowledge.</li>
+                                    <li><strong>Personal Fulfillment:</strong> Others believe the meaning of life is found in personal happiness, relationships, creativity, and leaving a positive impact on the world.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="offices-display">
+                            <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 20px;">[ OFFICES ]</div>
+                            <h2>Collaboration across borders</h2>
+
+                            <div class="flex-container" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 280px;">
+                                    <p>
+                                        We are hiring across all our offices in San Francisco, Palo Alto, and London, UK. We prioritize in-person
+                                        work to support our fast-paced, collaborative projects. Exceptional candidates are welcome to
+                                        apply from anywhere.
+                                    </p>
+                                    <button>
+                                        OPEN ROLES
+                                    </button>
+                                </div>
+                                <div id="offices-map-container">
+                                    <svg viewBox="0 0 500 250">
+                                        <path d="M 0 125 C 125 0, 375 0, 500 125" stroke="#444" stroke-width="1" fill="none"/>
+                                        <path d="M 0 125 C 125 250, 375 250, 500 125" stroke="#444" stroke-width="1" fill="none"/>
+                                        <circle cx="100" cy="100" r="3" fill="#FF5733"/>
+                                        <text x="105" y="95" class="city-name">SAN FRANCISCO</text>
+                                        <text x="105" y="105" fill="#aaa">PALO ALTO</text>
+                                        <text x="105" y="115" fill="#aaa">37.6145°N</text>
+                                        <text x="105" y="125" fill="#aaa">122.3945°W</text>
+
+                                        <!-- London -->
+                                        <circle cx="400" cy="80" r="3" fill="#FF5733"/>
+                                        <text x="405" y="75" class="city-name">LONDON</text>
+                                        <text x="405" y="85" fill="#aaa">51.5053°N</text>
+                                        <text x="405" y="95" fill="#aaa">0.121°W</text>
+
+                                        <!-- Memphis -->
+                                        <circle cx="250" cy="180" r="3" fill="#FF5733"/>
+                                        <text x="255" y="175" class="city-name">MEMPHIS</text>
+                                        <text x="255" y="185" fill="#aaa">35.1495°N</text>
+                                        <text x="255" y="195" fill="#aaa">90.049°W</text>
+
+                                        <!-- Connecting lines from image -->
+                                        <path d="M100,100 C175,50 325,50 400,80" stroke="#FF5733" stroke-width="1" fill="none"/>
+                                        <path d="M100,100 C150,140 200,160 250,180" stroke="#FF5733" stroke-width="1" fill="none"/>
+                                        <path d="M400,80 C350,120 300,140 250,180" stroke="#FF5733" stroke-width="1" fill="none"/>
+
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- API Section End -->
+
+            <!-- Developer Docs Section -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
+                <div class="md:w-1/2 text-left">
+                    <h2 class="text-4xl font-semibold mb-4">Developer Docs</h2>
+                    <p class="text-lg text-gray-300 mb-8 max-w-md">
+                        Learn how to quickly install Grok at the heart of your applications and explore guides covering common use cases.
+                    </p>
+                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                        LEARN MORE <span class="ml-2">&#8594;</span>
+                    </button>
+                </div>
+                <!-- Infinite Scroller -->
+                <div class="md:w-1/2 flex justify-center items-center">
+                    <div class="infinite-scroller-main-container fluid">
                         <div class="indicator"></div>
                         <ul>
                             <li>prototype.</li>
@@ -160,9 +786,131 @@
                             <li>scale.</li>
                             <li>do it.</li>
                         </ul>
-</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Developer Docs Section End -->
 
-  <script type="module">
+        </div>
+    </section>
+
+    <script>
+        // JS for the API section animation
+        // Renamed IDs to be unique to avoid conflicts and ensure correct targeting
+        let apiTypingDiv, apiThinkingDiv, apiFinalDiv, apiCountText, apiFinalContent, officesDisplayDiv;
+        let originalApiFinalContentElements = [];
+
+        function startAnimationSequence() {
+            apiTypingDiv.style.display = "none";
+            apiThinkingDiv.style.display = "none";
+            apiFinalDiv.style.display = "none";
+            officesDisplayDiv.style.display = "none";
+
+            // Reset typing animation
+            apiTypingDiv.style.maxWidth = "0";
+            apiTypingDiv.textContent = "What is the meaning of life?";
+
+            apiCountText.textContent = `Thinking for 1 second...`;
+            const scrollContent = document.getElementById("api-scrollContent");
+            scrollContent.style.animationDuration = "10s"; // Ensure scroll animation speed
+            apiFinalContent.innerHTML = ''; // Clear previous content
+
+            apiTypingDiv.style.display = "block"; // Show typing div
+            setTimeout(() => {
+                apiTypingDiv.style.display = "none"; // Hide typing div
+                apiThinkingDiv.style.display = "block"; // Show thinking div
+
+                let seconds = 1;
+                apiCountText.textContent = `Thinking for ${seconds} second...`;
+                const intervalId = setInterval(() => {
+                    seconds++;
+                    const plural = seconds > 1 ? "seconds" : "second";
+                    apiCountText.textContent = `Thinking for ${seconds} ${plural}...`;
+
+                    if (seconds >= 10) { // Stop after 10 seconds of "thinking"
+                        clearInterval(intervalId); // Stop the counter
+                        setTimeout(() => {
+                            apiThinkingDiv.style.display = "none"; // Hide thinking div
+                            apiFinalDiv.style.display = "block"; // Show final div
+                            typeOutApiFinalContent(0); // Start typing out the final content
+                        }, 1000); // Wait 1 second before showing final
+                    }
+                }, 1000); // Update every second
+            }, 3000); // Show thinking div after 3 seconds of typing
+        }
+
+        function typeOutApiFinalContent(elementIndex) {
+            if (elementIndex < originalApiFinalContentElements.length) {
+                const currentElementHTML = originalApiFinalContentElements[elementIndex];
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = currentElementHTML;
+                const actualElement = tempContainer.firstElementChild;
+                if (!actualElement) {
+                    console.error("Could not parse element:", currentElementHTML);
+                    setTimeout(() => typeOutApiFinalContent(elementIndex + 1), 100);
+                    return;
+                }
+
+                apiFinalContent.appendChild(actualElement);
+
+                if (actualElement.tagName === 'P' || actualElement.tagName === 'LI') {
+                    const originalText = actualElement.textContent;
+                    actualElement.textContent = '';
+                    let charIndex = 0;
+                    const typingSpeed = 20;
+
+                    function typeChar() {
+                        if (charIndex < originalText.length) {
+                            actualElement.textContent += originalText[charIndex];
+                            charIndex++;
+                            setTimeout(typeChar, typingSpeed);
+                        } else {
+                            setTimeout(() => typeOutApiFinalContent(elementIndex + 1), 500);
+                        }
+                    }
+                    typeChar();
+                } else if (actualElement.tagName === 'H4' || actualElement.tagName === 'UL') {
+                    setTimeout(() => typeOutApiFinalContent(elementIndex + 1), 500);
+                } else {
+                    setTimeout(() => typeOutApiFinalContent(elementIndex + 1), 500);
+                }
+            } else {
+                setTimeout(() => {
+                    apiFinalDiv.style.display = "none";
+                    officesDisplayDiv.style.display = "block";
+                    setTimeout(startAnimationSequence, 5000);
+                }, 1000);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Updated IDs for API section elements
+            apiTypingDiv = document.getElementById("api-typing");
+            apiThinkingDiv = document.getElementById("api-thinking");
+            apiFinalDiv = document.getElementById("api-final");
+            apiCountText = document.getElementById("api-countText");
+            apiFinalContent = document.getElementById("api-finalContent");
+            officesDisplayDiv = document.getElementById("offices-display"); // This ID remains global as per original code
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `
+                <p>The question "What is the meaning of life?" is one that has puzzled humanity for centuries, and it's not something that comes with a single, universal answer. Instead, it's a deeply personal and complex idea that can look very different depending on who's asking and what they value.</p>
+                <h4 style="margin-top:12px; margin-bottom:8px;">A Range of Perspectives</h4>
+                <p>People have approached this question from many angles:</p>
+                <ul style="margin-left: 16px; color: #ddd;">
+                    <li><strong>Philosophical Views:</strong> Some philosophers, like existentialists, suggest that life doesn't come with a built-in meaning. Instead, individuals must create their own purpose.</li>
+                    <li><strong>Religious/Spiritual Interpretations:</strong> Many religious traditions propose that the meaning of life is to fulfill the will of a higher power, achieve spiritual enlightenment, or attain harmony with the universe.</li>
+                    <li><strong>Scientific Approaches:</strong> From a scientific perspective, life may be seen as a process of evolution, where meaning arises from survival, reproduction, and the expansion of knowledge.</li>
+                    <li><strong>Personal Fulfillment:</strong> Others believe the meaning of life is found in personal happiness, relationships, creativity, and leaving a positive impact on the world.</li>
+                </ul>
+            `;
+            originalApiFinalContentElements = Array.from(tempDiv.children).map(child => child.outerHTML);
+
+            startAnimationSequence();
+        });
+    </script>
+
+    <script type="module">
         // GSAP for Infinite Scroller
         import gsap from 'https://cdn.skypack.dev/gsap@3.12.0';
 
@@ -212,7 +960,15 @@
         let index = 0;
         const indicator = document.querySelector('.infinite-scroller-main-container .indicator');
 
+        // Added for text cover animation: keep track of the last highlighted line
+        let lastActiveLine = null;
+
         const syncIndicator = () => {
+            // Dim the previously active line, if any, instantly
+            if (lastActiveLine) {
+                gsap.to(lastActiveLine, { color: '#666', duration: 0 }); // Instant dim
+            }
+
             index += 1;
             const currentLine = lines[index % lines.length];
             const wordWidth = currentLine.getBoundingClientRect().width;
@@ -228,11 +984,19 @@
 
             gsap.set(indicator, {
                 '--width': wordWidth,
-                '--h': gsap.utils.random(0, 359),
+                // '--h' is already set in the CSS, so no need to set it here if using CSS custom properties for SVG stroke
                 left: wordCenterXRelativeToContainer,
                 xPercent: -50,
                 opacity: 1
             });
+
+            // Update the --h variable to change the indicator's border color
+            const randomHue = gsap.utils.random(0, 359);
+            indicator.style.setProperty('--h', randomHue);
+
+            // Brighten the current line instantly
+            gsap.to(currentLine, { color: '#FFFFFF', duration: 0 }); // Instant brighten
+            lastActiveLine = currentLine;
         };
 
         const initialLine = lines[0];
@@ -265,6 +1029,192 @@
         });
 
         gsap.set('.infinite-scroller-main-container', { opacity: 1 });
-                                                       </script>
+    </script>
+
+    <script type="module">
+        // GSAP for Curved Scroller
+        import { ScrollTrigger } from 'https://cdn.skypack.dev/gsap@3.12.0/ScrollTrigger';
+
+        let tlCurvedScroller;
+        let configureTimeline;
+
+        const scroller = document.querySelector('.scroller');
+        const list = scroller.querySelector('div');
+        const bar = scroller.querySelector('.scroller__bar');
+        const track = scroller.querySelector('.bar__track');
+        const thumb = bar.querySelector('.bar__thumb');
+        const styles = scroller.querySelector('style#scroller-frames');
+
+        const config = {
+            show: true,
+            radius: 32,
+            scrollPadding: 60,
+            stroke: 5,
+            inset: 6,
+            trail: 20,
+            thumb: 70,
+            finish: 5,
+            alpha: 0.9,
+            track: 0,
+            color: '#f85922',
+            cornerLength: 0,
+            offsetCorner: -50,
+            offsetEnd: 30,
+        };
+
+        let frames = [];
+        const syncBar = (scrollerBar) => {
+            const mid = config.radius;
+            const innerRad = Math.max(
+                0,
+                config.radius - (config.inset + config.stroke * 0.5)
+            );
+            const padTop = config.inset + config.stroke * 0.5;
+            const padLeft = config.radius * 2 - padTop;
+            bar.setAttribute(
+                'viewBox',
+                `0 0 ${config.radius * 2} ${scrollerBar.target.offsetHeight}`
+            );
+            scroller.style.setProperty('--stroke-width', config.stroke);
+            let d = `
+            M${mid - config.trail},${padTop}
+                ${innerRad === 0 ? '' : `L${mid},${padTop}`}
+                ${
+                    innerRad === 0
+                        ? `L${padLeft},${padTop}`
+                        : `a${innerRad},${innerRad} 0 0 1 ${innerRad} ${innerRad}`
+                }`;
+            thumb.setAttribute('d', d);
+            const cornerLength = Math.ceil(thumb.getTotalLength());
+            config.cornerLength = cornerLength;
+            d = `
+                M${mid - config.trail},${padTop}
+                ${innerRad === 0 ? '' : `L${mid},${padTop}`}
+                ${
+                    innerRad === 0
+                        ? `L${padLeft},${padTop}`
+                        : `a${innerRad},${innerRad} 0 0 1 ${innerRad} ${innerRad}`
+                }
+                L${padLeft},${
+                scrollerBar.target.offsetHeight -
+                (config.inset + config.stroke * 0.5 + innerRad)
+                }
+                ${
+                    innerRad === 0
+                        ? `L${padLeft},${
+                            scrollerBar.target.offsetHeight -
+                            (config.inset + config.stroke * 0.5)
+                        }`
+                        : `a${innerRad},${innerRad} 0 0 1 ${-innerRad} ${innerRad}`
+                }
+                L${mid - config.trail},${
+                scrollerBar.target.offsetHeight - (config.inset + config.stroke * 0.5)
+                }
+            `;
+            thumb.setAttribute('d', d);
+            track.setAttribute('d', d);
+            scroller.style.setProperty(
+                '--track-length',
+                Math.ceil(track.getTotalLength())
+            );
+            scroller.style.setProperty('--track-start', cornerLength);
+            scroller.style.setProperty('--start', config.thumb * 2 + cornerLength);
+            scroller.style.setProperty(
+                '--destination',
+                Math.ceil(track.getTotalLength()) - cornerLength + config.thumb
+            );
+            frames = [
+                [0, config.thumb - config.finish - config.offsetEnd],
+                [
+                    Math.floor(
+                        (config.scrollPadding / (list.scrollHeight - scroller.offsetHeight)) *
+                        100
+                    ),
+                    (cornerLength + config.offsetCorner) * -1,
+                ],
+                [
+                    100 -
+                    Math.floor(
+                        (config.scrollPadding / (list.scrollHeight - scroller.offsetHeight)) *
+                        100
+                    ),
+                    (Math.floor(track.getTotalLength()) -
+                        cornerLength -
+                        config.thumb -
+                        config.offsetCorner) *
+                    -1,
+                ],
+                [
+                    100,
+                    (Math.floor(track.getTotalLength()) - config.finish - config.offsetEnd) *
+                    -1,
+                ],
+            ];
+            styles.innerHTML = `
+                @keyframes scroll {
+                    ${frames[0][0]}% { stroke-dashoffset: ${frames[0][1]};}
+                    ${frames[1][0]}% { stroke-dashoffset: ${frames[1][1]};}
+                    ${frames[2][0]}% { stroke-dashoffset: ${frames[2][1]};}
+                    ${frames[3][0]}% { stroke-dashoffset: ${frames[3][1]};}
+                }
+            `;
+        };
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                syncBar(entry);
+                update();
+                if (configureTimeline && !CSS.supports('animation-timeline: scroll()'))
+                    configureTimeline();
+            }
+        });
+        resizeObserver.observe(scroller);
+
+        const update = () => {
+            document.documentElement.dataset.roundedScroll = config.show;
+            scroller.style.setProperty('--radius', config.radius);
+            scroller.style.setProperty('--padding', config.scrollPadding);
+            scroller.style.setProperty('--color', config.color);
+            scroller.style.setProperty('--thumb-size', config.thumb);
+            scroller.style.setProperty('--bar-alpha', config.alpha);
+            scroller.style.setProperty('--track-alpha', config.track);
+            scroller.style.setProperty(
+                '--destination',
+                Math.ceil(track.getTotalLength()) -
+                ((Math.ceil(track.getTotalLength()) - scroller.offsetHeight) * 0.5 +
+                    config.inset)
+            );
+            scroller.style.setProperty('--start', config.thumb * 2);
+            syncBar({ target: list });
+        };
+
+        // Set initial theme to dark
+        document.documentElement.dataset.theme = 'dark';
+
+        // Initial call to update to apply default config values and sync the bar
+        update();
+
+        syncBar({ target: scroller });
+        if (!CSS.supports('(animation-timeline: scroll())')) {
+            configureTimeline = () => {
+                if (tlCurvedScroller) tlCurvedScroller.kill();
+                tlCurvedScroller = gsap.to('.bar__thumb', {
+                    scrollTrigger: {
+                        scroller: list,
+                        scrub: true,
+                    },
+                    ease: 'none',
+                    keyframes: {
+                        [`${frames[0][0]}`]: { strokeDashoffset: frames[0][1] },
+                        [`${frames[1][0]}`]: { strokeDashoffset: frames[1][1] },
+                        [`${frames[2][0]}`]: { strokeDashoffset: frames[2][1] },
+                        [`${frames[3][0]}`]: { strokeDashoffset: frames[3][1] },
+                    },
+                });
+            };
+            gsap.registerPlugin(ScrollTrigger);
+            configureTimeline();
+        }
+    </script>
 </body>
 </html>
