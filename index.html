@@ -16,21 +16,19 @@
         .vertical-scroller-container {
             width: 320px; /* iPhone-like width */
             height: 480px; /* Medium iPhone-like height */
-            overflow-y: auto; /* Enable vertical scrolling */
             background: #1c1c1c; /* Slightly brighter screen background */
             border-radius: 40px; /* More rounded for iPhone look */
             border: 10px solid #282828; /* Thicker, darker bezel */
             box-sizing: border-box;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
             position: relative; /* For notch/speaker styling */
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.05); /* Outer shadow + subtle inner screen light */
+            overflow: hidden; /* Hide anything outside the main phone frame */
         }
 
-        .vertical-scroller-container::before {
-            content: '';
+        /* New div for the iPhone notch */
+        .iphone-notch {
             position: absolute;
-            top: 0;
+            top: 10px; /* Position relative to the container's inner edge (adjust for border) */
             left: 50%;
             transform: translateX(-50%);
             width: 130px; /* Notch width */
@@ -38,10 +36,27 @@
             background: #000;
             border-bottom-left-radius: 15px;
             border-bottom-right-radius: 15px;
+            border: 1px solid #282828; /* Match the main border color */
+            box-sizing: border-box; /* Include border in size */
             z-index: 100; /* Ensure notch is always on top */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Subtle shadow for depth */
         }
 
-        .vertical-scroller-container::-webkit-scrollbar {
+        /* New container for scrollable content inside the iPhone */
+        .iphone-scrollable-content {
+            height: 100%; /* Take full height of parent container */
+            width: 100%;
+            overflow-y: auto; /* Enable vertical scrolling for this content */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+            padding-top: 4.5rem; /* Space for the fixed notch */
+            padding-bottom: 1rem;
+            box-sizing: border-box;
+            position: relative; /* Needed for z-index context if internal elements need it */
+            z-index: 50; /* Ensure content is below notch */
+        }
+
+        .iphone-scrollable-content::-webkit-scrollbar {
             display: none; /* Hide scrollbar for Chrome, Safari, Opera */
         }
 
@@ -49,10 +64,9 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem; /* Gap between content items */
-            padding-top: 3.5rem; /* Adjust padding for static notch */
-            padding-bottom: 1rem; /* Padding at the bottom */
             padding-left: 1rem;
             padding-right: 1rem;
+            /* No padding-top/bottom here, handled by iphone-scrollable-content */
         }
 
         .vertical-scroller-content img {
@@ -429,25 +443,28 @@
                 <!-- Standard Vertical Scroller (Grok section - iPhone Layout) -->
                 <div class="md:w-1/2 flex justify-center items-center">
                     <div class="vertical-scroller-container">
-                        <div class="vertical-scroller-content">
-                            <h3>Unlocking the Future with AI</h3>
-                            <p>Artificial Intelligence is rapidly transforming every aspect of our lives, from personalized recommendations to advanced scientific research. Discover how our cutting-edge AI models are designed to empower users and solve complex challenges across various industries.</p>
-                            <img src="https://placehold.co/1280x720/000/FFF?text=AI+Overview" alt="AI Overview Image" />
-                            <h3>Ethical AI Development</h3>
-                            <p>We are committed to developing AI responsibly, prioritizing fairness, transparency, and accountability. Our ethical guidelines ensure that our AI systems are beneficial for all of humanity, minimizing bias and promoting positive societal impact.</p>
-                            <img src="https://placehold.co/1280x720/000/FFF?text=Ethical+AI" alt="Ethical AI Image" />
-                            <h3>AI in Healthcare</h3>
-                            <p>Explore the groundbreaking ways AI is revolutionizing healthcare, from accelerating drug discovery and diagnosing diseases with greater accuracy to personalizing patient treatment plans. Our AI solutions are helping to improve health outcomes globally.</p>
-                            <img src="healthcare.png" alt="Healthcare AI Image" />
-                            <h3>AI in Education</h3>
-                            <p>AI is personalizing learning experiences, providing adaptive content, and automating administrative tasks to free up educators. Learn how our AI tools are making education more accessible and effective for students worldwide.</p>
-                            <img src="https://placehold.co/1280x720/000/FFF?text=Education+AI" alt="Education AI Image" />
-                            <h3>The Power of Machine Learning</h3>
-                            <p>At the core of our AI capabilities is advanced machine learning, enabling systems to learn from data, identify patterns, and make informed decisions. We leverage state-of-the-art algorithms to deliver unparalleled performance.</p>
-                            <img src="https://placehold.co/1280x720/000/FFF?text=Machine+Learning" alt="Machine Learning Image" />
-                            <h3>Join the AI Revolution</h3>
-                            <p>Be a part of shaping the future with AI. We invite researchers, developers, and innovators to collaborate with us on open-source projects, pushing the boundaries of what's possible with artificial intelligence.</p>
-                            <img src="https://placehold.co/1280x720/000/FFF?text=Join+Us" alt="Join Us Image" />
+                        <div class="iphone-notch"></div> <!-- Dedicated notch div -->
+                        <div class="iphone-scrollable-content">
+                            <div class="vertical-scroller-content">
+                                <h3>Unlocking the Future with AI</h3>
+                                <p>Artificial Intelligence is rapidly transforming every aspect of our lives, from personalized recommendations to advanced scientific research. Discover how our cutting-edge AI models are designed to empower users and solve complex challenges across various industries.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=AI+Overview" alt="AI Overview Image" />
+                                <h3>Ethical AI Development</h3>
+                                <p>We are committed to developing AI responsibly, prioritizing fairness, transparency, and accountability. Our ethical guidelines ensure that our AI systems are beneficial for all of humanity, minimizing bias and promoting positive societal impact.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Ethical+AI" alt="Ethical AI Image" />
+                                <h3>AI in Healthcare</h3>
+                                <p>Explore the groundbreaking ways AI is revolutionizing healthcare, from accelerating drug discovery and diagnosing diseases with greater accuracy to personalizing patient treatment plans. Our AI solutions are helping to improve health outcomes globally.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Healthcare+AI" alt="Healthcare AI Image" />
+                                <h3>AI in Education</h3>
+                                <p>AI is personalizing learning experiences, providing adaptive content, and automating administrative tasks to free up educators. Learn how our AI tools are making education more accessible and effective for students worldwide.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Education+AI" alt="Education AI Image" />
+                                <h3>The Power of Machine Learning</h3>
+                                <p>At the core of our AI capabilities is advanced machine learning, enabling systems to learn from data, identify patterns, and make informed decisions. We leverage state-of-the-art algorithms to deliver unparalleled performance.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Machine+Learning" alt="Machine Learning Image" />
+                                <h3>Join the AI Revolution</h3>
+                                <p>Be a part of shaping the future with AI. We invite researchers, developers, and innovators to collaborate with us on open-source projects, pushing the boundaries of what's possible with artificial intelligence.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Join+Us" alt="Join Us Image" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -484,7 +501,7 @@
                                 </div>
                                 <!-- Response Display (hidden by default) -->
                                 <div class="response-display" id="responseDisplay">
-                                    <h3 id="apiResponseTitle">AI Response</h3>
+                                    <h3 id="apiResponseTitle">Grok</h3> <!-- Changed title to "Grok" -->
                                     <div id="apiResponseContent" class="flex-grow overflow-y-auto pr-2"></div>
                                     <p class="footer-text">This response was generated by Grok AI based on current understanding.</p>
                                 </div>
@@ -731,7 +748,7 @@
             const lineRect = currentLine.getBoundingClientRect();
 
             const wordLeftInUlContent = lineRect.left - ulRect.left;
-            const wordCenterXRelativeToContainer = (ulRect.left - containerRect.left) + wordLeftInUlContent + (wordWidth / 2);
+            const wordCenterXRelativeToContainer = (ulRect.left - initialContainerRect.left) + wordLeftInUlContent + (wordWidth / 2);
 
             gsap.set(indicator, {
                 '--width': wordWidth,
@@ -777,4 +794,3 @@
     </script>
 </body>
 </html>
-
