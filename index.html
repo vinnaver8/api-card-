@@ -1,796 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI for All Humanity</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Standard Vertical Scroller (Grok section - iPhone Layout) */
-        .vertical-scroller-container {
-            width: 320px; /* iPhone-like width */
-            height: 480px; /* Medium iPhone-like height */
-            background: #0d0d0d; /* Slightly brighter screen background */
-            border-radius: 40px; /* More rounded for iPhone look */
-            border: 10px solid #282828; /* Thicker, darker bezel */
-            box-sizing: border-box;
-            position: relative; /* For notch/speaker styling */
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.05); /* Outer shadow + subtle inner screen light */
-            overflow: hidden; /* Hide anything outside the main phone frame */
-        }
-
-        /* New div for the iPhone notch */
-        .iphone-notch {
-            position: absolute;
-            top: 0px; /* Position relative to the container's inner edge (adjust for border) */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 130px; /* Notch width */
-            height: 30px; /* Notch height */
-            background: #282828;
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
-            border: 1px solid #282828; /* Match the main border color */
-            box-sizing: border-box; /* Include border in size */
-            z-index: 100; /* Ensure notch is always on top */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Subtle shadow for depth */
-        }
-
-        /* New container for scrollable content inside the iPhone */
-        .iphone-scrollable-content {
-            height: 100%; /* Take full height of parent container */
-            width: 100%;
-            overflow-y: auto; /* Enable vertical scrolling for this content */
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-            padding-top: 4.5rem; /* Space for the fixed notch */
-            padding-bottom: 1rem;
-            box-sizing: border-box;
-            position: relative; /* Needed for z-index context if internal elements need it */
-            z-index: 50; /* Ensure content is below notch */
-        }
-
-        .iphone-scrollable-content::-webkit-scrollbar {
-            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
-        }
-
-        .vertical-scroller-content {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem; /* Gap between content items */
-            padding-left: 1rem;
-            padding-right: 1rem;
-            /* No padding-top/bottom here, handled by iphone-scrollable-content */
-        }
-
-        .vertical-scroller-content img {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-
-        .vertical-scroller-content h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .vertical-scroller-content p {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: #ccc;
-        }
-
-
-        /* API Section (MacBook Layout) */
-        .macbook-container {
-            position: relative;
-            width: 100%;
-            max-width: 700px; /* Adjusted wider for the full laptop */
-            margin-bottom: 30px; /* Space for the base */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.9); /* More prominent overall shadow */
-            border-radius: 18px; /* Overall rounded corners for the laptop */
-            background-color: #3a3a3a; /* Darker base color */
-        }
-
-        #api-box {
-            position: relative;
-            width: calc(100% - 10px); /* Account for thin screen border */
-            height: 380px; /* Medium screen height */
-            background-color: #0d0d0d; /* Screen background */
-            border-radius: 12px 12px 0 0; /* Rounded top corners, sharp bottom for screen */
-            border: 4px solid #1a1a1a; /* Thicker, darker bezel */
-            box-sizing: border-box;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column; /* Use flex column for general layout */
-            align-items: center;
-            justify-content: flex-start; /* Align content to top initially */
-            aspect-ratio: 16 / 9; /* Typical laptop screen aspect ratio */
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7), 0 5px 15px rgba(0,0,0,0.3); /* Inner screen depth + subtle screen shadow */
-            margin-top: 5px; /* Push down slightly from container top edge */
-            padding: 25px; /* General padding for screen content */
-        }
-
-        /* MacBook Camera Dot */
-        #api-box::before {
-            content: '';
-            position: absolute;
-            top: 15px; /* Position camera at top center */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 7px;
-            height: 7px;
-            background: #444;
-            border-radius: 50%;
-            z-index: 10;
-            box-shadow: 0 0 3px rgba(0,0,0,0.5);
-        }
-
-        .macbook-base {
-            width: 98%; /* Slightly narrower base than screen */
-            height: 35px; /* Thickness of the base/keyboard area */
-            background-color: #2b2b2b; /* Base color, slightly different from screen */
-            border-radius: 0 0 18px 18px; /* Rounded bottom corners matching container */
-            position: relative;
-            z-index: -1; /* Place behind the screen for hinge effect */
-            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(0,0,0,0.5); /* Inner shadow for keyboard area + outer shadow */
-            margin-top: -15px; /* Overlap with screen for hinge effect */
-            transform: perspective(200px) rotateX(4deg); /* Slight 3D tilt for base */
-            transform-origin: top center;
-            border-top: 2px solid #444; /* Hinge line */
-        }
-
-        /* Real-time clock */
-        #macbook-clock {
-            position: absolute; /* Keep absolute to position over other content */
-            top: 25px; /* Adjust padding from top */
-            left: 25px; /* Adjust padding from left */
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #ccc;
-            z-index: 15; /* Higher z-index to always be on top */
-        }
-
-        /* Main content containers within MacBook screen */
-        .macbook-screen-content-wrapper {
-            position: absolute; /* Take full screen content area */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between; /* Distribute space for input/button at bottom */
-            padding: 25px; /* General padding for screen content */
-            padding-top: 60px; /* Adjust padding for the clock at the top */
-            box-sizing: border-box;
-        }
-
-
-        /* Input and Button Styling */
-        #inputFormContent {
-            display: flex; /* Ensure it's a flex container for its children */
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            width: 100%; /* Take full width of parent */
-            padding: 0 20px; /* Add horizontal padding */
-            box-sizing: border-box;
-            margin-top: auto; /* Push to the bottom */
-        }
-
-        #apiQueryInput {
-            width: 100%; /* Fill the container width */
-            padding: 12px 15px;
-            border: 1px solid #555;
-            border-radius: 8px;
-            font-size: 1rem;
-            background-color: #2a2a2a;
-            color: #fff;
-            outline: none;
-        }
-
-        #generateResponseButton {
-            background-color: #f85922;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-            width: 100%; /* Fill the container width */
-        }
-
-        #generateResponseButton:hover {
-            background-color: #e04a1b;
-        }
-
-        /* Generation Progress Styling */
-        .generation-progress {
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: absolute; /* Take full screen content area */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0d0d0d; /* Match screen background */
-            z-index: 10; /* Overlay other content but below clock */
-            padding-top: 60px; /* Space for the clock */
-            box-sizing: border-box;
-        }
-
-        .generation-progress p {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-
-        .dynamic-number {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #f85922;
-        }
-
-        /* Response Display Styling */
-        .response-display {
-            display: none; /* Hidden by default */
-            position: absolute; /* Take full screen content area */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: flex-start;
-            text-align: left;
-            padding: 25px; /* Match screen padding */
-            padding-top: 60px; /* Adjust padding for the clock at the top */
-            box-sizing: border-box;
-            background-color: #0d0d0d; /* Match screen background */
-            z-index: 10; /* Overlay other content but below clock */
-            overflow-y: auto; /* Enable scrolling for long content */
-            -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
-            scrollbar-width: none; /* Hide scrollbar for Firefox */
-        }
-        .response-display::-webkit-scrollbar {
-            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
-        }
-
-        .response-display h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #f85922;
-        }
-
-        .response-display p {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            color: #ccc;
-        }
-
-        .response-display ul {
-            list-style-type: disc;
-            margin-left: 20px;
-            color: #ccc;
-        }
-
-        .response-display .footer-text {
-            font-size: 0.75rem;
-            color: #555;
-            margin-top: auto; /* Push to bottom */
-            padding-top: 15px; /* Padding above footer text */
-        }
-
-
-        /* Infinite Scroller (Developer Docs section) */
-        @layer demo {
-            .infinite-scroller-main-container {
-                --font-level: 5;
-                opacity: 1; /* Make visible initially */
-                width: 100%;
-                max-width: 600px;
-                height: 280px;
-                max-height: 100%;
-                display: flex;
-                place-items: center;
-                text-align: center;
-                position: relative;
-                background: #0D0D0D;
-                overflow: hidden;
-                border-radius: 12px;
-                border: 1px solid #333;
-                aspect-ratio: 3 / 3.5; /* Updated aspect ratio */
-
-                /* Apply mask for blur effect with sharper transitions */
-                mask-image: linear-gradient(
-                    to bottom,
-                    transparent 0%,
-                    black 10%, /* Start opaque earlier */
-                    black 90%, /* End opaque later */
-                    transparent 100%
-                );
-                -webkit-mask-image: linear-gradient(
-                    to bottom,
-                    transparent 0%,
-                    black 10%,
-                    black 90%,
-                    transparent 100%
-                );
-            }
-
-            .infinite-scroller-main-container ul {
-                padding: 0;
-                margin: 0;
-                list-style-type: none;
-                text-transform: uppercase;
-                line-height: 1;
-                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold',
-                sans-serif;
-                height: 1lh;
-                display: inline-grid;
-                position: relative;
-                padding-inline: 1em;
-                align-items: center;
-                align-content: center;
-                justify-content: center;
-                justify-items: center;
-                text-align: center;
-                width: 100%;
-            }
-
-            .infinite-scroller-main-container li {
-                display: inline-block;
-                width: fit-content;
-                height: 1lh;
-                grid-area: 1 / 1;
-                color: #666; /* Default dim color for non-highlighted text */
-                transition: color 0.2s ease-in-out; /* Smooth color transition */
-            }
-
-            .infinite-scroller-main-container .indicator {
-                --c: 0.3em;
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                height: 1lh;
-                border: 0.05em solid oklch(0.75 1 var(--h, 320));
-                transition: width 0.25s, border-color 0.25s;
-                width: calc((var(--width) * 1px) + (var(--c) * 2));
-                border-radius: 8px;
-                opacity: 1; /* Ensure indicator is visible */
-            }
-        }
-
-        @layer base {
-            :root {
-                --font-size-min: 16;
-                --font-size-max: 20;
-                --font-ratio-min: 1.2;
-                --font-ratio-max: 1.33;
-                --font-width-min: 375;
-                --font-width-max: 1500;
-            }
-
-            :where(.fluid) {
-                --fluid-min: calc(
-                    var(--font-size-min) *
-                    pow(var(--font-ratio-min), var(--font-level, 0))
-                );
-                --fluid-max: calc(
-                    var(--font-size-max) *
-                    pow(var(--font-ratio-max), var(--font-level, 0))
-                );
-                --fluid-preferred: calc(
-                    (var(--fluid-max) - var(--fluid-min)) /
-                    (var(--font-width-max) - var(--font-width-min))
-                );
-                --fluid-type: clamp(
-                    (var(--fluid-min) / 16) * 1rem,
-                    ((var(--fluid-min) / 16) * 1rem) -
-                    (((var(--fluid-preferred) * var(--font-width-min)) / 16) * 1rem) +
-                    (var(--fluid-preferred) * var(--variable-unit, 100vi)),
-                    (var(--fluid-max) / 16) * 1rem
-                );
-                font-size: var(--fluid-type);
-            }
-
-            *,
-            *::before,
-            *::after {
-                box-sizing: border-box;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Responsive Footer Example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Include Font Awesome for social icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* Footer Styles */
+    footer {
+      background: linear-gradient(to right, #282828 50%, #1a1a1a 50%); /* two-tone gray background */
+      color: white;
+      padding: 40px 20px;
+      font-family: Arial, sans-serif;
+    }
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+    }
+    /* Social icon sidebar */
+    .social-sidebar {
+      display: flex;
+      flex-direction: column;
+      margin-right: 40px;
+    }
+    .social-sidebar a {
+      color: white;
+      font-size: 24px;
+      margin: 10px 0;
+      text-decoration: none;
+    }
+    .social-sidebar a:hover {
+      color: #cccccc;
+    }
+    /* Main footer content: logo and columns */
+    .footer-main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+    }
+    .logo {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 2em;
+      font-weight: bold;
+      margin-right: 40px;
+      align-self: center;
+    }
+    .footer-links {
+      display: flex;
+      border-left: 1px solid #444; /* divider between columns */
+      padding-left: 40px;
+    }
+    .footer-col {
+      margin: 0 40px;
+    }
+    .footer-col h3 {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .footer-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .footer-col li {
+      margin-bottom: 8px;
+    }
+    .footer-col a {
+      color: #cccccc;
+      text-decoration: none;
+    }
+    .footer-col a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+    /* Bottom bar with Privacy/Terms */
+    .footer-bottom {
+      margin-top: 40px;
+      border-top: 1px solid #444;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .footer-bottom a {
+      color: #cccccc;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+    .footer-bottom a:hover {
+      color: #ffffff;
+    }
+    /* Responsive layout */
+    @media (max-width: 768px) {
+      .footer-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      .social-sidebar {
+        flex-direction: row;
+        justify-content: center;
+        margin: 0 0 20px 0;
+      }
+      .footer-main {
+        flex-direction: column;
+        align-items: center;
+      }
+      .logo {
+        margin: 0 0 20px 0;
+      }
+      .footer-links {
+        flex-direction: column;
+        border-left: none;
+        padding: 0;
+        align-items: center;
+      }
+      .footer-col {
+        margin: 10px 0;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-bottom a {
+        margin: 5px 0;
+      }
+    }
+  </style>
 </head>
-<body class="bg-[#0D0D0D]">
-    <section id="section-4" class="relative min-h-[1900px] bg-[#0D0D0D] text-white overflow-hidden pt-32">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-32">
-            <div class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-8">
-                [ PRODUCTS ]
-            </div>
+<body>
 
-            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-24 leading-tight">
-                AI for all humanity
-            </h1>
+  <footer>
+    <div class="footer-container">
+      <!-- Social media sidebar (vertical icons) -->
+      <div class="social-sidebar">
+        <a href="#"><i class="fab fa-discord"></i></a>
+        <a href="#"><i class="fab fa-github"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin"></i></a>
+      </div>
 
-            <!-- Grok Section -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
-                <div class="md:w-1/2 text-left">
-                    <h2 class="text-4xl font-semibold mb-4">Grok</h2>
-                    <p class="text-lg text-gray-300 mb-8 max-w-md">
-                        Grok is your cosmic guide, now accessible on grok.com, iOS, and Android. Explore the universe with AI.
-                    </p>
-                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                        USE NOW <span class="ml-2">&#8594;</span>
-                    </button>
-                </div>
-                <!-- Standard Vertical Scroller (Grok section - iPhone Layout) -->
-                <div class="md:w-1/2 flex justify-center items-center">
-                    <div class="vertical-scroller-container">
-                        <div class="iphone-notch"></div> <!-- Dedicated notch div -->
-                        <div class="iphone-scrollable-content">
-                            <div class="vertical-scroller-content">
-                                <h3>Unlocking the Future with AI</h3>
-                                <p>Artificial Intelligence is rapidly transforming every aspect of our lives, from personalized recommendations to advanced scientific research. Discover how our cutting-edge AI models are designed to empower users and solve complex challenges across various industries.</p>
-                                <img src="https://placehold.co/1280x720/000/FFF?text=AI+Overview" alt="AI Overview Image" />
-                                <h3>Ethical AI Development</h3>
-                                <p>We are committed to developing AI responsibly, prioritizing fairness, transparency, and accountability. Our ethical guidelines ensure that our AI systems are beneficial for all of humanity, minimizing bias and promoting positive societal impact.</p>
-                                <img src="https://placehold.co/1280x720/000/FFF?text=Ethical+AI" alt="Ethical AI Image" />
-                                <h3>AI in Healthcare</h3>
-                                <p>Explore the groundbreaking ways AI is revolutionizing healthcare, from accelerating drug discovery and diagnosing diseases with greater accuracy to personalizing patient treatment plans. Our AI solutions are helping to improve health outcomes globally.</p>
-                                <img src="https://placehold.co/1280x720/000/FFF?text=Healthcare+AI" alt="Healthcare AI Image" />
-                                <h3>AI in Education</h3>
-                                <p>AI is personalizing learning experiences, providing adaptive content, and automating administrative tasks to free up educators. Learn how our AI tools are making education more accessible and effective for students worldwide.</p>
-                                <img src="https://placehold.co/1280x720/000/FFF?text=Education+AI" alt="Education AI Image" />
-                                <h3>The Power of Machine Learning</h3>
-                                <p>At the core of our AI capabilities is advanced machine learning, enabling systems to learn from data, identify patterns, and make informed decisions. We leverage state-of-the-art algorithms to deliver unparalleled performance.</p>
-                                <img src="https://placehold.co/1280x720/000/FFF?text=Machine+Learning" alt="Machine Learning Image" />
-                                <h3>Join the AI Revolution</h3>
-                                <p>Be a part of shaping the future with AI. We invite researchers, developers, and innovators to collaborate with us on open-source projects, pushing the boundaries of what's possible with artificial intelligence.</p>
-                                <img src="https://placehold.co/1280x720/000/FFF?text=Join+Us" alt="Join Us Image" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Grok Section End -->
-
-            <!-- API Section (MacBook Layout) -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
-                <div class="md:w-1/2 text-left">
-                    <h2 class="text-4xl font-semibold mb-4">API</h2>
-                    <p class="text-lg text-gray-300 mb-8 max-w-md">
-                        Supercharge your applications with Grok's enhanced speed, precision, and multilingual capabilities.
-                    </p>
-                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105" id="apiBuildNowButton">
-                        BUILD NOW <span class="ml-2">&#8594;</span>
-                    </button>
-                </div>
-                <div class="md:w-1/2 flex justify-center items-center">
-                    <div class="macbook-container">
-                        <div id="api-box">
-                            <div id="macbook-clock"></div> <!-- Real-time clock always visible -->
-                            <div class="macbook-screen-content-wrapper">
-                                <!-- Input Form Content (visible by default) -->
-                                <div id="inputFormContent" class="flex flex-col items-center justify-center w-full h-full p-6 space-y-4">
-                                    <input type="text" id="apiQueryInput" placeholder="Ask Grok AI anything..." class="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                    <button id="generateResponseButton" class="w-full py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-md transition duration-300 ease-in-out">
-                                        GENERATE RESPONSE
-                                    </button>
-                                </div>
-                                <!-- Generation Progress (hidden by default) -->
-                                <div class="generation-progress" id="generationProgress">
-                                    <p>Generating Response...</p>
-                                    <div class="dynamic-number" id="dynamicNumber">0</div>
-                                </div>
-                                <!-- Response Display (hidden by default) -->
-                                <div class="response-display" id="responseDisplay">
-                                    <h3 id="apiResponseTitle">Grok</h3> <!-- Changed title to "Grok" -->
-                                    <div id="apiResponseContent" class="flex-grow overflow-y-auto pr-2"></div>
-                                    <p class="footer-text">This response was generated by Grok AI based on current understanding.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="macbook-base"></div>
-                    </div>
-                </div>
-            </div>
-            <!-- API Section End -->
-
-            <!-- Developer Docs Section -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
-                <div class="md:w-1/2 text-left">
-                    <h2 class="text-4xl font-semibold mb-4">Developer Docs</h2>
-                    <p class="text-lg text-gray-300 mb-8 max-w-md">
-                        Learn how to quickly install Grok at the heart of your applications and explore guides covering common use cases.
-                    </p>
-                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-                        LEARN MORE <span class="ml-2">&#8594;</span>
-                    </button>
-                </div>
-                <!-- Infinite Scroller -->
-                <div class="md:w-1/2 flex justify-center items-center">
-                    <div class="infinite-scroller-main-container fluid">
-                        <div class="indicator"></div>
-                        <ul>
-                            <li>prototype.</li>
-                            <li>solve.</li>
-                            <li>build.</li>
-                            <li>develop.</li>
-                            <li>debug.</li>
-                            <li>learn.</li>
-                            <li>cook.</li>
-                            <li>ship.</li>
-                            <li>prompt.</li>
-                            <li>collaborate.</li>
-                            <li>create.</li>
-                            <li>inspire.</li>
-                            <li>follow.</li>
-                            <li>innovate.</li>
-                            <li>test.</li>
-                            <li>optimize.</li>
-                            <li>teach.</li>
-                            <li>visualize.</li>
-                            <li>transform.</li>
-                            <li>scale.</li>
-                            <li>do it.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <!-- Developer Docs Section End -->
-
+      <!-- Main footer content -->
+      <div class="footer-main">
+        <!-- Logo / Branding -->
+        <div class="logo">LAYER4</div>
+        <!-- Link columns -->
+        <div class="footer-links">
+          <div class="footer-col">
+            <h3>Devs</h3>
+            <ul>
+              <li><a href="#">Docs</a></li>
+              <li><a href="#">API &amp; SDKs</a></li>
+              <li><a href="#">Tutorials</a></li>
+              <li><a href="#">Community</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h3>Ecosystem</h3>
+            <ul>
+              <li><a href="#">Events &amp; Meetups</a></li>
+              <li><a href="#">Partners</a></li>
+              <li><a href="#">Resources</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
 
-    <script type="module">
-        // API Section Animations and Functionality
-        document.addEventListener("DOMContentLoaded", () => {
-            const apiQueryInput = document.getElementById('apiQueryInput');
-            const generateResponseButton = document.getElementById('generateResponseButton');
-            const inputFormContent = document.getElementById('inputFormContent');
-            const generationProgress = document.getElementById('generationProgress');
-            const dynamicNumberElement = document.getElementById('dynamicNumber');
-            const responseDisplay = document.getElementById('responseDisplay');
-            const apiResponseTitle = document.getElementById('apiResponseTitle');
-            const apiResponseContent = document.getElementById('apiResponseContent');
-            const macbookClock = document.getElementById('macbook-clock');
+    <!-- Bottom policy links -->
+    <div class="footer-bottom">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms &amp; Conditions</a>
+    </div>
+  </footer>
 
-            let numberInterval;
-
-            function updateMacbookClock() {
-                const now = new Date();
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                macbookClock.textContent = `${hours}:${minutes}`;
-            }
-
-            // Initial clock update and set interval
-            updateMacbookClock();
-            setInterval(updateMacbookClock, 1000); // Update every second for real-time feel
-
-            // Initial setup: Only show the input form
-            inputFormContent.style.display = 'flex';
-            generationProgress.style.display = 'none';
-            responseDisplay.style.display = 'none';
-
-
-            async function generateAiResponse(prompt) {
-                try {
-                    let chatHistory = [];
-                    // Add specific instruction for 24hr time if relevant to the prompt
-                    let fullPrompt = prompt;
-                    if (prompt.toLowerCase().includes('time') || prompt.toLowerCase().includes('hour')) {
-                        fullPrompt += " (Please provide time in 24-hour format if relevant, e.g., HH:MM.)";
-                    }
-
-                    chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
-                    const payload = { contents: chatHistory };
-                    const apiKey = ""; // Canvas will automatically provide the API key at runtime
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    const result = await response.json();
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
-                        return result.candidates[0].content.parts[0].text;
-                    } else {
-                        console.error("Gemini API returned an unexpected structure or no content:", result);
-                        return "Failed to get a response. Please try again.";
-                    }
-                } catch (error) {
-                    console.error("Error calling Gemini API:", error);
-                    return "An error occurred while connecting to the AI. Please try again.";
-                }
-            }
-
-            async function handleGenerateResponse() {
-                const query = apiQueryInput.value.trim();
-                if (!query) {
-                    apiResponseContent.textContent = "Please enter a query.";
-                    // Change title to "Error" for invalid input
-                    apiResponseTitle.textContent = "Error";
-                    inputFormContent.style.display = 'none';
-                    generationProgress.style.display = 'none';
-                    responseDisplay.style.display = 'flex';
-                    return;
-                }
-
-                // Clear any previous intervals
-                clearInterval(numberInterval);
-
-                // Show generation progress
-                inputFormContent.style.display = 'none';
-                responseDisplay.style.display = 'none';
-                generationProgress.style.display = 'flex';
-                dynamicNumberElement.textContent = '0';
-
-                let currentNumber = 0;
-                numberInterval = setInterval(() => {
-                    currentNumber += Math.floor(Math.random() * 5) + 1;
-                    if (currentNumber > 99) currentNumber = 99;
-                    dynamicNumberElement.textContent = currentNumber;
-                }, 100);
-
-                // Generate response from AI
-                const responseText = await generateAiResponse(query);
-
-                // Stop thinking animation
-                clearInterval(numberInterval);
-                dynamicNumberElement.textContent = '100'; // Ensure it ends at 100
-
-                // Prepare response display
-                // Change title to "Grok"
-                apiResponseTitle.textContent = "Grok";
-                apiResponseContent.textContent = responseText;
-
-                // Show response after a short delay, and keep it visible
-                setTimeout(() => {
-                    generationProgress.style.display = 'none';
-                    responseDisplay.style.display = 'flex';
-                }, 1000); // Delay for 1 second after number animation finishes
-            }
-
-            generateResponseButton.addEventListener('click', handleGenerateResponse);
-            apiQueryInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    handleGenerateResponse();
-                }
-            });
-        });
-    </script>
-
-    <script type="module">
-        // GSAP for Infinite Scroller (Developer Docs section)
-        import gsap from 'https://cdn.skypack.dev/gsap@3.12.0';
-
-        gsap.defaults({
-            duration: 1,
-        });
-
-        const tl = gsap.timeline({ paused: true });
-        const lines = gsap.utils.toArray('.infinite-scroller-main-container ul li');
-
-        gsap.set(lines, { yPercent: 300 });
-
-        const paddedLines = [...lines, ...lines, ...lines];
-
-        paddedLines.forEach((line, index) => {
-            const lineTl = gsap.timeline()
-                .set(line, { yPercent: 300 })
-                .to(
-                    line,
-                    {
-                        yPercent: '-=600',
-                        repeatRefresh: true,
-                        immediateRender: false,
-                        ease: 'none',
-                        duration: 6,
-                    },
-                    0
-                );
-            tl.add(lineTl, index);
-        });
-
-        const scrubber = gsap.timeline({ paused: true }).fromTo(
-            tl,
-            {
-                totalTime: lines.length + 1,
-            },
-            {
-                totalTime: lines.length * 2 + 1,
-                ease: 'none',
-                duration: lines.length,
-                repeat: -1,
-            }
-        );
-
-        gsap.set(scrubber, { totalTime: lines.length + 2 });
-
-        let index = 0;
-        const indicator = document.querySelector('.infinite-scroller-main-container .indicator');
-
-        let lastActiveLine = null;
-
-        const syncIndicator = () => {
-            if (lastActiveLine) {
-                gsap.to(lastActiveLine, { color: '#666', duration: 0 });
-            }
-
-            index += 1;
-            const currentLine = lines[index % lines.length];
-            const wordWidth = currentLine.getBoundingClientRect().width;
-
-            const containerRect = document.querySelector('.infinite-scroller-main-container').getBoundingClientRect();
-            const ulRect = currentLine.closest('ul').getBoundingClientRect();
-            const lineRect = currentLine.getBoundingClientRect();
-
-            const wordLeftInUlContent = lineRect.left - ulRect.left;
-            const wordCenterXRelativeToContainer = (ulRect.left - initialContainerRect.left) + wordLeftInUlContent + (wordWidth / 2);
-
-            gsap.set(indicator, {
-                '--width': wordWidth,
-                '--h': gsap.utils.random(0, 359),
-                left: wordCenterXRelativeToContainer,
-                xPercent: -50,
-                opacity: 1
-            });
-
-            gsap.to(currentLine, { color: '#FFFFFF', duration: 0 });
-            lastActiveLine = currentLine;
-        };
-
-        const initialLine = lines[0];
-        const initialWordWidth = initialLine.getBoundingClientRect().width;
-        const initialContainerRect = document.querySelector('.infinite-scroller-main-container').getBoundingClientRect();
-        const initialUlRect = initialLine.closest('ul').getBoundingClientRect();
-        const initialLineRect = initialLine.getBoundingClientRect();
-        const initialWordLeftInUlContent = initialLineRect.left - initialUlRect.left;
-        const initialWordCenterXRelativeToContainer = (initialUlRect.left - initialContainerRect.left) + initialWordLeftInUlContent + (initialWordWidth / 2);
-
-        gsap.set(indicator, {
-            '--width': initialWordWidth,
-            left: initialWordCenterXRelativeToContainer,
-            xPercent: -50,
-            '--h': gsap.utils.random(0, 359),
-            opacity: 1
-        });
-
-        gsap.to(scrubber, {
-            delay: 1,
-            totalTime: '+=1',
-            duration: 1,
-            repeat: -1,
-            repeatDelay: 1,
-            repeatRefresh: true,
-            onStart: syncIndicator,
-            onRepeat: syncIndicator,
-            ease: 'elastic.out(1, 0.875)',
-        });
-
-        gsap.set('.infinite-scroller-main-container', { opacity: 1 });
-    </script>
 </body>
 </html>
