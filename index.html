@@ -1,180 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Responsive Footer Example</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Include Font Awesome for social icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Layer4 Footer Clone</title>
   <style>
-    /* Footer Styles */
-    footer {
-      background: linear-gradient(to right, #282828 50%, #1a1a1a 50%); /* two-tone gray background */
+    body {
+      margin: 0;
+      background-color: #0d0d0d;
+      font-family: 'Courier New', monospace;
       color: white;
-      padding: 40px 20px;
-      font-family: Arial, sans-serif;
     }
-    .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: flex-start;
-    }
-    /* Social icon sidebar */
-    .social-sidebar {
+
+    .footer {
       display: flex;
       flex-direction: column;
-      margin-right: 40px;
+      justify-content: space-between;
+      background-color: #0d0d0d;
+      padding: 40px 60px;
+      height: 100vh;
+      box-sizing: border-box;
     }
-    .social-sidebar a {
-      color: white;
-      font-size: 24px;
-      margin: 10px 0;
-      text-decoration: none;
-    }
-    .social-sidebar a:hover {
-      color: #cccccc;
-    }
-    /* Main footer content: logo and columns */
-    .footer-main {
+
+    .footer-top {
+      display: flex;
       flex: 1;
+      border-radius: 30px;
+      overflow: hidden;
+    }
+
+    .left-panel {
+      flex: 1;
+      background: linear-gradient(145deg, #dcdcdc, #bcbcbc);
       display: flex;
-      align-items: flex-start;
-    }
-    .logo {
-      font-family: "Courier New", Courier, monospace;
-      font-size: 2em;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
       font-weight: bold;
-      margin-right: 40px;
-      align-self: center;
+      letter-spacing: 5px;
     }
-    .footer-links {
-      display: flex;
-      border-left: 1px solid #444; /* divider between columns */
-      padding-left: 40px;
+
+    .right-panel {
+      flex: 1;
+      background: linear-gradient(145deg, rgba(220, 220, 220, 0.5), rgba(140, 140, 140, 0.7));
+      backdrop-filter: blur(8px);
+      padding: 60px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      border-left: 1px solid rgba(255,255,255,0.15);
     }
-    .footer-col {
-      margin: 0 40px;
-    }
-    .footer-col h3 {
-      font-weight: bold;
+
+    .footer-column h3 {
+      font-size: 16px;
+      color: white;
       margin-bottom: 10px;
     }
-    .footer-col ul {
+
+    .footer-column ul {
       list-style: none;
       padding: 0;
       margin: 0;
     }
-    .footer-col li {
+
+    .footer-column ul li {
+      font-size: 14px;
+      color: #c2c2c2;
       margin-bottom: 8px;
     }
-    .footer-col a {
-      color: #cccccc;
-      text-decoration: none;
-    }
-    .footer-col a:hover {
-      color: #ffffff;
-      text-decoration: underline;
-    }
-    /* Bottom bar with Privacy/Terms */
+
     .footer-bottom {
-      margin-top: 40px;
-      border-top: 1px solid #444;
-      padding-top: 20px;
       display: flex;
       justify-content: space-between;
-    }
-    .footer-bottom a {
-      color: #cccccc;
-      text-decoration: none;
-      font-size: 0.9em;
-    }
-    .footer-bottom a:hover {
-      color: #ffffff;
-    }
-    /* Responsive layout */
-    @media (max-width: 768px) {
-      .footer-container {
-        flex-direction: column;
-        align-items: center;
-      }
-      .social-sidebar {
-        flex-direction: row;
-        justify-content: center;
-        margin: 0 0 20px 0;
-      }
-      .footer-main {
-        flex-direction: column;
-        align-items: center;
-      }
-      .logo {
-        margin: 0 0 20px 0;
-      }
-      .footer-links {
-        flex-direction: column;
-        border-left: none;
-        padding: 0;
-        align-items: center;
-      }
-      .footer-col {
-        margin: 10px 0;
-      }
-      .footer-bottom {
-        flex-direction: column;
-        text-align: center;
-      }
-      .footer-bottom a {
-        margin: 5px 0;
-      }
+      margin-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+      font-size: 12px;
+      color: #a0a0a0;
     }
   </style>
 </head>
 <body>
-
-  <footer>
-    <div class="footer-container">
-      <!-- Social media sidebar (vertical icons) -->
-      <div class="social-sidebar">
-        <a href="#"><i class="fab fa-discord"></i></a>
-        <a href="#"><i class="fab fa-github"></i></a>
-        <a href="#"><i class="fab fa-twitter"></i></a>
-        <a href="#"><i class="fab fa-linkedin"></i></a>
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="left-panel">
+        LAYER4
       </div>
-
-      <!-- Main footer content -->
-      <div class="footer-main">
-        <!-- Logo / Branding -->
-        <div class="logo">LAYER4</div>
-        <!-- Link columns -->
-        <div class="footer-links">
-          <div class="footer-col">
-            <h3>Devs</h3>
-            <ul>
-              <li><a href="#">Docs</a></li>
-              <li><a href="#">API &amp; SDKs</a></li>
-              <li><a href="#">Tutorials</a></li>
-              <li><a href="#">Community</a></li>
-            </ul>
-          </div>
-          <div class="footer-col">
-            <h3>Ecosystem</h3>
-            <ul>
-              <li><a href="#">Events &amp; Meetups</a></li>
-              <li><a href="#">Partners</a></li>
-              <li><a href="#">Resources</a></li>
-              <li><a href="#">Contact</a></li>
-            </ul>
-          </div>
+      <div class="right-panel">
+        <div class="footer-column">
+          <h3>+ Devs</h3>
+          <ul>
+            <li>Docs</li>
+            <li>API & SDKs</li>
+            <li>Testnet Access</li>
+            <li>Smart Contract Templates</li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>+ Ecosystem</h3>
+          <ul>
+            <li>Grants & Funding</li>
+            <li>Events & Meetups</li>
+            <li>DAO Governance</li>
+            <li>SheDesigns.fun</li>
+          </ul>
         </div>
       </div>
     </div>
-
-    <!-- Bottom policy links -->
     <div class="footer-bottom">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms &amp; Conditions</a>
+      <div>Privacy Policy</div>
+      <div>Terms & Conditions</div>
     </div>
   </footer>
-
 </body>
 </html>
