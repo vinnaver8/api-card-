@@ -117,30 +117,29 @@
         }
 
         /* Root variables for the animation */
-        :root {
-            --debug: 0;
-            --supported: 0;
-            --not-supported: 0;
+        .custom-effect {
+  --debug: 0;
+  --supported: 0;
+  --not-supported: 0;
 
-            --card-color: hsl(260deg 100% 3%);
-            --text-color: hsl(260deg 10% 55%);
-            --card-radius: 3.6vw; /* Adjusted below for specific size */
-            --border-width: 3px;
-            --bg-size: 1;
+  --card-color: hsl(260deg 100% 3%);
+  --text-color: hsl(260deg 10% 55%);
+  --card-radius: 3.6vw;
+  --border-width: 3px;
+  --bg-size: 1;
 
-            --hue: 0;
-            --hue-speed: 1;
+  --hue: 0;
+  --hue-speed: 1;
+  --rotate: 0;
+  --animation-speed: 4s;
 
-            --rotate: 0;
-            --animation-speed: 4s;
-
-            --interaction-speed: 0.55s;
-            --glow-scale: 1.5;
-            --scale-factor: 1;
-            --glow-blur: 6;
-            --glow-opacity: 1;
-            --glow-radius: 100;
-            --glow-rotate-unit: 1deg;
+  --interaction-speed: 0.55s;
+  --glow-scale: 1.5;
+  --scale-factor: 1;
+  --glow-blur: 6;
+  --glow-opacity: 1;
+  --glow-radius: 100;
+  --glow-rotate-unit: 1deg;
         }
 
         /* Hidden messages for CSS.registerProperty support */
@@ -358,7 +357,7 @@
 <body class="bg-black text-white">
 
     <!-- Footer Section Container -->
-    <footer class="bg-[#0d0d0d] py-16 px-4 sm:px-6 lg:px-8">
+    <footer class="custom-effect bg-[#0d0d0d] py-16 px-4 sm:px-6 lg:px-8">
         <!-- Top part of the footer (Join the Movement) -->
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 pb-16">
             <!-- Animated Logo Section -->
