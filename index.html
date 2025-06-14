@@ -3,12 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Huly Labs Footer</title>
+    <title>Huly Footer Section</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0xmVtHP/Rz9Q8S/CW/KcGo+o2o7lE6+vQ0q0fK2x1V4c4d7zP+u6o3iLdA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        /* Mona Sans font for the new glowing button */
+        /* Custom gradient for buttons, similar to the image */
+        .gradient-button {
+            background: linear-gradient(90deg, #FF6F00 0%, #FFB300 100%);
+            color: #1a1a1a; /* Darker text for contrast on bright gradient */
+        }
+        .gradient-border-button {
+            background: transparent;
+            border: 1px solid;
+            border-image: linear-gradient(90deg, #FF6F00 0%, #FFB300 100%) 1;
+            color: #ffffff;
+        }
+
+        /* Mona Sans Font for animation text */
         @font-face {
             font-family: "Mona Sans";
             src: url("https://assets.codepen.io/64/Mona-Sans.woff2") format("woff2 supports variations"),
@@ -16,25 +29,12 @@
             font-weight: 100 1000;
         }
 
+        /* Inter font for overall body, as previously requested */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000; /* Dark background matching the image */
-        }
-        /* Custom gradient for the button */
-        .gradient-button {
-            background-image: linear-gradient(to right, #FF7F50, #FFD700); /* Coral to Gold */
-        }
-        /* Icon styling for social media */
-        .social-icon {
-            font-size: 1.5rem; /* Adjust size as needed */
-            color: #ccc; /* Light grey color */
-            transition: color 0.3s ease;
-        }
-        .social-icon:hover {
-            color: #fff; /* White on hover */
+            font-family: "Inter", sans-serif;
         }
 
-        /* --- Custom Properties for Glowing Button --- */
+        /* CSS @property rules for animation */
         @property --hue {
             syntax: "<number>";
             inherits: true;
@@ -91,21 +91,24 @@
             initial-value: 0;
         }
 
-        /* --- Scoped Styles for Glowing Button (unique names) --- */
-        .glowing-button-wrapper {
-            /* Adjusting these values to fit the footer's context better */
-            --button-card-color: hsl(260deg 100% 3%);
-            --button-text-color: hsl(260deg 10% 55%);
-            --button-card-radius: 2rem; /* Adjusted for better visual */
-            --button-width: 14rem; /* Similar to original w-48 (12rem) but allows more flexibility */
-            --button-height: 14rem;
-            --button-border-width: 3px;
+        /* Root variables for the animation */
+        :root {
+            --debug: 0;
+            --supported: 0;
+            --not-supported: 0;
+
+            --card-color: hsl(260deg 100% 3%);
+            --text-color: hsl(260deg 10% 55%);
+            --card-radius: 3.6vw; /* Adjusted below for specific size */
+            --border-width: 3px;
             --bg-size: 1;
 
             --hue: 0;
             --hue-speed: 1;
+
             --rotate: 0;
             --animation-speed: 4s;
+
             --interaction-speed: 0.55s;
             --glow-scale: 1.5;
             --scale-factor: 1;
@@ -113,10 +116,48 @@
             --glow-opacity: 1;
             --glow-radius: 100;
             --glow-rotate-unit: 1deg;
+        }
 
-            width: var(--button-width);
-            height: var(--button-height);
-            aspect-ratio: 1/1; /* Adjusted from 1.5/1 to make it a circle/square */
+        /* Hidden messages for CSS.registerProperty support */
+        body::before,
+        body::after {
+            content: "CSS.registerProperty is supported ✅";
+            position: absolute;
+            display: block;
+            top: 8px;
+            left: 0;
+            right: 0;
+            margin: auto;
+            width: calc(100% - 160px);
+            max-width: 380px;
+            height: auto;
+            padding: 8px;
+            border-radius: 8px;
+            background: hsl(114deg 51% 48%);
+            color: white;
+            text-align: center;
+            font-family: sans-serif;
+            z-index: var(--supported, 0);
+            opacity: var(--supported, 0);
+            display: none !important; /* Hide these from view */
+        }
+
+        body::after {
+            content: "CSS.registerProperty is NOT supported ❌";
+            background: hsl(0deg 51% 48%);
+            z-index: var(--not-supported, 0);
+            opacity: var(--not-supported, 0);
+        }
+
+        /* Main container for the animated logo */
+        .animated-logo-container {
+            /* These dimensions match the original placeholder image (w-64 h-64) */
+            width: 256px;
+            height: 256px;
+            /* Adjust --card-width to match the container's width */
+            --card-width: 256px;
+            /* Make it square */
+            aspect-ratio: 1 / 1;
             color: white;
             margin: auto;
             display: flex;
@@ -124,145 +165,140 @@
             justify-content: center;
             position: relative;
             z-index: 2;
-            border-radius: var(--button-card-radius); /* Use the new radius var */
+            border-radius: var(--card-radius);
             cursor: pointer;
-            font-family: "Mona Sans", sans-serif; /* Apply Mona Sans here */
+            /* Apply Mona Sans to the animation text */
+            font-family: "Mona Sans", sans-serif;
+        }
 
-            /* Responsive adjustments */
-            @media (min-width: 640px) { /* sm breakpoint */
-                --button-width: 18rem; /* Similar to original sm:w-64 (16rem) */
-                --button-height: 18rem;
-            }
-
-
-            &:hover {
-                .button-inner-content {
-                    mix-blend-mode: darken;
-                    --button-text-color: white;
-                    box-shadow: 0 0 calc(var(--white-shadow) * 1vw) calc(var(--white-shadow) * 0.15vw) rgb(255 255 255 / 20%);
-                    animation: shadow-pulse calc(var(--animation-speed) * 2) linear infinite;
-                    &:before {
-                        --bg-size: 15;
-                        animation-play-state: paused;
-                        transition: --bg-size var(--interaction-speed) ease;
-                    }
-                }
-                .button-glow {
-                    --glow-blur: 1.5;
-                    --glow-opacity: 0.6;
-                    --glow-scale: 2.5;
-                    --glow-radius: 0;
-                    --rotate: 900;
-                    --glow-rotate-unit: 0;
-                    --scale-factor: 1.25;
+        .animated-logo-container:hover {
+            > div {
+                mix-blend-mode: darken;
+                --text-color: white;
+                box-shadow: 0 0 calc(var(--white-shadow) * 1vw) calc(var(--white-shadow) * 0.15vw) rgb(255 255 255 / 20%);
+                animation: shadow-pulse calc(var(--animation-speed) * 2) linear infinite;
+                &:before {
+                    --bg-size: 15;
                     animation-play-state: paused;
-
-                    &:after {
-                        --glow-translate-y: 0;
-                        animation-play-state: paused;
-                        transition: --glow-translate-y 0s ease, --glow-blur 0.05s ease,
-                            --glow-opacity 0.05s ease, --glow-scale 0.05s ease,
-                            --glow-radius 0.05s ease;
-                    }
+                    transition: --bg-size var(--interaction-speed) ease;
                 }
             }
+            .glow {
+                --glow-blur: 1.5;
+                --glow-opacity: 0.6;
+                --glow-scale: 2.5;
+                --glow-radius: 0;
+                --rotate: 900;
+                --glow-rotate-unit: 0;
+                --scale-factor: 1.25;
+                animation-play-state: paused;
 
-            &:before,
-            &:after {
+                &:after {
+                    --glow-translate-y: 0;
+                    animation-play-state: paused;
+                    transition: --glow-translate-y 0s ease, --glow-blur 0.05s ease,
+                    --glow-opacity 0.05s ease, --glow-scale 0.05s ease,
+                    --glow-radius 0.05s ease;
+                }
+            }
+        }
+
+        .animated-logo-container:before,
+        .animated-logo-container:after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--card-radius);
+        }
+
+        .animated-logo-container > div {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--card-color);
+            border-radius: calc(calc(var(--card-radius) * 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-stretch: 150%;
+            font-size: 18px;
+            font-size: clamp(1.5vw, 1.5vmin, 32px); /* Keep this responsive sizing */
+            color: var(--text-color);
+            padding: calc(var(--card-width) / 8);
+
+            span {
+                display: inline-block;
+                padding: 0.25em;
+                border-radius: 4px;
+                background: var(--text-color);
+                color: black;
+                margin-right: 8px;
+                font-weight: 900;
+            }
+
+            &:before {
                 content: "";
                 display: block;
                 position: absolute;
                 width: 100%;
                 height: 100%;
-                border-radius: var(--button-card-radius);
+                border-radius: calc(calc(var(--card-radius) * 0.9));
+                box-shadow: 0 0 20px black;
+                mix-blend-mode: color-burn;
+                z-index: -1;
+                background: hsl(0deg 0% 16%)
+                radial-gradient(
+                    30% 30% at calc(var(--bg-x) * 1%) calc(var(--bg-y) * 1%),
+                    hsl(calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 90%)
+                    calc(0% * var(--bg-size)),
+                    hsl(calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 80%)
+                    calc(20% * var(--bg-size)),
+                    hsl(calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 60%)
+                    calc(40% * var(--bg-size)),
+                    transparent 100%
+                );
+                width: calc(100% + var(--border-width));
+                height: calc(100% + var(--border-width));
+                animation: hue-animation var(--animation-speed) linear infinite,
+                rotate-bg var(--animation-speed) linear infinite;
+                transition: --bg-size var(--interaction-speed) ease;
             }
+        }
 
-            .button-inner-content {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                background: var(--button-card-color);
-                border-radius: calc(var(--button-card-radius) * 0.9);
-                display: flex;
-                flex-direction: column; /* Changed to column for vertical stacking of text */
-                align-items: center;
-                justify-content: center;
-                font-weight: 800;
-                text-transform: uppercase;
-                font-stretch: 150%;
-                font-size: 18px; /* Fixed size, adjust if needed */
-                font-size: clamp(1rem, 4vw, 32px); /* Responsive font size */
-                color: var(--button-text-color);
-                padding: calc(var(--button-width) / 8); /* Use button-width for padding */
-                line-height: 1.2; /* Adjust line height for better appearance */
+        .animated-logo-container .glow {
+            --glow-translate-y: 0;
+            display: block;
+            position: absolute;
+            width: calc(var(--card-width) / 5);
+            height: calc(var(--card-width) / 5);
+            animation: rotate var(--animation-speed) linear infinite;
+            transform: rotateZ(calc(var(--rotate) * var(--glow-rotate-unit)));
+            transform-origin: center;
+            border-radius: calc(var(--glow-radius) * 10vw);
 
-                .button-cool-text {
-                    display: inline-block;
-                    padding: 0.25em;
-                    border-radius: 4px;
-                    background: var(--button-text-color);
-                    color: black;
-                    margin-bottom: 0.5rem; /* Space between "cool" and "Glowing shadows" */
-                    font-weight: 900;
-                }
-
-                &:before {
-                    content: "";
-                    display: block;
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    border-radius: calc(var(--button-card-radius) * 0.9);
-                    box-shadow: 0 0 20px black;
-                    mix-blend-mode: color-burn;
-                    z-index: -1;
-                    background: hsl(0deg 0% 16%)
-                        radial-gradient(
-                            30% 30% at calc(var(--bg-x) * 1%) calc(var(--bg-y) * 1%),
-                            hsl(calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 90%) calc(0% * var(--bg-size)),
-                            hsl(calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 80%) calc(20% * var(--bg-size)),
-                            hsl(calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 60%) calc(40% * var(--bg-size)),
-                            transparent 100%
-                        );
-                    width: calc(100% + var(--button-border-width));
-                    height: calc(100% + var(--button-border-width));
-                    animation: hue-animation var(--animation-speed) linear infinite,
-                        rotate-bg var(--animation-speed) linear infinite;
-                    transition: --bg-size var(--interaction-speed) ease;
-                }
-            }
-
-            .button-glow {
-                --glow-translate-y: 0;
+            &:after {
+                content: "";
                 display: block;
-                position: absolute;
-                width: calc(var(--button-width) / 5);
-                height: calc(var(--button-width) / 5);
-                animation: rotate var(--animation-speed) linear infinite;
-                transform: rotateZ(calc(var(--rotate) * var(--glow-rotate-unit)));
-                transform-origin: center;
-                border-radius: calc(var(--glow-radius) * 10vw); /* This might need adjustment */
-
-                &:after {
-                    content: "";
-                    display: block;
-                    z-index: -2;
-                    filter: blur(calc(var(--glow-blur) * 10px));
-                    width: 130%;
-                    height: 130%;
-                    left: -15%;
-                    top: -15%;
-                    background: hsl(
-                        calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 60%
-                    );
-                    position: relative;
-                    border-radius: calc(var(--glow-radius) * 10vw); /* This might need adjustment */
-                    animation: hue-animation var(--animation-speed) linear infinite;
-                    transform: scaleY(calc(var(--glow-scale) * var(--scale-factor) / 1.1))
-                        scaleX(calc(var(--glow-scale) * var(--scale-factor) * 1.2))
-                        translateY(calc(var(--glow-translate-y) * 1%));
-                    opacity: var(--glow-opacity);
-                }
+                z-index: -2;
+                filter: blur(calc(var(--glow-blur) * 10px));
+                width: 130%;
+                height: 130%;
+                left: -15%;
+                top: -15%;
+                background: hsl(
+                    calc(calc(var(--hue) * var(--hue-speed)) * 1deg) 100% 60%
+                );
+                position: relative;
+                border-radius: calc(var(--glow-radius) * 10vw);
+                animation: hue-animation var(--animation-speed) linear infinite;
+                transform: scaleY(calc(var(--glow-scale) * var(--scale-factor) / 1.1))
+                scaleX(calc(var(--glow-scale) * var(--scale-factor) * 1.2))
+                translateY(calc(var(--glow-translate-y) * 1%));
+                opacity: var(--glow-opacity);
             }
         }
 
@@ -294,108 +330,87 @@
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen text-white">
-    <main class="flex-grow"></main> <!-- Placeholder for main content -->
+<body class="bg-black text-white">
 
-    <footer class="bg-black py-16 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto flex flex-col">
-
-            <!-- "Join the Movement" section -->
-            <div class="mb-12">
-                <!-- Glowing button component -->
-                <div role="button" class="glowing-button-wrapper mb-8 items-start justify-start">
-                    <span class="button-glow items-start justify-start"></span>
-                    <div class="button-inner-content items-start justify-start">
-                        <span class="button-cool-text">cool</span>Glowing shadows
+    <!-- Footer Section Container -->
+    <footer class="bg-gray-950 py-16 px-4 sm:px-6 lg:px-8">
+        <!-- Top part of the footer (Join the Movement) -->
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 pb-16">
+            <!-- Animated Logo Section -->
+            <div class="flex-shrink-0 w-full md:w-1/2 flex items-center justify-center md:justify-start">
+                <div role="button" class="animated-logo-container">
+                    <span class="glow"></span>
+                    <div>
+                        <span>cool</span>Glowing shadows
                     </div>
                 </div>
+            </div>
 
-                <h2 class="text-4xl sm:text-5xl font-bold mb-4">Join the Movement</h2>
-                <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto">
-                    Unlock the future of productivity with Huly. Remember, this journey is just getting started.
+            <!-- Call to Action Content -->
+            <div class="flex-1 text-center md:text-left">
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
+                    Join the <span class="block">Movement</span>
+                </h2>
+                <p class="text-lg text-gray-400 mb-2">
+                    Unlock the future of productivity with Huly.
                 </p>
-            </div>
-
-            <!-- Call to action buttons -->
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-12 w-full max-w-sm">
-                <button class="w-full sm:w-auto px-8 py-3 rounded-full text-black font-semibold text-lg shadow-lg gradient-button transition duration-300 ease-in-out hover:opacity-90">
-                    START NOW
-                </button>
-                <button class="w-full sm:w-auto px-8 py-3 rounded-full bg-gray-800 text-white font-semibold text-lg border border-gray-700 flex items-center justify-center space-x-2 transition duration-300 ease-in-out hover:bg-gray-700">
-                    <!-- Slack icon using inline SVG for better control -->
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12.001 10.046c-.57.06-1.127.202-1.666.425a.996.996 0 00-.735.617c-.305.81-.302 1.69-.17 2.502.132.812.387 1.583.766 2.298a1.002 1.002 0 00.736.618c.57-.06 1.127-.202 1.666-.425a.996.996 0 00.735-.617c.305-.81.302-1.69.17-2.502-.132-.812-.387-1.583-.766-2.298a1.002 1.002 0 00-.736-.618zm4.008 0c-.57.06-1.127.202-1.666.425a.996.996 0 00-.735.617c-.305.81-.302 1.69-.17 2.502.132.812.387 1.583.766 2.298a1.002 1.002 0 00.736.618c.57-.06 1.127-.202 1.666-.425a.996.996 0 00.735-.617c.305-.81.302-1.69.17-2.502-.132-.812-.387-1.583-.766-2.298a1.002 1.002 0 00-.736-.618zm-8.004 0c-.57.06-1.127.202-1.666.425a.996.996 0 00-.735.617c-.305.81-.302 1.69-.17 2.502.132.812.387 1.583.766 2.298a1.002 1.002 0 00.736.618c.57-.06 1.127-.202 1.666-.425a.996.996 0 00.735-.617c.305-.81.302-1.69.17-2.502-.132-.812-.387-1.583-.766-2.298a1.002 1.002 0 00-.736-.618zM4 12c.06-.57.202-1.127.425-1.666a.996.996 0 00.617-.735c.81-.305 1.69-.302 2.502-.17.812.132 1.583.387 2.298.766a1.002 1.002 0 00.618.736c-.06.57-.202 1.127-.425 1.666a.996.996 0 00-.617.735c-.81.305-1.69.302-2.502.17-.812-.132-1.583-.387-2.298-.766a1.002 1.002 0 00-.618-.736zm16 0c.06-.57.202-1.127.425-1.666a.996.996 0 00.617-.735c.81-.305 1.69-.302 2.502-.17.812.132 1.583.387 2.298.766a1.002 1.002 0 00.618.736c-.06.57-.202 1.127-.425 1.666a.996.996 0 00-.617.735c-.81.305-1.69.302-2.502.17-.812-.132-1.583-.387-2.298-.766a1.002 1.002 0 00-.618-.736z"/>
-                    </svg>
-                    <span>JOIN OUR SLACK</span>
-                </button>
-            </div>
-
-            <!-- Social media icons -->
-            <div class="flex space-x-6 mb-8">
-                <a href="#" class="social-icon" aria-label="Twitter/X">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18.901 1.153h3.684L14.444 10.1L24 22.846h-9.8L7.172 13.084 1.153 22.846H.064L9.932 9.09L0 1.153h10.153L16.848 8.114 18.901 1.153zm-1.89 19.34L3.86 3.19h2.95l11.082 17.29H17.01Z" />
-                    </svg>
-                </a>
-                <a href="#" class="social-icon" aria-label="LinkedIn">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.326-.026-3.044-1.852-3.044-1.853 0-2.136 1.445-2.136 2.95v5.66H9.288V9.883h3.419v1.56a3.738 3.738 0 013.369-1.85c3.601 0 4.275 2.372 4.275 6.157v6.676zM7.91 8.567a1.64 1.64 0 01-1.64-.814c0-.909.734-1.64 1.64-1.64.906 0 1.64.731 1.64 1.64 0 .906-.734 1.64-1.64.814zM4.49 20.452H7.9V9.883H4.49v10.569z" />
-                    </svg>
-                </a>
-                <a href="#" class="social-icon" aria-label="GitHub">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.475.087.647-.207.647-.456 0-.227-.008-.888-.013-1.744-2.782.607-3.369-1.341-3.369-1.341-.454-1.157-1.11-1.465-1.11-1.465-.908-.62.069-.608.069-.608 1.004.072 1.531 1.03 1.531 1.03.892 1.543 2.341 1.096 2.91.836.09-.648.35-1.096.634-1.347-2.22-.253-4.555-1.116-4.555-4.94 0-1.091.39-1.984 1.03-2.684-.104-.253-.448-1.272.097-2.658 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.026 2.747-1.026.546 1.386.202 2.405.097 2.658.64.7 1.028 1.593 1.028 2.684 0 3.834-2.339 4.681-4.566 4.929.359.307.678.915.678 1.846 0 1.347-.012 2.433-.012 2.767 0 .25.172.548.653.454C20.147 20.197 23 16.442 23 12.017 23 6.484 18.523 2 13 2h-1z" clip-rule="evenodd" />
-                    </svg>
-                </a>
-                <a href="#" class="social-icon" aria-label="YouTube">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19.61 7.23a2.76 2.76 0 00-1.95-1.95C16.27 5 12 5 12 5s-4.27 0-5.66.28A2.76 2.76 0 004.39 7.23C4 8.62 4 12 4 12s0 3.38.28 4.77a2.76 2.76 0 001.95 1.95C7.73 19 12 19 12 19s4.27 0 5.66-.28a2.76 2.76 0 001.95-1.95C20 15.38 20 12 20 12s0-3.38-.28-4.77zM10 15.5V8.5L16 12l-6 3.5z" />
-                    </svg>
-                </a>
-                <a href="#" class="social-icon" aria-label="Hashnode">
-                    <!-- Placeholder for Hashnode icon as it's not standard SVG. Use a generic icon or custom SVG if available. -->
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 1.636c4.613 0 8.364 3.751 8.364 8.364 0 4.613-3.751 8.364-8.364 8.364-4.613 0-8.364-3.751-8.364-8.364C3.636 7.387 7.387 3.636 12 3.636zm-.095 2.118a.636.636 0 01.636.636v7.364a.636.636 0 01-1.272 0V6.39a.636.636 0 01.636-.636zm0 10.909a.636.636 0 01.636.636v.091a.636.636 0 01-1.272 0v-.091a.636.636 0 01.636-.636z"/>
-                    </svg>
-                </a>
-                <a href="#" class="social-icon" aria-label="Medium">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M7.66 4.39a1.05 1.05 0 00-1.01-.76c-.57 0-1.03.49-1.03 1.11v14.18c0 .61.46 1.1 1.03 1.1.57 0 1.01-.49 1.01-1.11V4.39zM12.91 4.39a1.05 1.05 0 00-1.01-.76c-.57 0-1.03.49-1.03 1.11v14.18c0 .61.46 1.1 1.03 1.1.57 0 1.01-.49 1.01-1.11V4.39zM18.15 4.39a1.05 1.05 0 00-1.01-.76c-.57 0-1.03.49-1.03 1.11v14.18c0 .61.46 1.1 1.03 1.1.57 0 1.01-.49 1.01-1.11V4.39z"/>
-                    </svg>
-                </a>
-            </div>
-
-            <!-- Legal links -->
-            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 mb-4 text-gray-400 text-sm">
-                <a href="#" class="hover:text-white transition duration-200">Terms of Service</a>
-                <a href="#" class="hover:text-white transition duration-200">Privacy Policy</a>
-            </div>
-
-            <!-- Copyright and "Made with passion" -->
-            <div class="text-gray-500 text-sm flex flex-col items-center">
-                <p class="mb-2">Copyright &copy; 2025 Huly Labs.</p>
-                <p class="mb-4">All rights reserved.</p>
-                <div class="flex items-center space-x-2">
-                    <!-- Heart icon - Using inline SVG -->
-                    <svg class="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    <span>Made with passion and Huly</span>
+                <p class="text-lg text-gray-400 mb-8">
+                    Remember, this journey is just getting started.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
+                    <button class="gradient-button px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
+                        START NOW
+                    </button>
+                    <button class="flex items-center justify-center gap-2 gradient-border-button px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-800 transition-colors">
+                        <i class="fab fa-slack text-xl"></i>
+                        JOIN OUR SLACK
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Bottom part of the footer (Copyright and Legal) -->
+        <div class="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-6 pt-8">
+            <!-- Left section: Social Icons and Copyright -->
+            <div class="flex flex-col items-center md:items-start gap-4 text-gray-400 text-sm w-full md:w-auto">
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-twitter text-xl"></i></a> <!-- Using Twitter for X -->
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-linkedin-in text-xl"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-youtube text-xl"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-discord text-xl"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-github text-xl"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-dribbble text-xl"></i></a>
+                </div>
+                <!-- Copyright text moved directly below social icons -->
+                <p class="mt-4 md:mt-0 text-center md:text-left">Copyright &copy; 2025 Huly Labs. All rights reserved.</p>
+            </div>
+
+            <!-- Right section: Legal Links and Made with Passion -->
+            <div class="flex flex-col items-center md:items-end gap-4 text-gray-400 text-sm w-full md:w-auto">
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                </div>
+                <p class="flex items-center gap-1 mt-4 md:mt-0 text-center md:text-right">
+                    Made with passion and Huly <i class="fas fa-heart text-red-500"></i>
+                </p>
             </div>
         </div>
     </footer>
 
+    <!-- JavaScript for CSS.registerProperty detection -->
     <script>
-        // JavaScript for CSS.registerProperty support check
         if (typeof window.CSS.registerProperty === 'function') {
             console.log('CSS.registerProperty supported 🎉');
+            document.body.style.setProperty('--supported', 1);
             document.body.classList.add('registerProperty-supported');
         } else {
             console.log('CSS.registerProperty not supported ❌');
+            document.body.style.setProperty('--not-supported', 1);
             document.body.classList.add('registerProperty-not-supported');
         }
     </script>
+
 </body>
 </html>
 
