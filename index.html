@@ -8,83 +8,167 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     body { font-family: 'Inter', sans-serif; }
+    /* Heartbeat */
     @keyframes heartbeat {
-      0%,100%{transform:scale(1)}25%,75%{transform:scale(1.1)}50%{transform:scale(1.2)}
+      0%,100% { transform: scale(1); }
+      25%,75% { transform: scale(1.1); }
+      50%      { transform: scale(1.2); }
     }
     .heartbeat { animation: heartbeat 1.5s infinite; transform-origin:center; }
+
+    /* === Your Glowing-Button-Wrapper CSS === */
+    @property --hue { syntax: "<number>"; inherits: true; initial-value: 0; }
+    @property --rotate { syntax: "<number>"; inherits: true; initial-value: 0; }
+    @property --bg-x { syntax: "<number>"; inherits: true; initial-value: 0; }
+    @property --bg-y { syntax: "<number>"; inherits: true; initial-value: 0; }
+    @property --bg-size { syntax: "<number>"; inherits: true; initial-value: 1; }
+    @property --glow-blur { syntax: "<number>"; inherits: true; initial-value: 6; }
+    @property --glow-opacity { syntax: "<number>"; inherits: true; initial-value: 1; }
+    @property --glow-scale { syntax: "<number>"; inherits: true; initial-value: 1.5; }
+    @property --glow-radius { syntax: "<number>"; inherits: true; initial-value: 100; }
+
+    .glowing-button-wrapper {
+      --button-card-color: hsl(260,3%,3%);
+      --button-text-color: hsl(260,10%,55%);
+      --button-card-radius: 2rem;
+      --button-width: 14rem;
+      --button-height: 14rem;
+      --animation-speed: 4s;
+
+      width: var(--button-width);
+      height: var(--button-height);
+      border-radius: var(--button-card-radius);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .glowing-button-wrapper .button-inner-content {
+      position: absolute; inset:0;
+      border-radius: calc(var(--button-card-radius)*0.9);
+      background: var(--button-card-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--button-text-color);
+      z-index:2;
+    }
+    .glowing-button-wrapper .button-inner-content:before {
+      content:""; position:absolute; inset:0;
+      border-radius: calc(var(--button-card-radius)*0.9);
+      mix-blend-mode: color-burn;
+      background:
+        hsl(0,0%,16%) radial-gradient(
+          circle at var(--bg-x)% var(--bg-y)%,
+          hsl(calc(var(--hue)*1deg),100%,90%) calc(0%*var(--bg-size)),
+          hsl(calc(var(--hue)*1deg),100%,80%) calc(20%*var(--bg-size)),
+          hsl(calc(var(--hue)*1deg),100%,60%) calc(40%*var(--bg-size)),
+          transparent 100%
+        );
+      animation: hue-animation var(--animation-speed) linear infinite,
+                 rotate-bg   var(--animation-speed) linear infinite;
+    }
+    .glowing-button-wrapper .button-glow {
+      position:absolute; top:50%; left:50%;
+      width:25%; height:25%;
+      transform-origin:center;
+      animation: rotate var(--animation-speed) linear infinite;
+      transform: translate(-50%,-50%) rotateZ(calc(var(--rotate)*1deg));
+    }
+    .glowing-button-wrapper .button-glow:after {
+      content:""; position:absolute; inset:-15%;
+      border-radius: var(--glow-radius)%;
+      filter: blur(calc(var(--glow-blur)*10px));
+      background: hsl(calc(var(--hue)*1deg),100%,60%);
+      opacity: var(--glow-opacity);
+      transform: scale(var(--glow-scale));
+      animation: hue-animation var(--animation-speed) linear infinite;
+    }
+
+    @keyframes rotate-bg {
+      0%   { --bg-x:0;   --bg-y:0; }
+      25%  { --bg-x:100; --bg-y:0; }
+      50%  { --bg-x:100; --bg-y:100; }
+      75%  { --bg-x:0;   --bg-y:100; }
+      100% { --bg-x:0;   --bg-y:0; }
+    }
+    @keyframes rotate {
+      from { --rotate:-70; } to { --rotate:290; }
+    }
+    @keyframes hue-animation {
+      0%   { --hue:0; } 100% { --hue:360; }
+    }
+    /* === End Glowing Button CSS === */
   </style>
 </head>
 <body class="flex flex-col min-h-screen text-white">
 
   <main class="flex-grow"></main>
 
-  <footer class="px-4 py-12 sm:py-16 lg:px-8">
-    <div class="max-w-7xl mx-auto">
+  <footer class="px-6 py-16 bg-black text-white">
+    <div class="max-w-7xl mx-auto lg:flex lg:items-start lg:gap-12">
 
-      <!-- Container that flips order on mobile vs desktop -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
-
-        <!-- 1) Clock box on desktop left, on mobile it sits at top -->
-        <div class="order-1 lg:order-none flex justify-center lg:justify-start">
-          <!-- Replace this div with your glowing-button-wrapper / clock SVG -->
-          <div class="w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gray-900 flex items-center justify-center">
-            <!-- 👉 YOUR CLOCK ANIMATION GOES HERE 👈 -->
-            <span class="text-gray-600">Clock</span>
-          </div>
-        </div>
-
-        <!-- 2) Text + buttons -->
-        <div class="order-2 text-center lg:text-left space-y-6">
-          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Join the Movement</h2>
-          <p class="text-gray-400 max-w-md mx-auto lg:mx-0">
-            Unlock the future of productivity with Huly.<br>
-            Remember, this journey is just getting started.
-          </p>
-
-          <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-            <button class="px-8 py-3 bg-white text-black font-semibold rounded-full shadow-lg transition hover:opacity-90">
-              START NOW
-            </button>
-            <button class="px-8 py-3 bg-gray-800 text-white font-semibold rounded-full flex items-center justify-center gap-2 transition hover:bg-gray-700">
-              <!-- Slack icon SVG -->
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><!-- … --></svg>
-              JOIN OUR SLACK
-            </button>
-          </div>
+      <!-- Clock (glowing box) -->
+      <div class="lg:flex-shrink-0 lg:order-none order-1 flex justify-center lg:justify-start mb-12 lg:mb-0">
+        <div class="glowing-button-wrapper">
+          <span class="button-glow"></span>
+          <div class="button-inner-content"></div>
         </div>
       </div>
 
-      <!-- 3) Footer links & socials -->
-      <div class="mt-16 border-t border-gray-800 pt-8 flex flex-col lg:flex-row items-center justify-between space-y-6 lg:space-y-0">
-        <div class="flex space-x-4 justify-center lg:justify-start">
-          <!-- Replace with your real SVGs -->
-          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- X --></svg></a>
-          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- LinkedIn --></svg></a>
-          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- GitHub --></svg></a>
-          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- YouTube --></svg></a>
-          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- Slack --></svg></a>
-          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- Other --></svg></a>
+      <!-- Text & buttons -->
+      <div class="flex flex-col justify-center space-y-6 text-center lg:text-left order-2">
+        <h2 class="text-4xl sm:text-5xl font-bold">Join the<br>Movement</h2>
+        <p class="text-gray-400 max-w-md mx-auto lg:mx-0">
+          Unlock the future of productivity with Huly.<br>
+          Remember, this journey is just getting started.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <button class="px-6 py-3 bg-white text-black font-semibold rounded-full shadow-lg hover:opacity-90">
+            START NOW
+          </button>
+          <button class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-full flex items-center gap-2 hover:bg-gray-700">
+            <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/slack.svg"
+                 class="w-5 h-5 invert" alt="Slack">
+            JOIN OUR SLACK
+          </button>
         </div>
-        <div class="flex space-x-8">
-          <a href="#" class="text-gray-400 hover:text-white">Terms of Service</a>
-          <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+      </div>
+    </div>
+
+    <!-- Footer bottom -->
+    <div class="mt-16 border-t border-gray-800 pt-8">
+      <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-6 text-gray-400 text-sm">
+
+        <!-- Social icons -->
+        <div class="flex space-x-4">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/twitter.svg" alt="X" class="w-5 h-5 invert">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" alt="LinkedIn" class="w-5 h-5 invert">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub" class="w-5 h-5 invert">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/youtube.svg" alt="YouTube" class="w-5 h-5 invert">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/slack.svg" alt="Slack" class="w-5 h-5 invert">
+          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/hashnode.svg" alt="Hashnode" class="w-5 h-5 invert">
         </div>
-        <div class="text-gray-500 text-sm text-center lg:text-left space-y-1">
-          <p>© 2025 Huly Labs. All rights reserved.</p>
-          <div class="flex items-center justify-center lg:justify-start gap-2">
-            <svg class="w-5 h-5 text-orange-400 heartbeat" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
-                       4.42 3 7.5 3c1.74 0 3.41.81 
-                       4.5 2.09C13.09 3.81 14.76 3 
-                       16.5 3 19.58 3 22 5.42 22 
-                       8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+
+        <!-- Legal + heart -->
+        <div class="flex flex-col lg:flex-row items-center gap-6">
+          <div class="flex space-x-8">
+            <a href="#" class="hover:text-white">Terms of Service</a>
+            <a href="#" class="hover:text-white">Privacy Policy</a>
+          </div>
+          <div class="flex items-center gap-2 text-orange-400">
+            <svg class="w-5 h-5 heartbeat" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+                       2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09 
+                       C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5 
+                       c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
             <span>Made with passion and Huly</span>
           </div>
         </div>
       </div>
-
     </div>
   </footer>
+
 </body>
 </html>
