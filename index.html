@@ -10,43 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0xmVtHP/Rz9Q8S/CW/KcGo+o2o7lE6+vQ0q0fK2x1V4c4d7zP+u6o3iLdA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Custom gradient for buttons, similar to the image */
-.gradient-button{
-	background: linear-gradient(to right, #240b36, #c31432);
-	width: 180px;
-	height: 50px;
-	border: none;
-	font-size: 1.3rem;
-	color: white;
-	cursor: pointer;
-	border-radius: 0 25px;
-	position: relative;
-	transition: all .6s;
-}
-
-.gradient-button:hover{
-	border-radius: 25px 0;
-}
-
-.gradient-button::before{
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	background: linear-gradient(to right, #240b36, #c31432);
-	width: 100%;
-	height: 100%;
-	filter: blur(22px);
-	transform: scale(0.9, 0.8) translateY(20px);
-	z-index: -1;
-	opacity: 0;
-	transition: all 0.6s;
-}
-
-.gradient-button:hover::before{
-	opacity: 1;
-}
-
-.gradient-border-button {
+        .gradient-button {
+         background: linear-gradient(to bottom left, #0f172a, #1e1a78, #0f172a);   
+	color: #1a1a1a; /* Darker text for contrast on bright gradient */
+        }
+        .gradient-border-button {
             background: transparent;
             border: 1px solid;
             border-image: linear-gradient(90deg, #FF6F00 0%, #FFB300 100%) 1;
