@@ -1,116 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg-black">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Layer4 Footer Clone</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Huly Labs Footer/CTA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      margin: 0;
-      background-color: #0d0d0d;
-      font-family: 'Courier New', monospace;
-      color: white;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    @keyframes heartbeat {
+      0%,100%{transform:scale(1)}25%,75%{transform:scale(1.1)}50%{transform:scale(1.2)}
     }
-
-    .footer {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background-color: #0d0d0d;
-      padding: 40px 60px;
-      height: 100vh;
-      box-sizing: border-box;
-    }
-
-    .footer-top {
-      display: flex;
-      flex: 1;
-      border-radius: 30px;
-      overflow: hidden;
-    }
-
-    .left-panel {
-      flex: 1;
-      background: linear-gradient(145deg, #dcdcdc, #bcbcbc);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 60px;
-      font-weight: bold;
-      letter-spacing: 5px;
-    }
-
-    .right-panel {
-      flex: 1;
-      background: linear-gradient(145deg, rgba(220, 220, 220, 0.5), rgba(140, 140, 140, 0.7));
-      backdrop-filter: blur(8px);
-      padding: 60px;
-      box-sizing: border-box;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      border-left: 1px solid rgba(255,255,255,0.15);
-    }
-
-    .footer-column h3 {
-      font-size: 16px;
-      color: white;
-      margin-bottom: 10px;
-    }
-
-    .footer-column ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .footer-column ul li {
-      font-size: 14px;
-      color: #c2c2c2;
-      margin-bottom: 8px;
-    }
-
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 20px;
-      font-size: 12px;
-      color: #a0a0a0;
-    }
+    .heartbeat { animation: heartbeat 1.5s infinite; transform-origin:center; }
   </style>
 </head>
-<body>
-  <footer class="footer">
-    <div class="footer-top">
-      <div class="left-panel">
-        LAYER4
-      </div>
-      <div class="right-panel">
-        <div class="footer-column">
-          <h3>+ Devs</h3>
-          <ul>
-            <li>Docs</li>
-            <li>API & SDKs</li>
-            <li>Testnet Access</li>
-            <li>Smart Contract Templates</li>
-          </ul>
+<body class="flex flex-col min-h-screen text-white">
+
+  <main class="flex-grow"></main>
+
+  <footer class="px-4 py-12 sm:py-16 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- Container that flips order on mobile vs desktop -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12">
+
+        <!-- 1) Clock box on desktop left, on mobile it sits at top -->
+        <div class="order-1 lg:order-none flex justify-center lg:justify-start">
+          <!-- Replace this div with your glowing-button-wrapper / clock SVG -->
+          <div class="w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gray-900 flex items-center justify-center">
+            <!-- 👉 YOUR CLOCK ANIMATION GOES HERE 👈 -->
+            <span class="text-gray-600">Clock</span>
+          </div>
         </div>
-        <div class="footer-column">
-          <h3>+ Ecosystem</h3>
-          <ul>
-            <li>Grants & Funding</li>
-            <li>Events & Meetups</li>
-            <li>DAO Governance</li>
-            <li>SheDesigns.fun</li>
-          </ul>
+
+        <!-- 2) Text + buttons -->
+        <div class="order-2 text-center lg:text-left space-y-6">
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">Join the Movement</h2>
+          <p class="text-gray-400 max-w-md mx-auto lg:mx-0">
+            Unlock the future of productivity with Huly.<br>
+            Remember, this journey is just getting started.
+          </p>
+
+          <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+            <button class="px-8 py-3 bg-white text-black font-semibold rounded-full shadow-lg transition hover:opacity-90">
+              START NOW
+            </button>
+            <button class="px-8 py-3 bg-gray-800 text-white font-semibold rounded-full flex items-center justify-center gap-2 transition hover:bg-gray-700">
+              <!-- Slack icon SVG -->
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><!-- … --></svg>
+              JOIN OUR SLACK
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="footer-bottom">
-      <div>Privacy Policy</div>
-      <div>Terms & Conditions</div>
+
+      <!-- 3) Footer links & socials -->
+      <div class="mt-16 border-t border-gray-800 pt-8 flex flex-col lg:flex-row items-center justify-between space-y-6 lg:space-y-0">
+        <div class="flex space-x-4 justify-center lg:justify-start">
+          <!-- Replace with your real SVGs -->
+          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- X --></svg></a>
+          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- LinkedIn --></svg></a>
+          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- GitHub --></svg></a>
+          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- YouTube --></svg></a>
+          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- Slack --></svg></a>
+          <a href="#" class="text-gray-400 hover:text-white"><svg class="w-5 h-5"><!-- Other --></svg></a>
+        </div>
+        <div class="flex space-x-8">
+          <a href="#" class="text-gray-400 hover:text-white">Terms of Service</a>
+          <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+        </div>
+        <div class="text-gray-500 text-sm text-center lg:text-left space-y-1">
+          <p>© 2025 Huly Labs. All rights reserved.</p>
+          <div class="flex items-center justify-center lg:justify-start gap-2">
+            <svg class="w-5 h-5 text-orange-400 heartbeat" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
+                       4.42 3 7.5 3c1.74 0 3.41.81 
+                       4.5 2.09C13.09 3.81 14.76 3 
+                       16.5 3 19.58 3 22 5.42 22 
+                       8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span>Made with passion and Huly</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </footer>
 </body>
