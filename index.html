@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Huly Footer Section</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -14,91 +17,89 @@
   />
 
   <style>
-  /*====================================================
-   1) All custom properties prefixed with --ce-*
-  ====================================================*/
-  .custom-effect {
-    /* layout */
-    background: #0d0d0d;
-    padding: 4rem 1rem;
-    font-family: Inter, sans-serif;
+    /* ====================================================
+       1) All custom properties prefixed with --ce-*
+       ==================================================== */
+    .custom-effect {
+      background: #0d0d0d;
+      padding: 4rem 1rem;
+      font-family: Inter, sans-serif;
 
-    /* variables */
-    --ce-card-radius: 3.6vw;
-    --ce-animation-speed: 4s;
-    --ce-interaction-speed: 0.55s;
-    --ce-glow-blur: 6px;
-    --ce-glow-opacity: 1;
-  }
+      --ce-card-radius: 3.6vw;
+      --ce-animation-speed: 4s;
+      --ce-interaction-speed: 0.55s;
+      --ce-glow-blur: 6px;
+      --ce-glow-opacity: 1;
+    }
 
-  /*====================================================
-   2) Button glow (scoped)
-  ====================================================*/
-  .custom-effect .glow-btn {
-    position: relative;
-    overflow: hidden;
-  }
-  .custom-effect .glow-btn::before {
-    content: '';
-    position: absolute;
-    top: var(--y);
-    left: var(--x);
-    transform: translate(-50%, -50%);
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,165,0,0.4), transparent 60%);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    border-radius: 50%;
-    z-index: 0;
-  }
-  .custom-effect .glow-btn:hover::before {
-    opacity: 1;
-  }
-  .custom-effect .glow-btn span {
-    position: relative;
-    z-index: 1;
-  }
+    /* ====================================================
+       2) Button glow (scoped)
+       ==================================================== */
+    .custom-effect .glow-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    .custom-effect .glow-btn::before {
+      content: '';
+      position: absolute;
+      top: var(--y);
+      left: var(--x);
+      transform: translate(-50%, -50%);
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,165,0,0.4), transparent 60%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      border-radius: 50%;
+      z-index: 0;
+    }
+    .custom-effect .glow-btn:hover::before {
+      opacity: 1;
+    }
+    .custom-effect .glow-btn span {
+      position: relative;
+      z-index: 1;
+    }
 
-  /*====================================================
-   3) Animated logo container (scoped)
-  ====================================================*/
-  .custom-effect .animated-logo-container {
-    width: 256px; height: 256px;
-    --ce-card-width: 256px;
-    aspect-ratio: 1;
-    border-radius: var(--ce-card-radius);
-    position: relative;
-    margin: 0 auto 2rem;
-    cursor: pointer;
-  }
-  .custom-effect .animated-logo-container .glow {
-    position: absolute;
-    width: calc(var(--ce-card-width)/5);
-    height: calc(var(--ce-card-width)/5);
-    animation: ce-rotate var(--ce-animation-speed) linear infinite;
-    filter: blur(var(--ce-glow-blur));
-    opacity: var(--ce-glow-opacity);
-  }
-  @keyframes ce-rotate {
-    100% { transform: rotate(1turn); }
-  }
+    /* ====================================================
+       3) Animated logo container (scoped)
+       ==================================================== */
+    .custom-effect .animated-logo-container {
+      width: 256px; height: 256px;
+      --ce-card-width: 256px;
+      aspect-ratio: 1;
+      border-radius: var(--ce-card-radius);
+      position: relative;
+      margin: 0 auto 2rem;
+      cursor: pointer;
+    }
+    .custom-effect .animated-logo-container .glow {
+      position: absolute;
+      width: calc(var(--ce-card-width)/5);
+      height: calc(var(--ce-card-width)/5);
+      animation: ce-rotate var(--ce-animation-speed) linear infinite;
+      filter: blur(var(--ce-glow-blur));
+      opacity: var(--ce-glow-opacity);
+    }
+    @keyframes ce-rotate {
+      100% { transform: rotate(1turn); }
+    }
 
-  /*====================================================
-   4) Slack button border (scoped)
-  ====================================================*/
-  .custom-effect .gradient-border-button {
-    background: transparent;
-    border: 2px solid;
-    border-image: linear-gradient(90deg, #FF6F00, #FFB300) 1;
-    color: #fff;
-  }
+    /* ====================================================
+       4) Slack button border (scoped)
+       ==================================================== */
+    .custom-effect .gradient-border-button {
+      background: transparent;
+      border: 2px solid;
+      border-image: linear-gradient(90deg, #FF6F00, #FFB300) 1;
+      color: #fff;
+    }
   </style>
 </head>
 
 <body class="bg-black text-white">
 
-  <!-- Your existing content… -->
+  <!-- ... your existing site content ... -->
 
   <!-- ========== Scopped Footer ========== -->
   <footer class="custom-effect">
@@ -113,7 +114,9 @@
 
       <!-- CTA -->
       <div class="flex-1 text-center md:text-left">
-        <h2 class="text-5xl font-bold mb-4">Join the <span class="block">Movement</span></h2>
+        <h2 class="text-5xl font-bold mb-4">
+          Join the <span class="block">Movement</span>
+        </h2>
         <p class="text-gray-400 mb-8">Unlock the future of productivity with Huly.</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
           <!-- START NOW -->
@@ -122,7 +125,8 @@
             <span>START NOW</span>
           </button>
           <!-- JOIN OUR SLACK -->
-          <button class="gradient-border-button px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-800 transition-colors">
+          <button
+            class="gradient-border-button px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-800 transition-colors">
             <i class="fab fa-slack text-xl"></i>
             JOIN OUR SLACK
           </button>
