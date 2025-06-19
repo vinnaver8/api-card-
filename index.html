@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Global Box-sizing and Color Scheme */
+        /* Global Box-sizing and Color Scheme (fundamental resets, do not conflict with unique naming) */
         *, *::after, *::before {
             box-sizing: border-box;
         }
@@ -17,12 +17,9 @@
             html { color-scheme: dark only; }
         }
 
-        /* Body and Font */
-        body {
+        /* Custom font application via a unique class, applied to body */
+        .font-inter {
             font-family: 'Inter', sans-serif;
-            margin: 0; /* Remove default body margin */
-            min-height: 100vh; /* Ensures body takes full viewport height */
-            background-color: #0D0D0D; /* Set a default dark background */
         }
 
         /* Standard Vertical Scroller (Grok section - iPhone Layout) */
@@ -38,7 +35,7 @@
             overflow: hidden; /* Hide anything outside the main phone frame */
         }
 
-        /* New div for the iPhone notch */
+        /* Unique CSS for iPhone notch within the scroller */
         .iphone-notch {
             position: absolute;
             top: 10px; /* Position relative to the container's inner edge (adjust for border) */
@@ -55,7 +52,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Subtle shadow for depth */
         }
 
-        /* New container for scrollable content inside the iPhone */
+        /* Unique CSS for scrollable content within the iPhone frame */
         .iphone-scrollable-content {
             height: 100%; /* Take full height of parent container */
             width: 100%;
@@ -79,7 +76,6 @@
             gap: 1.5rem; /* Gap between content items */
             padding-left: 1rem;
             padding-right: 1rem;
-            /* No padding-top/bottom here, handled by iphone-scrollable-content */
         }
 
         .vertical-scroller-content img {
@@ -159,7 +155,7 @@
             }
         }
 
-        /* MacBook Camera Dot */
+        /* Unique CSS for MacBook Camera Dot */
         #api-box::before {
             content: '';
             position: absolute;
@@ -188,20 +184,20 @@
             border-top: 2px solid #444; /* Hinge line */
         }
 
-        /* Real-time clock */
+        /* Unique CSS for Real-time clock on MacBook */
         #macbook-clock {
-            position: absolute; /* Keep absolute to position over other content */
-            top: 25px; /* Adjust padding from top */
-            left: 25px; /* Adjust padding from left */
+            position: absolute;
+            top: 25px;
+            left: 25px;
             font-size: 1.2rem;
             font-weight: 600;
             color: #ccc;
-            z-index: 15; /* Higher z-index to always be on top */
+            z-index: 15;
         }
 
-        /* Main content containers within MacBook screen */
+        /* Unique CSS for MacBook screen content wrapper */
         .macbook-screen-content-wrapper {
-            position: absolute; /* Take full screen content area */
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -209,16 +205,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between; /* Distribute space for input/button at bottom */
-            padding: 25px; /* General padding for screen content */
-            padding-top: 60px; /* Adjust padding for the clock at the top */
+            justify-content: space-between;
+            padding: 25px;
+            padding-top: 60px;
             box-sizing: border-box;
         }
 
 
-        /* Input and Button Styling */
+        /* Unique CSS for Input and Button Styling */
         #inputFormContent {
-            display: flex; /* Ensure it's a flex container for its children */
+            display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
@@ -254,7 +250,7 @@
             background-color: #e04a1b;
         }
 
-        /* Generation Progress Styling */
+        /* Unique CSS for Generation Progress */
         .generation-progress {
             display: none;
             flex-direction: column;
@@ -282,7 +278,7 @@
             color: #f85922;
         }
 
-        /* Response Display Styling */
+        /* Unique CSS for Response Display */
         .response-display {
             display: none;
             position: absolute;
@@ -457,7 +453,7 @@
             }
         }
 
-        /* Specific styles for the new footer section */
+        /* Specific styles for the podcast/footer section */
         .footer-podcast-section {
             background-color: #0d0d0d;
             color: #ffffff;
@@ -513,8 +509,7 @@
         /* Responsive adjustments for the "VIEW ALL EPISODES" button */
         @media (max-width: 768px) {
             .podcast-header-bg {
-                /* Adjust padding to accommodate content and button in a flow layout */
-                padding-bottom: 4rem; /* Reduced padding from bottom to make space for button */
+                padding-bottom: 4rem;
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
@@ -522,20 +517,20 @@
             }
 
             .podcast-content-wrapper {
-                margin-bottom: 1.5rem; /* Space between text/icons and button */
-                width: 100%; /* Ensure content wrapper takes full width */
+                margin-bottom: 1.5rem;
+                width: 100%;
             }
 
-            .podcast-header-bg > .px-6.py-3 { /* Targeting the button directly */
-                position: static; /* Remove absolute positioning */
-                margin-top: 1rem; /* Add some space from the content above */
-                align-self: flex-end; /* Align button to the right */
+            .podcast-header-bg > .px-6.py-3 {
+                position: static;
+                margin-top: 1rem;
+                align-self: flex-end;
             }
         }
     </style>
 </head>
-<body class="bg-[#0D0D0D]">
-    <section id="section-4" class="relative min-h-[1900px] bg-[#0D0D0D] text-white overflow-hidden pt-32">
+<body class="bg-[#0D0D0D] font-inter">
+    <section id="section-4" class="relative min-h-[2000px] bg-[#0D0D0D] text-white overflow-hidden pt-32">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-32">
             <div class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-8">
                 [ PRODUCTS ]
