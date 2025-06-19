@@ -3,460 +3,977 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Huly Footer Section</title>
-    <!-- Tailwind CSS CDN -->
+    <title>AI for All Humanity</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome CDN for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0xmVtHP/Rz9Q8S/CW/KcGo+o2o7lE6+vQ0q0fK2x1V4c4d7zP+u6o3iLdA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Unique CSS for the new Start Now button with glow effect */
-        .huly-start-now-btn {
-            position: relative;
-            overflow: hidden;
-            /* Reverting to the original orange gradient for consistency */
-            background: linear-gradient(90deg, #FF6F00 0%, #FFB300 100%);
-            color: #1a1a1a; /* Darker text for contrast on bright gradient */
-            z-index: 1; /* Ensure button text is above the glow */
+        /* Global Box-sizing and Color Scheme */
+        *, *::after, *::before {
+            box-sizing: border-box;
         }
 
-        .huly-start-now-btn::before {
+        html { color-scheme: light only; }
+        @media(prefers-color-scheme: dark) {
+            html { color-scheme: dark only; }
+        }
+
+        /* Body and Font */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0; /* Remove default body margin */
+            min-height: 100vh; /* Ensures body takes full viewport height */
+            background-color: #0D0D0D; /* Set a default dark background */
+        }
+
+        /* Standard Vertical Scroller (Grok section - iPhone Layout) */
+        .vertical-scroller-container {
+            width: 320px; /* iPhone-like width */
+            height: 480px; /* Medium iPhone-like height */
+            background: #1c1c1c; /* Slightly brighter screen background */
+            border-radius: 40px; /* More rounded for iPhone look */
+            border: 10px solid #282828; /* Thicker, darker bezel */
+            box-sizing: border-box;
+            position: relative; /* For notch/speaker styling */
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.05); /* Outer shadow + subtle inner screen light */
+            overflow: hidden; /* Hide anything outside the main phone frame */
+        }
+
+        /* New div for the iPhone notch */
+        .iphone-notch {
+            position: absolute;
+            top: 10px; /* Position relative to the container's inner edge (adjust for border) */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px; /* Notch width */
+            height: 30px; /* Notch height */
+            background: #000;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            border: 1px solid #282828; /* Match the main border color */
+            box-sizing: border-box; /* Include border in size */
+            z-index: 100; /* Ensure notch is always on top */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Subtle shadow for depth */
+        }
+
+        /* New container for scrollable content inside the iPhone */
+        .iphone-scrollable-content {
+            height: 100%; /* Take full height of parent container */
+            width: 100%;
+            overflow-y: auto; /* Enable vertical scrolling for this content */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+            padding-top: 4.5rem; /* Space for the fixed notch */
+            padding-bottom: 1rem;
+            box-sizing: border-box;
+            position: relative; /* Needed for z-index context if internal elements needs it */
+            z-index: 50; /* Ensure content is below notch */
+        }
+
+        .iphone-scrollable-content::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
+        }
+
+        .vertical-scroller-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem; /* Gap between content items */
+            padding-left: 1rem;
+            padding-right: 1rem;
+            /* No padding-top/bottom here, handled by iphone-scrollable-content */
+        }
+
+        .vertical-scroller-content img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .vertical-scroller-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .vertical-scroller-content p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #ccc;
+        }
+
+
+        /* API Section (MacBook Layout) */
+        .macbook-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px; /* Adjusted wider for the full laptop */
+            margin-bottom: 30px; /* Space for the base */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 60px rgba(0, 0, 0, 0.9); /* More prominent overall shadow */
+            border-radius: 18px; /* Overall rounded corners for the laptop */
+            background-color: #3a3a3a; /* Darker base color */
+        }
+
+        #api-box {
+            position: relative;
+            width: calc(100% - 10px); /* Account for thin screen border */
+            height: 380px; /* Restored fixed height for desktop */
+            background-color: #0d0d0d; /* Screen background */
+            border-radius: 12px 12px 0 0; /* Rounded top corners, sharp bottom for screen */
+            border: 4px solid #1a1a1a; /* Thicker, darker bezel */
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column; /* Use flex column for general layout */
+            align-items: center;
+            justify-content: flex-start; /* Align content to top initially */
+            aspect-ratio: 16 / 9; /* Typical laptop screen aspect ratio */
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7), 0 5px 15px rgba(0,0,0,0.3); /* Inner screen depth + subtle screen shadow */
+            margin-top: 5px; /* Push down slightly from container top edge */
+            padding: 25px; /* General padding for screen content */
+        }
+
+        /* Media query for mobile-specific dimensions */
+        @media (max-width: 768px) {
+            .macbook-container {
+                width: 90vw; /* Make container fluid width */
+                max-width: none; /* Remove max-width constraint for container */
+            }
+            #api-box {
+                width: calc(100% - 10px); /* Use 100% width of the new fluid container with padding */
+                max-width: none; /* Remove max-width constraint for api-box */
+                min-height: 300px; /* Adjusted from fixed height to min-height for better content fit */
+                aspect-ratio: auto; /* Remove aspect ratio on mobile to allow fixed height */
+            }
+            /* Adjust content padding for smaller screen if needed */
+            #api-box .macbook-screen-content-wrapper {
+                padding: 20px; /* Adjusted padding for smaller screens */
+                padding-top: 60px; /* Adjusted padding for clock on smaller screens */
+            }
+            #macbook-clock {
+                font-size: 1rem; /* Smaller clock on mobile */
+                top: 20px; /* Adjusted position */
+                left: 20px; /* Adjusted position */
+            }
+        }
+
+        /* MacBook Camera Dot */
+        #api-box::before {
             content: '';
             position: absolute;
-            top: var(--huly-y-pos); /* Unique CSS variable */
-            left: var(--huly-x-pos); /* Unique CSS variable */
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,165,0,0.4), transparent 60%);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
+            top: 15px; /* Position camera at top center */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 7px;
+            height: 7px;
+            background: #444;
             border-radius: 50%;
-            z-index: 0;
+            z-index: 10;
+            box-shadow: 0 0 3px rgba(0,0,0,0.5);
         }
 
-        .huly-start-now-btn:hover::before {
-            opacity: 1;
-        }
-
-        .huly-start-now-btn span {
+        .macbook-base {
+            width: 98%; /* Slightly narrower base than screen */
+            height: 35px; /* Thickness of the base/keyboard area */
+            background-color: #2b2b2b; /* Base color, slightly different from screen */
+            border-radius: 0 0 18px 18px; /* Rounded bottom corners matching container */
             position: relative;
-            z-index: 1; /* Ensure text is above the pseudo-element glow */
+            z-index: -1; /* Place behind the screen for hinge effect */
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.3), 0 10px 20px rgba(0,0,0,0.5); /* Inner shadow for keyboard area + outer shadow */
+            margin-top: -15px; /* Overlap with screen for hinge effect */
+            transform: perspective(200px) rotateX(4deg); /* Slight 3D tilt for base */
+            transform-origin: top center;
+            border-top: 2px solid #444; /* Hinge line */
         }
 
-        /* Existing gradient for the "JOIN OUR SLACK" button */
-        .gradient-border-button {
-            background: transparent;
-            border: 2px solid;
-            border-image: linear-gradient(90deg, #FF6F00 0%, #FFB300 100%) 1;
+        /* Real-time clock */
+        #macbook-clock {
+            position: absolute; /* Keep absolute to position over other content */
+            top: 25px; /* Adjust padding from top */
+            left: 25px; /* Adjust padding from left */
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ccc;
+            z-index: 15; /* Higher z-index to always be on top */
+        }
+
+        /* Main content containers within MacBook screen */
+        .macbook-screen-content-wrapper {
+            position: absolute; /* Take full screen content area */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between; /* Distribute space for input/button at bottom */
+            padding: 25px; /* General padding for screen content */
+            padding-top: 60px; /* Adjust padding for the clock at the top */
+            box-sizing: border-box;
+        }
+
+
+        /* Input and Button Styling */
+        #inputFormContent {
+            display: flex; /* Ensure it's a flex container for its children */
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+            margin-top: auto;
+        }
+
+        #apiQueryInput {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #555;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #2a2a2a;
+            color: #fff;
+            outline: none;
+        }
+
+        #generateResponseButton {
+            background-color: #f85922;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            width: 100%;
+        }
+
+        #generateResponseButton:hover {
+            background-color: #e04a1b;
+        }
+
+        /* Generation Progress Styling */
+        .generation-progress {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0d0d0d;
+            z-index: 10;
+            padding-top: 60px;
+            box-sizing: border-box;
+        }
+
+        .generation-progress p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .dynamic-number {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #f85922;
+        }
+
+        /* Response Display Styling */
+        .response-display {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            text-align: left;
+            padding: 25px;
+            padding-top: 60px;
+            box-sizing: border-box;
+            background-color: #0d0d0d;
+            z-index: 10;
+            overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .response-display::-webkit-scrollbar {
+            display: none;
+        }
+
+        .response-display h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #f85922;
+        }
+
+        .response-display p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .response-display ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            color: #ccc;
+        }
+
+        .response-display .footer-text {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: auto;
+            padding-top: 15px;
+        }
+
+        /* Infinite Scroller (Developer Docs section) */
+        @layer demo {
+            .infinite-scroller-main-container {
+                --font-level: 5;
+                opacity: 1; /* Make visible initially */
+                width: 100%;
+                max-width: 600px;
+                height: 280px;
+                max-height: 100%;
+                display: flex;
+                place-items: center;
+                text-align: center;
+                position: relative;
+                background: #0D0D0D;
+                overflow: hidden;
+                border-radius: 12px;
+                border: 1px solid #333;
+                aspect-ratio: 3 / 3.5; /* Updated aspect ratio */
+
+                /* Apply mask for blur effect with sharper transitions */
+                mask-image: linear-gradient(
+                    to bottom,
+                    transparent 0%, /* Start fully transparent */
+                    transparent 15%, /* Transparent up to 15% */
+                    black 25%, /* Fully opaque by 25% */
+                    black 75%, /* Opaque until 75% */
+                    transparent 85%, /* Starts fading out at 85% */
+                    transparent 100% /* Fully transparent at 100% */
+                );
+                -webkit-mask-image: linear-gradient(
+                    to bottom,
+                    transparent 0%,
+                    transparent 15%,
+                    black 25%,
+                    black 75%,
+                    transparent 85%,
+                    transparent 100%
+                );
+            }
+
+            .infinite-scroller-main-container ul {
+                padding: 0;
+                margin: 0;
+                list-style-type: none;
+                text-transform: uppercase;
+                line-height: 1;
+                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold',
+                sans-serif;
+                height: 1lh;
+                display: inline-grid;
+                position: relative;
+                padding-inline: 1em;
+                align-items: center;
+                align-content: center;
+                justify-content: center;
+                justify-items: center;
+                text-align: center;
+                width: 100%;
+            }
+
+            .infinite-scroller-main-container li {
+                display: inline-block;
+                width: fit-content;
+                height: 1lh;
+                grid-area: 1 / 1;
+                color: #666; /* Default dim color for non-highlighted text */
+                transition: color 0.2s ease-in-out; /* Smooth color transition */
+            }
+
+            .infinite-scroller-main-container .indicator {
+                --c: 0.3em;
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                height: 1lh;
+                border: 0.05em solid oklch(0.75 1 var(--h, 320));
+                transition: width 0.25s, border-color 0.25s;
+                width: calc((var(--width) * 1px) + (var(--c) * 2));
+                border-radius: 8px;
+                opacity: 1; /* Ensure indicator is visible */
+            }
+        }
+
+        @layer base {
+            :root {
+                --font-size-min: 16;
+                --font-size-max: 20;
+                --font-ratio-min: 1.2;
+                --font-ratio-max: 1.33;
+                --font-width-min: 375;
+                --font-width-max: 1500;
+            }
+
+            :where(.fluid) {
+                --fluid-min: calc(
+                    var(--font-size-min) *
+                    pow(var(--font-ratio-min), var(--font-level, 0))
+                );
+                --fluid-max: calc(
+                    var(--font-size-max) *
+                    pow(var(--font-ratio-max), var(--font-level, 0))
+                );
+                --fluid-preferred: calc(
+                    (var(--fluid-max) - var(--fluid-min)) /
+                    (var(--font-width-max) - var(--font-width-min))
+                );
+                --fluid-type: clamp(
+                    (var(--fluid-min) / 16) * 1rem,
+                    ((var(--fluid-min) / 16) * 1rem) -
+                    (((var(--fluid-preferred) * var(--font-width-min)) / 16) * 1rem) +
+                    (var(--fluid-preferred) * var(--variable-unit, 100vi)),
+                    (var(--fluid-max) / 16) * 1rem
+                );
+                font-size: var(--fluid-type);
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+            }
+        }
+
+        /* Specific styles for the new footer section */
+        .footer-podcast-section {
+            background-color: #0d0d0d;
             color: #ffffff;
         }
 
-        /* Mona Sans Font for animation text */
-        @font-face {
-            font-family: "Mona Sans";
-            src: url("https://assets.codepen.io/64/Mona-Sans.woff2") format("woff2 supports variations"),
-                 url("https://assets.codepen.io/64/Mona-Sans.woff2") format("woff2-variations");
-            font-weight: 100 1000;
+        .podcast-header-bg {
+            background-image: url('https://placehold.co/1200x400/1a1a1a/cccccc?text=Podcast+Header+Background');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0.75rem; /* rounded-xl */
+            padding-top: 8rem; /* pb-32 */
+            padding-bottom: 8rem; /* pt-32 */
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Inter font for overall body, as previously requested */
-        body {
-            font-family: "Inter", sans-serif;
-        }
-
-        /* CSS @property rules for animation (these are globally registered and cannot be scoped) */
-        @property --huly-hue {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-rotate {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-bg-y {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-bg-x {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-glow-translate-y {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-bg-size {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-glow-opacity {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-glow-blur {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-        @property --huly-glow-scale {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 2;
-        }
-        @property --huly-glow-radius {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 2;
-        }
-        @property --huly-white-shadow {
-            syntax: "<number>";
-            inherits: true;
-            initial-value: 0;
-        }
-
-        /* Root variables for the animation, scoped to custom-effect */
-        .custom-effect {
-            --huly-debug: 0;
-            --huly-supported: 0;
-            --huly-not-supported: 0;
-
-            --huly-card-color: hsl(260deg 100% 3%);
-            --huly-text-color: hsl(260deg 10% 55%);
-            --huly-card-radius: 3.6vw;
-            --huly-border-width: 3px;
-            --huly-bg-size: 1;
-
-            --huly-hue: 0;
-            --huly-hue-speed: 1;
-            --huly-rotate: 0;
-            --huly-animation-speed: 4s;
-
-            --huly-interaction-speed: 0.55s;
-            --huly-glow-scale: 1.5;
-            --huly-scale-factor: 1;
-            --huly-glow-blur: 6;
-            --huly-glow-opacity: 1;
-            --huly-glow-radius: 100;
-            --huly-glow-rotate-unit: 1deg;
-        }
-
-        /* Hidden messages for CSS.registerProperty support */
-        body::before,
-        body::after {
-            content: "CSS.registerProperty is supported ✅";
+        .podcast-header-bg::before {
+            content: '';
             position: absolute;
-            display: block;
-            top: 8px;
+            top: 0;
             left: 0;
             right: 0;
-            margin: auto;
-            width: calc(100% - 160px);
-            max-width: 380px;
-            height: auto;
-            padding: 8px;
-            border-radius: 8px;
-            background: hsl(114deg 51% 48%);
-            color: white;
-            text-align: center;
-            font-family: sans-serif;
-            z-index: var(--huly-supported, 0); /* Unique variable */
-            opacity: var(--huly-supported, 0); /* Unique variable */
-            display: none !important; /* Hide these from view */
+            bottom: 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
+            z-index: 1;
         }
 
-        body::after {
-            content: "CSS.registerProperty is NOT supported ❌";
-            background: hsl(0deg 51% 48%);
-            z-index: var(--huly-not-supported, 0); /* Unique variable */
-            opacity: var(--huly-not-supported, 0); /* Unique variable */
-        }
-
-        /* Main container for the animated logo */
-        .animated-logo-container {
-            /* These dimensions match the original placeholder image (w-64 h-64) */
-            width: 256px;
-            height: 256px;
-            /* Adjust --card-width to match the container's width */
-            --huly-card-width: 256px; /* Unique variable */
-            /* Make it square */
-            aspect-ratio: 1 / 1;
-            color: white;
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .podcast-content-wrapper {
             position: relative;
             z-index: 2;
-            border-radius: var(--huly-card-radius); /* Unique variable */
-            cursor: pointer;
-            /* Apply Mona Sans to the animation text */
-            font-family: "Mona Sans", sans-serif;
         }
 
-        .animated-logo-container:hover {
-            > div {
-                mix-blend-mode: darken;
-                --huly-text-color: white; /* Unique variable */
-                box-shadow: 0 0 calc(var(--huly-white-shadow) * 1vw) calc(var(--huly-white-shadow) * 0.15vw) rgb(255 255 255 / 20%); /* Unique variable */
-                animation: huly-shadow-pulse calc(var(--huly-animation-speed) * 2) linear infinite; /* Unique animation */
-                &:before {
-                    --huly-bg-size: 15; /* Unique variable */
-                    animation-play-state: paused;
-                    transition: --huly-bg-size var(--huly-interaction-speed) ease; /* Unique variable */
-                }
-            }
-            .glow {
-                --huly-glow-blur: 1.5; /* Unique variable */
-                --huly-glow-opacity: 0.6; /* Unique variable */
-                --huly-glow-scale: 2.5; /* Unique variable */
-                --huly-glow-radius: 0; /* Unique variable */
-                --huly-rotate: 900; /* Unique variable */
-                --huly-glow-rotate-unit: 0; /* Unique variable */
-                --huly-scale-factor: 1.25; /* Unique variable */
-                animation-play-state: paused;
-
-                &:after {
-                    --huly-glow-translate-y: 0; /* Unique variable */
-                    animation-play-state: paused;
-                    transition: --huly-glow-translate-y 0s ease, --huly-glow-blur 0.05s ease,
-                    --huly-glow-opacity 0.05s ease, --huly-glow-scale 0.05s ease,
-                    --huly-glow-radius 0.05s ease;
-                }
-            }
+        .social-icons a {
+            color: #ffffff;
+            transition: color 0.2s ease-in-out;
         }
 
-        .animated-logo-container:before,
-        .animated-logo-container:after {
-            content: "";
-            display: block;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: var(--huly-card-radius); /* Unique variable */
+        .social-icons a:hover {
+            color: #f85922; /* Orange hover color */
         }
 
-        .animated-logo-container > div {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: var(--huly-card-color); /* Unique variable */
-            border-radius: calc(calc(var(--huly-card-radius) * 0.9)); /* Unique variable */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            text-transform: uppercase;
-            font-stretch: 150%;
-            font-size: 18px;
-            font-size: clamp(1.5vw, 1.5vmin, 32px); /* Keep this responsive sizing */
-            color: var(--huly-text-color); /* Unique variable */
-            padding: calc(var(--huly-card-width) / 8); /* Unique variable */
+        .subscribe-button {
+            background-color: #92e604; /* Lime green color from image */
+            color: #000;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
 
-            span {
-                display: inline-block;
-                padding: 0.25em;
-                border-radius: 4px;
-                background: var(--huly-text-color); /* Unique variable */
-                color: black;
-                margin-right: 8px;
-                font-weight: 900;
+        .subscribe-button:hover {
+            background-color: #72b303; /* Darker lime green on hover */
+        }
+
+        /* Responsive adjustments for the "VIEW ALL EPISODES" button */
+        @media (max-width: 768px) {
+            .podcast-header-bg {
+                /* Adjust padding to accommodate content and button in a flow layout */
+                padding-bottom: 4rem; /* Reduced padding from bottom to make space for button */
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
             }
 
-            &:before {
-                content: "";
-                display: block;
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                border-radius: calc(calc(var(--huly-card-radius) * 0.9)); /* Unique variable */
-                box-shadow: 0 0 20px black;
-                mix-blend-mode: color-burn;
-                z-index: -1;
-                background: hsl(0deg 0% 16%)
-                radial-gradient(
-                    30% 30% at calc(var(--huly-bg-x) * 1%) calc(var(--huly-bg-y) * 1%), /* Unique variable */
-                    hsl(calc(calc(var(--huly-hue) * var(--huly-hue-speed)) * 1deg) 100% 90%) /* Unique variable */
-                    calc(0% * var(--huly-bg-size)), /* Unique variable */
-                    hsl(calc(calc(var(--huly-hue) * var(--huly-hue-speed)) * 1deg) 100% 80%) /* Unique variable */
-                    calc(20% * var(--huly-bg-size)), /* Unique variable */
-                    hsl(calc(calc(var(--huly-hue) * var(--huly-hue-speed)) * 1deg) 100% 60%) /* Unique variable */
-                    calc(40% * var(--huly-bg-size)), /* Unique variable */
-                    transparent 100%
-                );
-                width: calc(100% + var(--huly-border-width)); /* Unique variable */
-                height: calc(100% + var(--huly-border-width)); /* Unique variable */
-                animation: huly-hue-animation var(--huly-animation-speed) linear infinite, /* Unique animation */
-                huly-rotate-bg var(--huly-animation-speed) linear infinite; /* Unique animation */
-                transition: --huly-bg-size var(--huly-interaction-speed) ease; /* Unique variable */
+            .podcast-content-wrapper {
+                margin-bottom: 1.5rem; /* Space between text/icons and button */
+                width: 100%; /* Ensure content wrapper takes full width */
             }
-        }
 
-        .animated-logo-container .glow {
-            --huly-glow-translate-y: 0; /* Unique variable */
-            display: block;
-            position: absolute;
-            width: calc(var(--huly-card-width) / 5); /* Unique variable */
-            height: calc(var(--huly-card-width) / 5); /* Unique variable */
-            animation: huly-rotate-animation var(--huly-animation-speed) linear infinite; /* Unique animation */
-            transform: rotateZ(calc(var(--huly-rotate) * var(--huly-glow-rotate-unit))); /* Unique variable */
-            transform-origin: center;
-            border-radius: calc(var(--huly-glow-radius) * 10vw); /* Unique variable */
-
-            &:after {
-                content: "";
-                display: block;
-                z-index: -2;
-                filter: blur(calc(var(--huly-glow-blur) * 10px)); /* Unique variable */
-                width: 130%;
-                height: 130%;
-                left: -15%;
-                top: -15%;
-                background: hsl(
-                    calc(calc(var(--huly-hue) * var(--huly-hue-speed)) * 1deg) 100% 60% /* Unique variable */
-                );
-                position: relative;
-                border-radius: calc(var(--huly-glow-radius) * 10vw); /* Unique variable */
-                animation: huly-hue-animation var(--huly-animation-speed) linear infinite; /* Unique animation */
-                transform: scaleY(calc(var(--huly-glow-scale) * var(--huly-scale-factor) / 1.1)) /* Unique variable */
-                scaleX(calc(var(--huly-glow-scale) * var(--huly-scale-factor) * 1.2)) /* Unique variable */
-                translateY(calc(var(--huly-glow-translate-y) * 1%)); /* Unique variable */
-                opacity: var(--huly-glow-opacity); /* Unique variable */
+            .podcast-header-bg > .px-6.py-3 { /* Targeting the button directly */
+                position: static; /* Remove absolute positioning */
+                margin-top: 1rem; /* Add some space from the content above */
+                align-self: flex-end; /* Align button to the right */
             }
-        }
-
-        @keyframes huly-shadow-pulse { /* Unique animation name */
-            0%, 24%, 46%, 73%, 96% { --huly-white-shadow: 0.5; }
-            12%, 28%, 41%, 63%, 75%, 82%, 98% { --huly-white-shadow: 2.5; }
-            6%, 32%, 57% { --huly-white-shadow: 1.3; }
-            18%, 52%, 88% { --huly-white-shadow: 3.5; }
-        }
-
-        @keyframes huly-rotate-bg { /* Unique animation name */
-            0% { --huly-bg-x: 0; --huly-bg-y: 0; }
-            25% { --huly-bg-x: 100; --huly-bg-y: 0; }
-            50% { --huly-bg-x: 100; --huly-bg-y: 100; }
-            75% { --huly-bg-x: 0; --huly-bg-y: 100; }
-            100% { --huly-bg-x: 0; --huly-bg-y: 0; }
-        }
-        @keyframes huly-rotate-animation { /* Unique animation name */
-            from { --huly-rotate: -70; --huly-glow-translate-y: -65; }
-            25% { --huly-glow-translate-y: -65; }
-            50% { --huly-glow-translate-y: -65; }
-            60%, 75% { --huly-glow-translate-y: -65; }
-            85% { --huly-glow-translate-y: -65; }
-            to { --huly-rotate: calc(360 - 70); --huly-glow-translate-y: -65; }
-        }
-        @keyframes huly-hue-animation { /* Unique animation name */
-            0% { --huly-hue: 0; }
-            100% { --huly-hue: 360; }
         }
     </style>
 </head>
-<body class="bg-black text-white">
+<body class="bg-[#0D0D0D]">
+    <section id="section-4" class="relative min-h-[1900px] bg-[#0D0D0D] text-white overflow-hidden pt-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-32">
+            <div class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-8">
+                [ PRODUCTS ]
+            </div>
 
-    <!-- Footer Section Container -->
-    <footer class="custom-effect bg-gray-950 py-16 px-4 sm:px-6 lg:px-8">
-        <!-- Top part of the footer (Join the Movement) -->
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 pb-16">
-            <!-- Animated Logo Section -->
-            <div class="flex-shrink-0 w-full md:w-1/2 flex items-center justify-center md:justify-start">
-                <div role="button" class="animated-logo-container">
-                    <span class="glow"></span>
-                    <div>
-                        <span>cool</span>Glowing shadows
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-24 leading-tight">
+                AI for all humanity
+            </h1>
+
+            <!-- Grok Section -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
+                <div class="md:w-1/2 text-left">
+                    <h2 class="text-4xl font-semibold mb-4">Grok</h2>
+                    <p class="text-lg text-gray-300 mb-8 max-w-md">
+                        Grok is your cosmic guide, now accessible on grok.com, iOS, and Android. Explore the universe with AI.
+                    </p>
+                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                        USE NOW <span class="ml-2">&#8594;</span>
+                    </button>
+                </div>
+                <!-- Standard Vertical Scroller (Grok section - iPhone Layout) -->
+                <div class="md:w-1/2 flex justify-center items-center">
+                    <div class="vertical-scroller-container">
+                        <div class="iphone-notch"></div> <!-- Dedicated notch div -->
+                        <div class="iphone-scrollable-content">
+                            <div class="vertical-scroller-content">
+                                <h3>Unlocking the Future with AI</h3>
+                                <p>Artificial Intelligence is rapidly transforming every aspect of our lives, from personalized recommendations to advanced scientific research. Discover how our cutting-g AI models are designed to empower users and solve complex challenges across various industries.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=AI+Overview" alt="AI Overview Image" />
+                                <h3>Ethical AI Development</h3>
+                                <p>We are committed to developing AI responsibly, prioritizing fairness, transparency, and accountability. Our ethical guidelines ensure that our AI systems are beneficial for all of humanity, minimizing bias and promoting positive societal impact.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Ethical+AI" alt="Ethical AI Image" />
+                                <h3>AI in Healthcare</h3>
+                                <p>Explore the groundbreaking ways AI is revolutionizing healthcare, from accelerating drug discovery and diagnosing diseases with greater accuracy to personalizing patient treatment plans. Our AI solutions are helping to improve health outcomes globally.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Healthcare+AI" alt="Healthcare AI Image" />
+                                <h3>AI in Education</h3>
+                                <p>AI is personalizing learning experiences, providing adaptive content, and automating administrative tasks to free up educators. Learn how our AI tools are making education more accessible and effective for students worldwide.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Education+AI" alt="Education AI Image" />
+                                <h3>The Power of Machine Learning</h3>
+                                <p>At the core of our AI capabilities is advanced machine learning, enabling systems to learn from data, identify patterns, and make informed decisions. We leverage state-of-the-art algorithms to deliver unparalleled performance.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Machine+Learning" alt="Machine Learning Image" />
+                                <h3>Join the AI Revolution</h3>
+                                <p>Be a part of shaping the future with AI. We invite researchers, developers, and innovators to collaborate with us on open-source projects, pushing the boundaries of what's possible with artificial intelligence.</p>
+                                <img src="https://placehold.co/1280x720/000/FFF?text=Join+Us" alt="Join Us Image" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Grok Section End -->
+
+            <!-- API Section (MacBook Layout) -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
+                <div class="md:w-1/2 text-left">
+                    <h2 class="text-4xl font-semibold mb-4">API</h2>
+                    <p class="text-lg text-gray-300 mb-8 max-w-md">
+                        Supercharge your applications with Grok's enhanced speed, precision, and multilingual capabilities.
+                    </p>
+                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105" id="apiBuildNowButton">
+                        BUILD NOW <span class="ml-2">&#8594;</span>
+                    </button>
+                </div>
+                <div class="md:w-1/2 flex justify-center items-center">
+                    <div class="macbook-container">
+                        <div id="api-box">
+                            <div id="macbook-clock"></div> <!-- Real-time clock always visible -->
+                            <div class="macbook-screen-content-wrapper">
+                                <!-- Input Form Content (visible by default) -->
+                                <div id="inputFormContent" class="flex flex-col items-center justify-center w-full h-full p-6 space-y-4">
+                                    <input type="text" id="apiQueryInput" placeholder="Ask Grok AI anything..." class="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <button id="generateResponseButton" class="w-full py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-md transition duration-300 ease-in-out">
+                                        GENERATE RESPONSE
+                                    </button>
+                                </div>
+                                <!-- Generation Progress (hidden by default) -->
+                                <div class="generation-progress" id="generationProgress">
+                                    <p>Generating Response...</p>
+                                    <div class="dynamic-number" id="dynamicNumber">0</div>
+                                </div>
+                                <!-- Response Display (hidden by default) -->
+                                <div class="response-display" id="responseDisplay">
+                                    <h3 id="apiResponseTitle">Grok</h3> <!-- Changed title to "Grok" -->
+                                    <div id="apiResponseContent" class="flex-grow overflow-y-auto pr-2"></div>
+                                    <p class="footer-text">This response was generated by Grok AI based on current understanding.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="macbook-base"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- API Section End -->
+
+            <!-- Developer Docs Section -->
+            <div class="flex flex-col md:flex-row items-center justify-between gap-16">
+                <div class="md:w-1/2 text-left">
+                    <h2 class="text-4xl font-semibold mb-4">Developer Docs</h2>
+                    <p class="text-lg text-gray-300 mb-8 max-w-md">
+                        Learn how to quickly install Grok at the heart of your applications and explore guides covering common use cases.
+                    </p>
+                    <button class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+                        LEARN MORE <span class="ml-2">&#8594;</span>
+                    </button>
+                </div>
+                <!-- Infinite Scroller -->
+                <div class="md:w-1/2 flex justify-center items-center">
+                    <div class="infinite-scroller-main-container fluid">
+                        <div class="indicator"></div>
+                        <ul>
+                            <li>prototype.</li>
+                            <li>solve.</li>
+                            <li>build.</li>
+                            <li>develop.</li>
+                            <li>debug.</li>
+                            <li>learn.</li>
+                            <li>cook.</li>
+                            <li>ship.</li>
+                            <li>prompt.</li>
+                            <li>collaborate.</li>
+                            <li>create.</li>
+                            <li>inspire.</li>
+                            <li>follow.</li>
+                            <li>innovate.</li>
+                            <li>test.</li>
+                            <li>optimize.</li>
+                            <li>teach.</li>
+                            <li>visualize.</li>
+                            <li>transform.</li>
+                            <li>scale.</li>
+                            <li>do it.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Developer Docs Section End -->
+
+        </div>
+    </section>
+
+    <!-- New Podcast/Footer Section -->
+    <section id="podcast-footer" class="footer-podcast-section py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto space-y-16">
+            <!-- Podcast Header Area -->
+            <div class="podcast-header-bg rounded-xl shadow-lg flex flex-col justify-center items-start text-left relative p-8 md:p-12">
+                <div class="podcast-content-wrapper max-w-2xl">
+                    <h2 class="text-4xl lg:text-5xl font-bold mb-4">The Divi Nation Podcast</h2>
+                    <p class="text-lg text-gray-300 mb-6">
+                        Elit at pharetra morbi dui posuere tortor aliquam elit elementum. Neque sit ipsum orci
+                        viverra etiam. Sit viverra posuere neque facilisis tellus phasellus donec sit.
+                    </p>
+                    <div class="flex items-center space-x-4 mb-8">
+                        <span class="text-gray-300 text-lg">Listen On:</span>
+                        <div class="social-icons flex space-x-4">
+                            <a href="#" aria-label="Spotify"><i class="fab fa-spotify text-2xl"></i></a>
+                            <a href="#" aria-label="Apple Podcasts"><i class="fab fa-apple text-2xl"></i></a>
+                            <a href="#" aria-label="RSS Feed"><i class="fas fa-rss-square text-2xl"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Adjusted button positioning for small screens -->
+                <button class="md:absolute md:bottom-8 md:right-8 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 mt-6 md:mt-0 self-end md:self-auto">
+                    VIEW ALL EPISODES <span class="ml-2">&#8594;</span>
+                </button>
+            </div>
+
+            <!-- Footer Links & Social Section -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left pt-8 pb-16">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6">Quick Links</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li><a href="#" class="hover:text-white transition duration-200">Landing</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-200">Homepage</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-200">About</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-200">Episodes</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-200">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-200">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6">Contact & Legal</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li><a href="mailto:Divipodcast@support.com" class="hover:text-white transition duration-200">Divipodcast@support.com</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-200">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition duration-200">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6">Join the Conversation - Let's Connect!</h3>
+                    <div class="social-icons flex justify-center md:justify-start space-x-6 text-3xl">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>
 
-            <!-- Call to Action Content -->
-            <div class="flex-1 text-center md:text-left">
-                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
-                    Join the <span class="block">Movement</span>
-                </h2>
-                <p class="text-lg text-gray-400 mb-2">
-                    Unlock the future of productivity with Huly.
-                </p>
-                <p class="text-lg text-gray-400 mb-8">
-                    Remember, this journey is just getting started.
-                </p>
-                <div class="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
-                    <!-- Updated "START NOW" button with unique classes and ID -->
-                    <button id="hulyStartNowButton" class="huly-start-now-btn px-8 py-4 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
-                        <span>START NOW</span>
-                    </button>
-                    <!-- Original "JOIN OUR SLACK" button -->
-                    <button class="flex items-center justify-center gap-2 gradient-border-button px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-800 transition-colors">
-                        <i class="fab fa-slack text-xl"></i>
-                        JOIN OUR SLACK
-                    </button>
-                </div>
+            <!-- Copyright -->
+            <div class="text-center text-sm text-gray-500 pt-8 pb-4">
+                <p>Copyright &copy; 2024 | <a href="#" class="hover:text-white transition duration-200">Privacy Policy</a></p>
             </div>
         </div>
+    </section>
 
-        <!-- Bottom part of the footer (Copyright and Legal) -->
-        <div class="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-6 pt-8">
-            <!-- Left section: Social Icons and Copyright -->
-            <div class="flex flex-col items-center md:items-start gap-4 text-gray-400 text-sm w-full md:w-auto">
-                <div class="flex space-x-6">
-                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-twitter text-xl"></i></a> <!-- Using Twitter for X -->
-                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-linkedin-in text-xl"></i></a>
-                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-youtube text-xl"></i></a>
-                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-discord text-xl"></i></a>
-                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-github text-xl"></i></a>
-                    <a href="#" class="hover:text-white transition-colors"><i class="fab fa-dribbble text-xl"></i></a>
-                </div>
-                <!-- Copyright text moved directly below social icons -->
-                <p class="mt-4 md:mt-0 text-center md:text-left">Copyright &copy; 2025 Huly Labs. All rights reserved.</p>
-            </div>
 
-            <!-- Right section: Legal Links and Made with Passion -->
-            <div class="flex flex-col items-center md:items-end gap-4 text-gray-400 text-sm w-full md:w-auto">
-                <div class="flex space-x-6">
-                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                </div>
-                <p class="flex items-center gap-1 mt-4 md:mt-0 text-center md:text-right">
-                    Made with passion and Huly <i class="fas fa-heart text-red-500"></i>
-                </p>
-            </div>
-        </div>
-    </footer>
+    <script src="https://cdn.skypack.dev/gsap@3.12.0"></script>
+    <script type="module">
+        // API Section Animations and Functionality
+        document.addEventListener("DOMContentLoaded", () => {
+            const apiQueryInput = document.getElementById('apiQueryInput');
+            const generateResponseButton = document.getElementById('generateResponseButton');
+            const inputFormContent = document.getElementById('inputFormContent');
+            const generationProgress = document.getElementById('generationProgress');
+            const dynamicNumberElement = document.getElementById('dynamicNumber');
+            const responseDisplay = document.getElementById('responseDisplay');
+            const apiResponseTitle = document.getElementById('apiResponseTitle');
+            const apiResponseContent = document.getElementById('apiResponseContent');
+            const macbookClock = document.getElementById('macbook-clock');
 
-    <!-- Unique JavaScript for the "START NOW" button glow effect -->
-    <script>
-        const hulyGlowButton = document.getElementById("hulyStartNowButton");
-        if (hulyGlowButton) {
-            hulyGlowButton.addEventListener("mousemove", (e) => {
-                const rect = hulyGlowButton.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                hulyGlowButton.style.setProperty('--huly-x-pos', `${x}px`);
-                hulyGlowButton.style.setProperty('--huly-y-pos', `${y}px`);
+            let numberInterval;
+
+            function updateMacbookClock() {
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                macbookClock.textContent = `${hours}:${minutes}`;
+            }
+
+            // Initial clock update and set interval
+            updateMacbookClock();
+            setInterval(updateMacbookClock, 1000); // Update every second for real-time feel
+
+            // Initial setup: Only show the input form
+            inputFormContent.style.display = 'flex';
+            generationProgress.style.display = 'none';
+            responseDisplay.style.display = 'none';
+
+
+            async function generateAiResponse(prompt) {
+                try {
+                    let chatHistory = [];
+                    // Add specific instruction for 24hr time if relevant to the prompt
+                    let fullPrompt = prompt;
+                    if (prompt.toLowerCase().includes('time') || prompt.toLowerCase().includes('hour')) {
+                        fullPrompt += " (Please provide time in 24-hour format if relevant, e.g., HH:MM.)";
+                    }
+
+                    chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // Canvas will automatically provide the API key at runtime
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        console.error("Gemini API returned an unexpected structure or no content:", result);
+                        return "Failed to get a response. Please try again.";
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return "An error occurred while connecting to the AI. Please try again.";
+                    }
+            }
+
+            async function handleGenerateResponse() {
+                const query = apiQueryInput.value.trim();
+                if (!query) {
+                    apiResponseContent.textContent = "Please enter a query.";
+                    // Change title to "Error" for invalid input
+                    apiResponseTitle.textContent = "Error";
+                    inputFormContent.style.display = 'none';
+                    generationProgress.style.display = 'none';
+                    responseDisplay.style.display = 'flex';
+                    return;
+                }
+
+                // Clear any previous intervals
+                clearInterval(numberInterval);
+
+                // Show generation progress
+                inputFormContent.style.display = 'none';
+                responseDisplay.style.display = 'none';
+                generationProgress.style.display = 'flex';
+                dynamicNumberElement.textContent = '0';
+
+                let currentNumber = 0;
+                numberInterval = setInterval(() => {
+                    currentNumber += Math.floor(Math.random() * 5) + 1;
+                    if (currentNumber > 99) currentNumber = 99;
+                    dynamicNumberElement.textContent = currentNumber;
+                }, 100);
+
+                // Generate response from AI
+                const responseText = await generateAiResponse(query);
+
+                // Stop thinking animation
+                clearInterval(numberInterval);
+                dynamicNumberElement.textContent = '100'; // Ensure it ends at 100
+
+                // Prepare response display
+                // Change title to "Grok"
+                apiResponseTitle.textContent = "Grok";
+                apiResponseContent.textContent = responseText;
+
+                // Show response after a short delay, and keep it visible
+                setTimeout(() => {
+                    generationProgress.style.display = 'none';
+                    responseDisplay.style.display = 'flex';
+                }, 1000); // Delay for 1 second after number animation finishes
+            }
+
+            generateResponseButton.addEventListener('click', handleGenerateResponse);
+            apiQueryInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    handleGenerateResponse();
+                }
             });
-        }
+        });
     </script>
 
-    <!-- Original JavaScript for CSS.registerProperty detection -->
-    <script>
-        if (typeof window.CSS.registerProperty === 'function') {
-            console.log('CSS.registerProperty supported 🎉');
-            document.body.style.setProperty('--huly-supported', 1);
-            document.body.classList.add('registerProperty-supported');
-        } else {
-            console.log('CSS.registerProperty not supported ❌');
-            document.body.style.setProperty('--huly-not-supported', 1);
-            document.body.classList.add('registerProperty-not-supported');
-        }
-    </script>
+    <script type="module">
+        // GSAP for Infinite Scroller (Developer Docs section)
+        import gsap from 'https://cdn.skypack.dev/gsap@3.12.0';
 
+        gsap.defaults({
+            duration: 1,
+        });
+
+        const tl = gsap.timeline({ paused: true });
+        const lines = gsap.utils.toArray('.infinite-scroller-main-container ul li');
+
+        gsap.set(lines, { yPercent: 300 });
+
+        const paddedLines = [...lines, ...lines, ...lines];
+
+        paddedLines.forEach((line, index) => {
+            const lineTl = gsap.timeline()
+                .set(line, { yPercent: 300 })
+                .to(
+                    line,
+                    {
+                        yPercent: '-=600',
+                        repeatRefresh: true,
+                        immediateRender: false,
+                        ease: 'none',
+                        duration: 6,
+                    },
+                    0
+                );
+            tl.add(lineTl, index);
+        });
+
+        const scrubber = gsap.timeline({ paused: true }).fromTo(
+            tl,
+            {
+                totalTime: lines.length + 1,
+            },
+            {
+                totalTime: lines.length * 2 + 1,
+                ease: 'none',
+                duration: lines.length,
+                repeat: -1,
+            }
+        );
+
+        gsap.set(scrubber, { totalTime: lines.length + 2 });
+
+        let index = 0;
+        const indicator = document.querySelector('.infinite-scroller-main-container .indicator');
+
+        let lastActiveLine = null;
+
+        const syncIndicator = () => {
+            if (lastActiveLine) {
+                gsap.to(lastActiveLine, { color: '#666', duration: 0 });
+            }
+
+            index += 1;
+            const currentLine = lines[index % lines.length];
+            const wordWidth = currentLine.getBoundingClientRect().width;
+
+            const containerRect = document.querySelector('.infinite-scroller-main-container').getBoundingClientRect();
+            const ulRect = currentLine.closest('ul').getBoundingClientRect();
+            const lineRect = currentLine.getBoundingClientRect();
+
+            const wordLeftInUlContent = lineRect.left - ulRect.left;
+            const wordCenterXRelativeToContainer = (ulRect.left - initialContainerRect.left) + initialWordLeftInUlContent + (wordWidth / 2);
+
+            gsap.set(indicator, {
+                '--width': wordWidth,
+                '--h': gsap.utils.random(0, 359),
+                left: wordCenterXRelativeToContainer,
+                xPercent: -50,
+                opacity: 1
+            });
+
+            gsap.to(currentLine, { color: '#FFFFFF', duration: 0 });
+            lastActiveLine = currentLine;
+        };
+
+        const initialLine = lines[0];
+        const initialWordWidth = initialLine.getBoundingClientRect().width;
+        const initialContainerRect = document.querySelector('.infinite-scroller-main-container').getBoundingClientRect();
+        const initialUlRect = initialLine.closest('ul').getBoundingClientRect();
+        const initialLineRect = initialLine.getBoundingClientRect();
+        const initialWordLeftInUlContent = initialLineRect.left - initialUlRect.left;
+        const initialWordCenterXRelativeToContainer = (initialUlRect.left - initialContainerRect.left) + initialWordLeftInUlContent + (initialWordWidth / 2);
+
+        gsap.set(indicator, {
+            '--width': initialWordWidth,
+            left: initialWordCenterXRelativeToContainer,
+            xPercent: -50,
+            '--h': gsap.utils.random(0, 359),
+            opacity: 1
+        });
+
+        gsap.to(scrubber, {
+            delay: 1,
+            totalTime: '+=1',
+            duration: 1,
+            repeat: -1,
+            repeatDelay: 1,
+            repeatRefresh: true,
+            onStart: syncIndicator,
+            onRepeat: syncIndicator,
+            ease: 'elastic.out(1, 0.875)',
+        });
+
+        gsap.set('.infinite-scroller-main-container', { opacity: 1 });
+    </script>
 </body>
 </html>
 
